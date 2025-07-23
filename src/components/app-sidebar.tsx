@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import Image from "next/image";
+import Link from "next/link";
 import {
   IconCash,
   IconChartCandle,
@@ -33,12 +34,12 @@ const data = {
   navMain: [
     {
       title: "Overview",
-      url: "#",
+      url: "/",
       icon: IconReport,
     },
     {
       title: "Transactions",
-      url: "#",
+      url: "/transactions",
       icon: IconCash,
     },
     {
@@ -108,7 +109,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               className="data-[slot=sidebar-menu-button]:!p-1.5"
               asChild
             >
-              <a href="#">
+              <Link href="/">
                 <Image
                   src={"/icons/icon.svg"}
                   width={100}
@@ -118,7 +119,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   unoptimized
                 />
                 <span className="text-base font-semibold">Hiruko</span>
-              </a>
+              </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
