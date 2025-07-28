@@ -1,8 +1,7 @@
 "use client";
 
+import { useUser, useClerk } from "@clerk/nextjs";
 import {
-  IconBell,
-  IconCreditCard,
   IconDotsVertical,
   IconLogout,
   IconUserCircle,
@@ -24,19 +23,25 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
+import { Skeleton } from "@/components/ui/skeleton";
 
-export function NavUser({
-  user,
-}: {
-  user: {
-    name: string;
-    email: string;
-    avatar: string;
-  };
-}) {
+export function NavUser() {
   const { isMobile } = useSidebar();
+  const { user, isLoaded } = useUser();
+  const { openUserProfile, signOut } = useClerk();
 
-  const avatarText = user.name.split(" ", 2).join().toUpperCase();
+  if (!isLoaded) return <Loading />;
+
+  const email =
+    user?.primaryEmailAddress?.emailAddress ||
+    user?.emailAddresses[0]?.emailAddress ||
+    "No email";
+
+  let avatarText = user?.username?.split(" ", 2).join().toUpperCase();
+  avatarText =
+    avatarText?.length === 2
+      ? avatarText
+      : user?.username?.substring(0, 2).toUpperCase();
 
   return (
     <SidebarMenu>
@@ -47,18 +52,19 @@ export function NavUser({
               size="lg"
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
-              <Avatar className="h-8 w-8 rounded-lg grayscale">
-                <AvatarImage src={user.avatar} alt={user.name} />
+              <Avatar className="w-8 h-8 rounded-lg grayscale">
+                <AvatarImage
+                  src={user?.imageUrl}
+                  alt={user?.username || "User Avatar"}
+                />
                 <AvatarFallback className="rounded-lg">
-                  {avatarText.length === 2
-                    ? avatarText
-                    : user.name.substring(0, 2).toUpperCase()}
+                  {avatarText}
                 </AvatarFallback>
               </Avatar>
-              <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-medium">{user.name}</span>
-                <span className="text-muted-foreground truncate text-xs">
-                  {user.email}
+              <div className="grid flex-1 text-sm leading-tight text-left">
+                <span className="font-medium truncate">{user?.username}</span>
+                <span className="text-xs truncate text-muted-foreground">
+                  {email}
                 </span>
               </div>
               <IconDotsVertical className="ml-auto size-4" />
@@ -72,39 +78,32 @@ export function NavUser({
           >
             <DropdownMenuLabel className="p-0 font-normal">
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
-                <Avatar className="h-8 w-8 rounded-lg">
-                  <AvatarImage src={user.avatar} alt={user.name} />
+                <Avatar className="w-8 h-8 rounded-lg">
+                  <AvatarImage
+                    src={user?.imageUrl}
+                    alt={user?.username || "User Avatar"}
+                  />
                   <AvatarFallback className="rounded-lg">
-                    {avatarText.length === 2
-                      ? avatarText
-                      : user.name.substring(0, 2).toUpperCase()}
+                    {avatarText}
                   </AvatarFallback>
                 </Avatar>
-                <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-medium">{user.name}</span>
-                  <span className="text-muted-foreground truncate text-xs">
-                    {user.email}
+                <div className="grid flex-1 text-sm leading-tight text-left">
+                  <span className="font-medium truncate">{user?.username}</span>
+                  <span className="text-xs truncate text-muted-foreground">
+                    {email}
                   </span>
                 </div>
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem>
+              <DropdownMenuItem onClick={() => openUserProfile()}>
                 <IconUserCircle />
                 Account
               </DropdownMenuItem>
-              <DropdownMenuItem>
-                <IconCreditCard />
-                Billing
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <IconBell />
-                Notifications
-              </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
+            <DropdownMenuItem onClick={() => signOut()}>
               <IconLogout />
               Log out
             </DropdownMenuItem>
@@ -112,5 +111,17 @@ export function NavUser({
         </DropdownMenu>
       </SidebarMenuItem>
     </SidebarMenu>
+  );
+}
+
+function Loading() {
+  return (
+    <div className="flex items-center gap-2">
+      <Skeleton className="w-8 h-8 rounded-lg" />
+      <div className="grid gap-1">
+        <Skeleton className="w-24 h-2.5 rounded-lg" />
+        <Skeleton className="w-32 h-2 rounded-lg" />
+      </div>
+    </div>
   );
 }

@@ -162,9 +162,9 @@ function SelectableRow({ row }: { row: Row<z.infer<typeof schema>> }) {
 }
 
 export function DataTable({
-  data: initialData,
+  initialData,
 }: {
-  data: z.infer<typeof schema>[];
+  initialData: z.infer<typeof schema>[];
 }) {
   const [data, _setData] = React.useState(() => initialData);
   const [rowSelection, setRowSelection] = React.useState({});

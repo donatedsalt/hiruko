@@ -1,9 +1,13 @@
 import { Document, Model, Types } from "mongoose";
 
 export interface ITransaction {
-  name: string;
+  userId: string;
+  category: string;
+  title?: string;
+  note?: string;
   type: "income" | "expense";
   amount: number;
+  transactionTime: Date;
 }
 
 export interface ITransactionDocument extends ITransaction, Document {
@@ -13,6 +17,14 @@ export interface ITransactionDocument extends ITransaction, Document {
 }
 
 export interface ITransactionModel extends Model<ITransactionDocument> {
-  findIncomeTransactions(): Promise<ITransactionDocument[]>;
-  findExpenseTransactions(): Promise<ITransactionDocument[]>;
+  findIncomeTransactions({
+    userId,
+  }: {
+    userId: string;
+  }): Promise<ITransactionDocument[]>;
+  findExpenseTransactions({
+    userId,
+  }: {
+    userId: string;
+  }): Promise<ITransactionDocument[]>;
 }

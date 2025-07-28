@@ -5,6 +5,12 @@ declare global {
     conn: Mongoose | null;
     promise: Promise<Mongoose> | null;
   };
+
+  interface CustomJwtSessionClaims {
+    metadata: {
+      onboardingComplete?: boolean;
+    };
+  }
 }
 
 export {};

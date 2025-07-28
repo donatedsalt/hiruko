@@ -165,7 +165,7 @@ export default function TransactionsPage() {
           <ul className="list-disc pl-5">
             {transactions.map((tx) => (
               <li key={tx._id.toString()}>
-                {tx.name} ({tx.type}): ${tx.amount.toFixed(2)}
+                {tx.title || tx.category} ({tx.type}): ${tx.amount.toFixed(2)}
               </li>
             ))}
           </ul>

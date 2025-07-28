@@ -7,12 +7,28 @@ import type {
 
 const transactionSchema: Schema<ITransactionDocument> = new Schema(
   {
-    name: {
+    userId: {
       type: String,
-      required: [true, "Transaction name is required"],
+      required: [true, "User ID is required"],
+    },
+    category: {
+      type: String,
+      required: [true, "Transaction category is required"],
       trim: true,
-      minlength: [3, "Transaction name must be at least 3 characters long"],
-      maxlength: [100, "Transaction name cannot exceed 100 characters"],
+      minlength: [3, "Transaction category must be at least 3 characters long"],
+      maxlength: [100, "Transaction category cannot exceed 100 characters"],
+    },
+    title: {
+      type: String,
+      trim: true,
+      minlength: [3, "Transaction title must be at least 3 characters long"],
+      maxlength: [100, "Transaction title cannot exceed 100 characters"],
+      default: "",
+    },
+    note: {
+      type: String,
+      trim: true,
+      default: "",
     },
     type: {
       type: String,
@@ -24,23 +40,34 @@ const transactionSchema: Schema<ITransactionDocument> = new Schema(
       required: [true, "Transaction amount is required"],
       min: [0, "Transaction amount cannot be negative"],
     },
+    transactionTime: {
+      type: Date,
+      required: [true, "Transaction time is required"],
+      default: Date.now,
+    },
   },
   {
     timestamps: true,
   }
 );
 
-transactionSchema.statics.findIncomeTransactions = async function (): Promise<
-  ITransactionDocument[]
-> {
-  return this.find({ type: "income" });
+transactionSchema.statics.findIncomeTransactions = async function ({
+  userId,
+}: {
+  userId: string;
+}): Promise<ITransactionDocument[]> {
+  return this.find({ type: "income", userId });
 };
 
-transactionSchema.statics.findExpenseTransactions = async function (): Promise<
-  ITransactionDocument[]
-> {
-  return this.find({ type: "expense" });
+transactionSchema.statics.findExpenseTransactions = async function ({
+  userId,
+}: {
+  userId: string;
+}): Promise<ITransactionDocument[]> {
+  return this.find({ type: "expense", userId });
 };
+
+transactionSchema.index({ userId: 1, type: 1, createdAt: -1 });
 
 const Transaction: ITransactionModel =
   (mongoose.models.Transaction as ITransactionModel) ||

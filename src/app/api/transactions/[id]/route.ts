@@ -1,11 +1,15 @@
+import z from "zod";
+import { auth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 
 import type { ITransaction } from "@/types/transaction";
 
-import Transaction from "@/models/Transaction";
-
 import dbConnect from "@/lib/mongodb";
 import { handleError, handleNotFound, validateId } from "@/lib/api-helpers";
+
+import { TransactionSchema } from "@/validation/transaction";
+
+import Transaction from "@/models/Transaction";
 
 interface RouteParams {
   params: { id: string };
@@ -16,13 +20,22 @@ interface RouteParams {
  * Fetches a single transaction by ID.
  */
 export async function GET(_request: NextRequest, { params }: RouteParams) {
+  const { userId } = await auth();
+
+  if (!userId) {
+    return NextResponse.json(
+      { success: false, error: "Unauthorized" },
+      { status: 401 }
+    );
+  }
+
   await dbConnect();
 
   const idValidationError = validateId(params.id, "Transaction ID");
   if (idValidationError) return idValidationError;
 
   try {
-    const transaction = await Transaction.findById(params.id);
+    const transaction = await Transaction.findOne({ _id: params.id, userId });
     if (!transaction) return handleNotFound("Transaction");
 
     return NextResponse.json(
@@ -40,17 +53,40 @@ export async function GET(_request: NextRequest, { params }: RouteParams) {
  * Request Body: Partial<ITransaction> (only fields to update)
  */
 export async function PUT(request: NextRequest, { params }: RouteParams) {
+  const { userId } = await auth();
+
+  if (!userId) {
+    return NextResponse.json(
+      { success: false, error: "Unauthorized" },
+      { status: 401 }
+    );
+  }
+
   await dbConnect();
 
   const idValidationError = validateId(params.id, "Transaction ID");
   if (idValidationError) return idValidationError;
 
+  const body: Partial<ITransaction> = await request.json();
+  const parsed = TransactionSchema.safeParse({ ...body, userId });
+
+  if (!parsed.success) {
+    const errorTree = z.treeifyError(parsed.error);
+    return NextResponse.json(
+      { success: false, error: errorTree },
+      { status: 400 }
+    );
+  }
+
   try {
-    const body: Partial<ITransaction> = await request.json();
-    const transaction = await Transaction.findByIdAndUpdate(params.id, body, {
-      new: true,
-      runValidators: true,
-    });
+    const transaction = await Transaction.findOneAndUpdate(
+      { _id: params.id, userId },
+      parsed.data,
+      {
+        new: true,
+        runValidators: true,
+      }
+    );
 
     if (!transaction) return handleNotFound("Transaction");
 
@@ -68,13 +104,25 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
  * Deletes a transaction by ID.
  */
 export async function DELETE(_request: NextRequest, { params }: RouteParams) {
+  const { userId } = await auth();
+
+  if (!userId) {
+    return NextResponse.json(
+      { success: false, error: "Unauthorized" },
+      { status: 401 }
+    );
+  }
+
   await dbConnect();
 
   const idValidationError = validateId(params.id, "Transaction ID");
   if (idValidationError) return idValidationError;
 
   try {
-    const transaction = await Transaction.findByIdAndDelete(params.id);
+    const transaction = await Transaction.findOneAndDelete({
+      _id: params.id,
+      userId,
+    });
     if (!transaction) return handleNotFound("Transaction");
 
     return NextResponse.json(
