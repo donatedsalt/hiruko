@@ -49,7 +49,7 @@ export function ListItem({ item }: { item: ITransaction }) {
   return (
     <li className="flex items-center justify-between gap-2">
       <div className="flex items-center gap-2">
-        <Avatar className="items-center justify-center bg-neutral-100 text-foreground size-12">
+        <Avatar className="items-center justify-center border size-12">
           <ListItemIcon item={item.type} />
         </Avatar>
         <div>
