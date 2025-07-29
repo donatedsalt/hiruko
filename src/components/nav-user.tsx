@@ -52,7 +52,7 @@ export function NavUser() {
               size="lg"
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
-              <Avatar className="w-8 h-8 rounded-lg grayscale">
+              <Avatar className="size-8 rounded-lg grayscale">
                 <AvatarImage
                   src={user?.imageUrl}
                   alt={user?.username || "User Avatar"}
@@ -78,7 +78,7 @@ export function NavUser() {
           >
             <DropdownMenuLabel className="p-0 font-normal">
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
-                <Avatar className="w-8 h-8 rounded-lg">
+                <Avatar className="size-8 rounded-lg">
                   <AvatarImage
                     src={user?.imageUrl}
                     alt={user?.username || "User Avatar"}
@@ -117,7 +117,7 @@ export function NavUser() {
 function Loading() {
   return (
     <div className="flex items-center gap-2">
-      <Skeleton className="w-8 h-8 rounded-lg" />
+      <Skeleton className="size-8 rounded-lg" />
       <div className="grid gap-1">
         <Skeleton className="w-24 h-2.5 rounded-lg" />
         <Skeleton className="w-32 h-2 rounded-lg" />
