@@ -28,3 +28,9 @@ export interface ITransactionModel extends Model<ITransactionDocument> {
     userId: string;
   }): Promise<ITransactionDocument[]>;
 }
+
+interface ITransactionApiResponse {
+  success: boolean;
+  data?: ITransactionDocument[] | ITransactionDocument;
+  error?: string;
+}
