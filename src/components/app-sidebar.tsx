@@ -1,7 +1,6 @@
 "use client";
 
 import * as React from "react";
-import Image from "next/image";
 import Link from "next/link";
 import {
   IconCash,
@@ -29,6 +28,8 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
+
+import HirukoIcon from "@/components/icons/hiruko-icon";
 
 const data = {
   navMain: [
@@ -105,14 +106,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               asChild
             >
               <Link href="/">
-                <Image
-                  src={"/icons/icon.svg"}
-                  width={100}
-                  height={100}
-                  className="!size-5"
-                  alt="Icon"
-                  unoptimized
-                />
+                <HirukoIcon className="!size-5 fill-foreground" />
                 <span className="text-base font-semibold">Hiruko</span>
               </Link>
             </SidebarMenuButton>
