@@ -56,7 +56,7 @@ transactionSchema.statics.findIncomeTransactions = async function ({
 }: {
   userId: string;
 }): Promise<ITransactionDocument[]> {
-  return this.find({ type: "income", userId });
+  return this.find({ type: "income", userId }).sort({ transactionTime: -1 });
 };
 
 transactionSchema.statics.findExpenseTransactions = async function ({
@@ -64,7 +64,7 @@ transactionSchema.statics.findExpenseTransactions = async function ({
 }: {
   userId: string;
 }): Promise<ITransactionDocument[]> {
-  return this.find({ type: "expense", userId });
+  return this.find({ type: "expense", userId }).sort({ transactionTime: -1 });
 };
 
 transactionSchema.index({ userId: 1, type: 1, createdAt: -1 });

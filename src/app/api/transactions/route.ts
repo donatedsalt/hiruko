@@ -39,7 +39,9 @@ export async function GET(request: NextRequest) {
     } else if (type === "expense") {
       transactions = await Transaction.findExpenseTransactions({ userId });
     } else {
-      transactions = await Transaction.find({ userId });
+      transactions = await Transaction.find({ userId }).sort({
+        transactionTime: -1,
+      });
     }
 
     return NextResponse.json(
