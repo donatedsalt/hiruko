@@ -89,7 +89,7 @@ export function DataListSkeleton() {
   return (
     <div className="flex flex-col justify-start w-full gap-4 md:gap-6">
       <div className="px-4 lg:px-6">
-        <Skeleton className="h-6 w-42" />
+        <Skeleton className="h-8 w-42" />
       </div>
       <div className="flex flex-col px-4 lg:px-6">
         <ul className="grid gap-4">
@@ -108,11 +108,11 @@ export function ListItemSkeleton() {
       <div className="flex items-center gap-2">
         <Skeleton className="rounded-full size-12" />
         <div className="grid gap-2">
-          <Skeleton className="w-24 h-3" />
-          <Skeleton className="w-12 h-2" />
+          <Skeleton className="w-24 h-4" />
+          <Skeleton className="w-12 h-3" />
         </div>
       </div>
-      <Skeleton className="w-16 h-4" />
+      <Skeleton className="w-16 h-6" />
     </li>
   );
 }
