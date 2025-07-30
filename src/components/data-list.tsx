@@ -15,7 +15,15 @@ import { Avatar } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-export function DataList({ data }: { data: ITransaction[] }) {
+export function DataList({
+  allData,
+  incomeData,
+  expenseData,
+}: {
+  allData: ITransaction[];
+  incomeData: ITransaction[];
+  expenseData: ITransaction[];
+}) {
   return (
     <Tabs
       defaultValue="all"
@@ -30,16 +38,40 @@ export function DataList({ data }: { data: ITransaction[] }) {
       </div>
       <TabsContent value="all" className="flex flex-col px-4 lg:px-6">
         <ul className="grid gap-4">
-          {data.map((item, index) => (
-            <ListItem key={index} item={item} />
-          ))}
+          {allData.length ? (
+            allData.map((item, index) => <ListItem key={index} item={item} />)
+          ) : (
+            <div className="grid border border-dashed rounded-lg place-items-center aspect-video">
+              <p className="text-xl font-semibold">No transactions found. 😲</p>
+            </div>
+          )}
         </ul>
       </TabsContent>
       <TabsContent value="income" className="flex flex-col px-4 lg:px-6">
-        <div className="flex-1 w-full border border-dashed rounded-lg aspect-video"></div>
+        <ul className="grid gap-4">
+          {incomeData.length ? (
+            incomeData.map((item, index) => (
+              <ListItem key={index} item={item} />
+            ))
+          ) : (
+            <div className="grid border border-dashed rounded-lg place-items-center aspect-video">
+              <p className="text-xl font-semibold">No income found. 😬</p>
+            </div>
+          )}
+        </ul>
       </TabsContent>
       <TabsContent value="expense" className="flex flex-col px-4 lg:px-6">
-        <div className="flex-1 w-full border border-dashed rounded-lg aspect-video"></div>
+        <ul className="grid gap-4">
+          {expenseData.length ? (
+            expenseData.map((item, index) => (
+              <ListItem key={index} item={item} />
+            ))
+          ) : (
+            <div className="grid border border-dashed rounded-lg place-items-center aspect-video">
+              <p className="text-xl font-semibold">No expense found. 🤯</p>
+            </div>
+          )}
+        </ul>
       </TabsContent>
     </Tabs>
   );
