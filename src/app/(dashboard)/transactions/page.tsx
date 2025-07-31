@@ -4,6 +4,7 @@ import { useTransactions } from "@/hooks/use-transactions";
 
 import { DataList, DataListSkeleton } from "@/components/data-list";
 import { SiteHeader } from "@/components/site-header";
+import { ErrorMessage } from "@/components/error-message";
 
 export default function TransactionsPage() {
   const { all, income, expense, loading, error } = useTransactions();
@@ -17,10 +18,7 @@ export default function TransactionsPage() {
         ) : !error ? (
           <DataList allData={all} incomeData={income} expenseData={expense} />
         ) : (
-          <div className="content-center text-center">
-            <p className="text-xl font-semibold">Something went wrong.</p>
-            {error && <p className="text-sm text-red-500">{error}</p>}
-          </div>
+          <ErrorMessage error={error} />
         )}
       </div>
     </>

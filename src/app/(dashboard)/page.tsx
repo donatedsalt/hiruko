@@ -9,6 +9,7 @@ import {
 import { DataList, DataListSkeleton } from "@/components/data-list";
 import { AccountsCards } from "@/components/accounts-cards";
 import { SiteHeader } from "@/components/site-header";
+import { ErrorMessage } from "@/components/error-message";
 
 export default function Page() {
   const { all, income, expense, loading, error } = useTransactions();
@@ -26,10 +27,7 @@ export default function Page() {
             ) : !error ? (
               <ChartAreaInteractive data={all} />
             ) : (
-              <div className="content-center text-center min-h-64">
-                <p className="text-xl font-semibold">Something went wrong.</p>
-                {error && <p className="text-sm text-red-500">{error}</p>}
-              </div>
+              <ErrorMessage error={error} />
             )}
           </div>
 
@@ -38,10 +36,7 @@ export default function Page() {
           ) : !error ? (
             <DataList allData={all} incomeData={income} expenseData={expense} />
           ) : (
-            <div className="content-center text-center">
-              <p className="text-xl font-semibold">Something went wrong.</p>
-              {error && <p className="text-sm text-red-500">{error}</p>}
-            </div>
+            <ErrorMessage error={error} />
           )}
         </div>
       </div>
