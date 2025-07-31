@@ -2,7 +2,10 @@
 
 import { useTransactions } from "@/hooks/use-transactions";
 
-import { ChartAreaInteractive } from "@/components/chart-area-interactive";
+import {
+  ChartAreaInteractive,
+  ChartAreaInteractiveSkeleton,
+} from "@/components/chart-area-interactive";
 import { DataList, DataListSkeleton } from "@/components/data-list";
 import { SectionCards } from "@/components/section-cards";
 import { SiteHeader } from "@/components/site-header";
@@ -18,7 +21,16 @@ export default function Page() {
           <SectionCards />
 
           <div className="px-4 lg:px-6">
-            <ChartAreaInteractive />
+            {loading ? (
+              <ChartAreaInteractiveSkeleton />
+            ) : !error ? (
+              <ChartAreaInteractive data={all} />
+            ) : (
+              <div className="content-center text-center min-h-64">
+                <p className="text-xl font-semibold">Something went wrong.</p>
+                {error && <p className="text-sm text-red-500">{error}</p>}
+              </div>
+            )}
           </div>
 
           {loading ? (
