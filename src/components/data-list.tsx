@@ -4,6 +4,7 @@ import {
   IconCaretDownFilled,
   IconCaretUpFilled,
 } from "@tabler/icons-react";
+import React from "react";
 
 import { ITransaction } from "@/types/transaction";
 
@@ -13,6 +14,65 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+
+function groupByDay(transactions: ITransaction[]) {
+  return transactions.reduce((groupedTransactions, transaction) => {
+    const dateStr = new Date(transaction.transactionTime).toLocaleDateString();
+    if (!groupedTransactions[dateStr]) groupedTransactions[dateStr] = [];
+    groupedTransactions[dateStr].push(transaction);
+    return groupedTransactions;
+  }, {} as Record<string, ITransaction[]>);
+}
+
+function formatDisplayDate(dateStr: string) {
+  const date = new Date(dateStr);
+  const today = new Date();
+  const yesterday = new Date();
+  yesterday.setDate(today.getDate() - 1);
+
+  const isToday =
+    date.getDate() === today.getDate() &&
+    date.getMonth() === today.getMonth() &&
+    date.getFullYear() === today.getFullYear();
+
+  const isYesterday =
+    date.getDate() === yesterday.getDate() &&
+    date.getMonth() === yesterday.getMonth() &&
+    date.getFullYear() === yesterday.getFullYear();
+
+  const weekday = date.toLocaleDateString(undefined, { weekday: "long" });
+  const monthDay = date.toLocaleDateString(undefined, {
+    month: "long",
+    day: "numeric",
+  });
+
+  if (isToday) return `Today, ${monthDay}`;
+  if (isYesterday) return `Yesterday, ${monthDay}`;
+  return `${weekday}, ${monthDay}`;
+}
+
+function RenderGroupedList({ transactions }: { transactions: ITransaction[] }) {
+  const grouped = groupByDay(transactions);
+  const dates = Object.keys(grouped).sort(
+    (a, b) => new Date(b).getTime() - new Date(a).getTime()
+  );
+  return (
+    <div className="grid gap-6">
+      {dates.map((date) => (
+        <div key={date}>
+          <div className="py-3 text-xs font-semibold text-muted-foreground">
+            {formatDisplayDate(date)}
+          </div>
+          <ul className="grid gap-4">
+            {grouped[date].map((item, idx) => (
+              <ListItem key={idx} item={item} />
+            ))}
+          </ul>
+        </div>
+      ))}
+    </div>
+  );
+}
 
 export function DataList({
   allData,
@@ -36,41 +96,31 @@ export function DataList({
         </TabsList>
       </div>
       <TabsContent value="all" className="flex flex-col px-4 lg:px-6">
-        <ul className="grid gap-4">
-          {allData.length ? (
-            allData.map((item, index) => <ListItem key={index} item={item} />)
-          ) : (
-            <div className="grid border border-dashed rounded-lg place-items-center aspect-video">
-              <p className="text-xl font-semibold">No transactions found. 😲</p>
-            </div>
-          )}
-        </ul>
+        {allData.length ? (
+          <RenderGroupedList transactions={allData} />
+        ) : (
+          <div className="grid border border-dashed rounded-lg place-items-center aspect-video">
+            <p className="text-xl font-semibold">No transactions found. 😲</p>
+          </div>
+        )}
       </TabsContent>
       <TabsContent value="income" className="flex flex-col px-4 lg:px-6">
-        <ul className="grid gap-4">
-          {incomeData.length ? (
-            incomeData.map((item, index) => (
-              <ListItem key={index} item={item} />
-            ))
-          ) : (
-            <div className="grid border border-dashed rounded-lg place-items-center aspect-video">
-              <p className="text-xl font-semibold">No income found. 😬</p>
-            </div>
-          )}
-        </ul>
+        {incomeData.length ? (
+          <RenderGroupedList transactions={incomeData} />
+        ) : (
+          <div className="grid border border-dashed rounded-lg place-items-center aspect-video">
+            <p className="text-xl font-semibold">No income found. 😬</p>
+          </div>
+        )}
       </TabsContent>
       <TabsContent value="expense" className="flex flex-col px-4 lg:px-6">
-        <ul className="grid gap-4">
-          {expenseData.length ? (
-            expenseData.map((item, index) => (
-              <ListItem key={index} item={item} />
-            ))
-          ) : (
-            <div className="grid border border-dashed rounded-lg place-items-center aspect-video">
-              <p className="text-xl font-semibold">No expense found. 🤯</p>
-            </div>
-          )}
-        </ul>
+        {expenseData.length ? (
+          <RenderGroupedList transactions={expenseData} />
+        ) : (
+          <div className="grid border border-dashed rounded-lg place-items-center aspect-video">
+            <p className="text-xl font-semibold">No expense found. 🤯</p>
+          </div>
+        )}
       </TabsContent>
     </Tabs>
   );
