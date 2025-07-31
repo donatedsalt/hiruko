@@ -85,7 +85,7 @@ export function ListItem({ item }: { item: ITransaction }) {
         </Avatar>
         <div>
           <h3 className="font-semibold">{item.title || item.category}</h3>
-          <Badge variant={"outline"}>{item.category}</Badge>
+          {item.title && <Badge variant={"outline"}>{item.category}</Badge>}
         </div>
       </div>
       <p

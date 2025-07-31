@@ -21,7 +21,6 @@ const transactionSchema: Schema<ITransactionDocument> = new Schema(
     title: {
       type: String,
       trim: true,
-      minlength: [3, "Transaction title must be at least 3 characters long"],
       maxlength: [100, "Transaction title cannot exceed 100 characters"],
       default: "",
     },
