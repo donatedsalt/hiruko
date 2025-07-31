@@ -26,16 +26,21 @@ export function AccountsCards() {
       <AccountsCard name={"NayaPay"} balance={200} transactionsCount={3} />
       <AccountsCard name={"Bank"} balance={15600.69} transactionsCount={12} />
 
-      <Card className="flex flex-col items-center justify-center gap-3 p-6 bg-transparent border-dashed shadow-xs shrink-0">
-        <CardHeader className="@container-normal">
-          <CardTitle className="flex flex-col items-center text-2xl font-semibold text-muted-foreground">
-            <IconCirclePlusFilled />
-            <span className="break-keep">Add Account</span>
-          </CardTitle>
-        </CardHeader>
-        <CardFooter className="text-sm text-muted-foreground">
-          Click to add a new account
-        </CardFooter>
+      <Card className="flex flex-col items-center justify-center gap-3 p-0 bg-transparent border-dashed shadow-xs shrink-0">
+        <Link
+          href="/accounts/add"
+          className="flex flex-col items-center justify-center w-full h-full p-6"
+        >
+          <CardHeader className="@container-normal">
+            <CardTitle className="flex flex-col items-center text-2xl font-semibold text-muted-foreground">
+              <IconCirclePlusFilled />
+              <span className="break-keep">Add Account</span>
+            </CardTitle>
+          </CardHeader>
+          <CardFooter className="text-sm text-muted-foreground">
+            Click to add a new account
+          </CardFooter>
+        </Link>
       </Card>
     </div>
   );
@@ -49,10 +54,10 @@ function AccountsCard({
   return (
     <Card className="justify-center gap-3 p-6 shadow-xs shrink-0 from-primary/5 to-card dark:bg-card bg-gradient-to-t">
       <CardHeader className="@container-normal">
-        <CardTitle className="text-2xl font-semibold text-muted-foreground">
+        <CardTitle className="font-semibold text-1xl text-muted-foreground">
           {name}
         </CardTitle>
-        <CardDescription className="text-3xl font-semibold text-foreground tabular-nums">
+        <CardDescription className="text-2xl font-semibold text-foreground tabular-nums">
           {balance.toLocaleString("en-US", {
             style: "currency",
             currency: "USD",
