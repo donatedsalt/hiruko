@@ -29,7 +29,7 @@ export interface ITransactionModel extends Model<ITransactionDocument> {
   }): Promise<ITransactionDocument[]>;
 }
 
-interface ITransactionApiResponse {
+export interface ITransactionApiResponse {
   success: boolean;
   data?: ITransactionDocument[] | ITransactionDocument;
   error?: string;

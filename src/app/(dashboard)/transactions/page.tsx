@@ -6,7 +6,7 @@ import { DataList, DataListSkeleton } from "@/components/data-list";
 import { SiteHeader } from "@/components/site-header";
 import { ErrorMessage } from "@/components/error-message";
 
-export default function TransactionsPage() {
+export default function Page() {
   const { all, income, expense, loading, error } = useTransactions();
 
   return (

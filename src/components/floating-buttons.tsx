@@ -7,7 +7,7 @@ import { IconCirclePlusFilled } from "@tabler/icons-react";
 
 import { Button } from "@/components/ui/button";
 
-const hiddenRoutes = ["/transactions/add", "/transactions/edit", "/settings"];
+const hiddenRoutes = ["/transactions/new", "/transactions/edit", "/settings"];
 
 export function FloatingButtons() {
   const pathname = usePathname();
@@ -17,7 +17,7 @@ export function FloatingButtons() {
   return (
     <div className="fixed z-50 flex flex-col items-end gap-4 bottom-6 right-6">
       <Button floating asChild>
-        <Link href="/transactions/add">
+        <Link href="/transactions/new">
           <IconCirclePlusFilled className="!size-6" />
         </Link>
       </Button>
