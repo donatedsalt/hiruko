@@ -1,29 +1,38 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { IconCaretDownFilled, IconCaretUpFilled } from "@tabler/icons-react";
 
 import { ITransactionApiResponse } from "@/types/transaction";
 
 import api from "@/lib/axios";
 
+import { useAccounts } from "@/hooks/use-account";
+
 import { SiteHeader } from "@/components/site-header";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Button } from "@/components/ui/button";
 import { TransactionSchema } from "@/validation/transaction";
 import { DatePicker } from "@/components/ui/date-picker";
 import { Textarea } from "@/components/ui/textarea";
+import { Skeleton } from "@/components/ui/skeleton";
+import { ErrorMessage } from "@/components/error-message";
 
 export default function Page() {
   const router = useRouter();
+  const { accounts, loading, error } = useAccounts();
+  const [transactionType, setTransactionType] = useState("expense");
+  const [transactionAccount, setTransactionAccount] = useState("");
+
+  useEffect(() => {
+    if (accounts) {
+      setTransactionAccount(accounts[0]?._id?.toString() || "");
+    }
+  }, [accounts]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -32,6 +41,7 @@ export default function Page() {
 
     const loadingToast = toast.loading("Processing request...");
 
+    const accountId = formData.get("accountId") as string;
     const category = formData.get("category") as string;
     const amount = parseFloat(formData.get("amount") as string);
     const type = formData.get("type") as "income" | "expense";
@@ -43,6 +53,7 @@ export default function Page() {
     const transactionTime = new Date(`${date}T${time}`);
 
     const payload = {
+      accountId,
       category,
       amount,
       type,
@@ -57,8 +68,10 @@ export default function Page() {
       console.log(result.error);
 
       toast.dismiss(loadingToast);
-      toast.warning("Validation error", {
-        description: result.error.issues[0].message,
+      result.error.issues.slice(0, 3).forEach((issue) => {
+        toast.warning(issue.message, {
+          description: "Please check your input.",
+        });
       });
       return;
     }
@@ -96,13 +109,86 @@ export default function Page() {
       <SiteHeader title="Add Transaction" />
       <form onSubmit={handleSubmit} className="grid gap-6 m-4 md:m-6">
         <div className="grid gap-3 *:w-full">
-          <Label htmlFor="category">Category</Label>
+          <Label htmlFor="category">
+            Category<span className="text-destructive">*</span>
+          </Label>
           <Input
             id="category"
             name="category"
             type="text"
             placeholder="Shopping"
             required
+          />
+        </div>
+        <div className="grid gap-3 *:w-full">
+          <Label htmlFor="type">
+            Type<span className="text-destructive">*</span>
+          </Label>
+          <input type="hidden" name="type" value={transactionType} />
+          <ToggleGroup
+            type="single"
+            value={transactionType}
+            onValueChange={(val: string) => {
+              if (val) setTransactionType(val);
+            }}
+          >
+            <ToggleGroupItem
+              value="expense"
+              aria-label="Toggle expense"
+              className="border dark:bg-input/30 data-[state=on]:bg-destructive text-destructive-foreground"
+            >
+              <IconCaretDownFilled /> Expense
+            </ToggleGroupItem>
+            <ToggleGroupItem
+              value="income"
+              aria-label="Toggle income"
+              className="border dark:bg-input/30 data-[state=on]:bg-emerald-500 text-foreground"
+            >
+              <IconCaretUpFilled /> Income
+            </ToggleGroupItem>
+          </ToggleGroup>
+        </div>
+        <div className="grid gap-3 *:w-full">
+          <Label htmlFor="accountId">
+            Account<span className="text-destructive">*</span>
+          </Label>
+          <input type="hidden" name="accountId" value={transactionAccount} />
+          {loading ? (
+            <Skeleton className="h-9 w-full" />
+          ) : error ? (
+            <ErrorMessage error={error} className="min-h-36" />
+          ) : (
+            <ToggleGroup
+              type="single"
+              value={transactionAccount}
+              onValueChange={(val: string) => {
+                if (val) setTransactionAccount(val);
+              }}
+            >
+              {accounts.map((account) => (
+                <ToggleGroupItem
+                  key={account._id.toString()}
+                  value={account._id.toString()}
+                  className="border dark:bg-input/30"
+                >
+                  {account.name}
+                </ToggleGroupItem>
+              ))}
+            </ToggleGroup>
+          )}
+        </div>
+        <div className="grid gap-3 *:w-full">
+          <Label htmlFor="amount">
+            Amount<span className="text-destructive">*</span>
+          </Label>
+          <Input
+            id="amount"
+            name="amount"
+            type="number"
+            placeholder="99.99"
+            required
+            min="0.01"
+            step="0.01"
           />
         </div>
         <div className="grid gap-3 *:w-full">
@@ -120,35 +206,15 @@ export default function Page() {
           />
         </div>
         <div className="grid gap-3 *:w-full">
-          <Label htmlFor="amount">Amount</Label>
-          <Input
-            id="amount"
-            name="amount"
-            type="number"
-            placeholder="99.99"
-            required
-            min="0.01"
-            step="0.01"
-          />
-        </div>
-        <div className="grid gap-3 *:w-full">
-          <Label htmlFor="type">Type</Label>
-          <Select name="type" defaultValue="expense" required>
-            <SelectTrigger id="type">
-              <SelectValue placeholder="Transaction Type" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="expense">Expense</SelectItem>
-              <SelectItem value="income">Income</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-        <div className="grid gap-3 *:w-full">
-          <Label htmlFor="date">Date</Label>
+          <Label htmlFor="date">
+            Date<span className="text-destructive">*</span>
+          </Label>
           <DatePicker id="date" name="date" defaultValue={currentDate} />
         </div>
         <div className="grid gap-3 *:w-full">
-          <Label htmlFor="time">Time</Label>
+          <Label htmlFor="time">
+            Time<span className="text-destructive">*</span>
+          </Label>
           <Input
             id="time"
             name="time"
