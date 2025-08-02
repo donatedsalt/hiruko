@@ -16,5 +16,15 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 ## TODOS
 
-- [ ] change tabler icons to lucide icons
+- [ ] add transction view
+- [ ] add transction edit
+- [ ] add account view
+- [ ] add account edit
+- [ ] add budget
+- [ ] add goal
+- [ ] add conuslt chatbot
+- [ ] add market tracking
+- [ ] add account edit
+- [ ] change lucide icons to tabler icons
 - [ ] add [simple icons](https://simpleicons.org/) for using brand icons
+- [ ] take image of reciepts to automatically add transactions
