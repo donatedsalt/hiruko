@@ -1,11 +1,11 @@
 import z from "zod";
-import { auth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 
 import type { ITransaction } from "@/types/transaction";
 
 import dbConnect from "@/lib/mongodb";
 import { handleError, handleNotFound, validateId } from "@/lib/api-helpers";
+import { authUser } from "@/lib/auth-user";
 
 import { TransactionSchema } from "@/validation/transaction";
 
@@ -20,14 +20,8 @@ interface RouteParams {
  * Fetches a single transaction by ID.
  */
 export async function GET(_request: NextRequest, { params }: RouteParams) {
-  const { userId } = await auth();
-
-  if (!userId) {
-    return NextResponse.json(
-      { success: false, error: "Unauthorized" },
-      { status: 401 }
-    );
-  }
+  const { userId, error } = await authUser();
+  if (error) return error;
 
   await dbConnect();
 
@@ -53,14 +47,8 @@ export async function GET(_request: NextRequest, { params }: RouteParams) {
  * Request Body: Partial<ITransaction> (only fields to update)
  */
 export async function PUT(request: NextRequest, { params }: RouteParams) {
-  const { userId } = await auth();
-
-  if (!userId) {
-    return NextResponse.json(
-      { success: false, error: "Unauthorized" },
-      { status: 401 }
-    );
-  }
+  const { userId, error } = await authUser();
+  if (error) return error;
 
   await dbConnect();
 
@@ -104,14 +92,8 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
  * Deletes a transaction by ID.
  */
 export async function DELETE(_request: NextRequest, { params }: RouteParams) {
-  const { userId } = await auth();
-
-  if (!userId) {
-    return NextResponse.json(
-      { success: false, error: "Unauthorized" },
-      { status: 401 }
-    );
-  }
+  const { userId, error } = await authUser();
+  if (error) return error;
 
   await dbConnect();
 

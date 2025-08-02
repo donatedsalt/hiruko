@@ -1,11 +1,11 @@
 import z from "zod";
-import { auth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 
 import type { ITransaction, ITransactionDocument } from "@/types/transaction";
 
 import dbConnect from "@/lib/mongodb";
 import { handleError } from "@/lib/api-helpers";
+import { authUser } from "@/lib/auth-user";
 
 import { TransactionSchema } from "@/validation/transaction";
 
@@ -18,14 +18,8 @@ import Transaction from "@/models/Transaction";
  * - type: 'income' | 'expense' (optional)
  */
 export async function GET(request: NextRequest) {
-  const { userId } = await auth();
-
-  if (!userId) {
-    return NextResponse.json(
-      { success: false, error: "Unauthorized" },
-      { status: 401 }
-    );
-  }
+  const { userId, error } = await authUser();
+  if (error) return error;
 
   await dbConnect();
 
@@ -59,14 +53,8 @@ export async function GET(request: NextRequest) {
  * Request Body: ITransaction (name, type, amount)
  */
 export async function POST(request: NextRequest) {
-  const { userId } = await auth();
-
-  if (!userId) {
-    return NextResponse.json(
-      { success: false, error: "Unauthorized" },
-      { status: 401 }
-    );
-  }
+  const { userId, error } = await authUser();
+  if (error) return error;
 
   await dbConnect();
 
