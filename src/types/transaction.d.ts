@@ -1,8 +1,10 @@
 import { Document, Model, Types } from "mongoose";
 
+import { IAccountDocument } from "@/types/account";
+
 export interface ITransaction {
   userId: string;
-  accountId: Types.ObjectId;
+  account: Types.ObjectId | IAccountDocument;
   category: string;
   title?: string;
   note?: string;

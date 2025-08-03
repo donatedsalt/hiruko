@@ -29,7 +29,10 @@ export async function GET(_request: NextRequest, { params }: RouteParams) {
   if (idValidationError) return idValidationError;
 
   try {
-    const transaction = await Transaction.findOne({ _id: params.id, userId });
+    const transaction = await Transaction.findOne({
+      _id: params.id,
+      userId,
+    }).populate("account");
     if (!transaction) return handleNotFound("Transaction");
 
     return NextResponse.json(

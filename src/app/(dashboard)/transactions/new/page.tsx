@@ -41,7 +41,7 @@ export default function Page() {
 
     const loadingToast = toast.loading("Processing request...");
 
-    const accountId = formData.get("accountId") as string;
+    const account = formData.get("account") as string;
     const category = formData.get("category") as string;
     const amount = parseFloat(formData.get("amount") as string);
     const type = formData.get("type") as "income" | "expense";
@@ -53,7 +53,7 @@ export default function Page() {
     const transactionTime = new Date(`${date}T${time}`);
 
     const payload = {
-      accountId,
+      account,
       category,
       amount,
       type,
@@ -149,10 +149,10 @@ export default function Page() {
           </ToggleGroup>
         </div>
         <div className="grid gap-3 *:w-full">
-          <Label htmlFor="accountId">
+          <Label htmlFor="account">
             Account<span className="text-destructive">*</span>
           </Label>
-          <input type="hidden" name="accountId" value={transactionAccount} />
+          <input type="hidden" name="account" value={transactionAccount} />
           {loading ? (
             <Skeleton className="h-9 w-full" />
           ) : error ? (

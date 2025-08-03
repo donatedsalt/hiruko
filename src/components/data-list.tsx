@@ -128,29 +128,34 @@ export function DataList({
 
 export function ListItem({ item }: { item: ITransaction }) {
   return (
-    <li className="flex items-center justify-between gap-2">
-      <div className="flex items-center gap-2">
-        <Avatar className="items-center justify-center border size-12">
-          <ListItemIcon item={item.type} />
-        </Avatar>
-        <div>
-          <h3 className="font-semibold">{item.title || item.category}</h3>
-          {item.title && <Badge variant={"outline"}>{item.category}</Badge>}
-        </div>
-      </div>
-      <p
-        className={cn(
-          "flex items-center text-lg font-semibold [&>svg]:size-4",
-          item.type === "income" ? "text-green-500" : "text-red-500"
-        )}
+    <li>
+      <Link
+        href={`/transactions/${item._id}`}
+        className="flex items-center justify-between gap-2"
       >
-        {item.type === "income" ? (
-          <IconCaretUpFilled />
-        ) : (
-          <IconCaretDownFilled />
-        )}
-        {item.amount}
-      </p>
+        <div className="flex items-center gap-2">
+          <Avatar className="items-center justify-center border size-12">
+            <ListItemIcon item={item.type} />
+          </Avatar>
+          <div>
+            <h3 className="font-semibold">{item.title || item.category}</h3>
+            {item.title && <Badge variant={"outline"}>{item.category}</Badge>}
+          </div>
+        </div>
+        <p
+          className={cn(
+            "flex items-center text-lg font-semibold [&>svg]:size-4",
+            item.type === "income" ? "text-emerald-500" : "text-destructive"
+          )}
+        >
+          {item.type === "income" ? (
+            <IconCaretUpFilled />
+          ) : (
+            <IconCaretDownFilled />
+          )}
+          {item.amount}
+        </p>
+      </Link>
     </li>
   );
 }
