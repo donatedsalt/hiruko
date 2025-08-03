@@ -3,6 +3,8 @@ import { ClerkProvider } from "@clerk/nextjs";
 import { shadcn } from "@clerk/themes";
 import { Geist, Geist_Mono } from "next/font/google";
 
+import { BaseTheme } from "@clerk/types";
+
 import "@/app/globals.css";
 
 import { ThemeProvider } from "@/components/theme-provider";
@@ -39,7 +41,7 @@ export default function RootLayout({
   return (
     <ClerkProvider
       appearance={{
-        baseTheme: shadcn,
+        baseTheme: shadcn as BaseTheme,
       }}
     >
       <html lang="en" suppressHydrationWarning>
