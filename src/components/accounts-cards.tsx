@@ -25,6 +25,18 @@ export function AccountsCards() {
     setAccounts((prev) => [...prev, newAccount]);
   };
 
+  const handleUpdateAccount = (newAccount: IAccountDocument) => {
+    setAccounts((prev) =>
+      prev.map((account) =>
+        account._id === newAccount._id ? newAccount : account
+      )
+    );
+  };
+
+  const handleRemoveAccount = (account: IAccountDocument) => {
+    setAccounts((prev) => prev.filter((a) => a._id !== account._id));
+  };
+
   return (
     <div className="flex gap-4 px-4 overflow-auto lg:px-6 scrollbar-none">
       {loading ? (
@@ -37,9 +49,9 @@ export function AccountsCards() {
         accounts.map((account) => (
           <AccountsCard
             key={account._id.toString()}
-            name={account.name}
-            balance={account.balance}
-            transactionsCount={account.transactionsCount}
+            account={account}
+            onRemove={handleRemoveAccount}
+            onUpdate={handleUpdateAccount}
           />
         ))
       )}

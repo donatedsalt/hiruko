@@ -1,0 +1,127 @@
+import z from "zod";
+import mongoose from "mongoose";
+import { NextRequest, NextResponse } from "next/server";
+
+import type { IAccount } from "@/types/account";
+
+import dbConnect from "@/lib/mongodb";
+import { handleError, handleNotFound, validateId } from "@/lib/api-helpers";
+import { authUser } from "@/lib/auth-user";
+
+import { AccountSchema } from "@/validation/account";
+
+import Account from "@/models/Account";
+import Transaction from "@/models/Transaction";
+
+interface RouteParams {
+  params: { id: string };
+}
+
+/**
+ * GET /api/accounts/[id]
+ * Fetches a single account by ID.
+ */
+export async function GET(_request: NextRequest, { params }: RouteParams) {
+  const { userId, error } = await authUser();
+  if (error) return error;
+
+  await dbConnect();
+
+  const idValidationError = validateId(params.id, "Account ID");
+  if (idValidationError) return idValidationError;
+
+  try {
+    const account = await Account.findOne({
+      _id: params.id,
+      userId,
+    }).populate("account");
+    if (!account) return handleNotFound("Account");
+
+    return NextResponse.json({ success: true, data: account }, { status: 200 });
+  } catch (error) {
+    return handleError(error);
+  }
+}
+
+/**
+ * PUT /api/accounts/[id]
+ * Updates an existing account by ID.
+ * Request Body: Partial<IAccount> (only fields to update)
+ */
+export async function PUT(request: NextRequest, { params }: RouteParams) {
+  const { userId, error } = await authUser();
+  if (error) return error;
+
+  await dbConnect();
+
+  const idValidationError = validateId(params.id, "Account ID");
+  if (idValidationError) return idValidationError;
+
+  const body: Partial<IAccount> = await request.json();
+  const parsed = AccountSchema.safeParse({ ...body, userId });
+
+  if (!parsed.success) {
+    const errorTree = z.treeifyError(parsed.error);
+    return NextResponse.json(
+      { success: false, error: errorTree },
+      { status: 400 }
+    );
+  }
+
+  try {
+    const account = await Account.findOneAndUpdate(
+      { _id: params.id, userId },
+      parsed.data,
+      {
+        new: true,
+        runValidators: true,
+      }
+    );
+
+    if (!account) return handleNotFound("Account");
+
+    return NextResponse.json({ success: true, data: account }, { status: 200 });
+  } catch (error) {
+    return handleError(error);
+  }
+}
+
+/**
+ * DELETE /api/accounts/[id]
+ * Deletes an account by ID and all its associated transactions (in a transaction).
+ */
+export async function DELETE(_request: NextRequest, { params }: RouteParams) {
+  const { userId, error } = await authUser();
+  if (error) return error;
+
+  await dbConnect();
+
+  const idValidationError = validateId(params.id, "Account ID");
+  if (idValidationError) return idValidationError;
+
+  const session = await mongoose.startSession();
+
+  try {
+    session.startTransaction();
+
+    const account = await Account.findOneAndDelete(
+      { _id: params.id, userId },
+      { session }
+    );
+
+    if (!account) {
+      await session.abortTransaction();
+      return handleNotFound("Account");
+    }
+
+    await Transaction.deleteMany({ account: account._id, userId }, { session });
+
+    await session.commitTransaction();
+    return NextResponse.json({ success: true, data: account }, { status: 200 });
+  } catch (err) {
+    await session.abortTransaction();
+    return handleError(err);
+  } finally {
+    session.endSession();
+  }
+}
