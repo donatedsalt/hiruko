@@ -14,7 +14,7 @@ const transactionSchema: Schema<ITransactionDocument> = new Schema(
     account: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Account",
-      required: [true, "Account ID is required"],
+      required: [true, "Account is required."],
     },
     category: {
       type: String,

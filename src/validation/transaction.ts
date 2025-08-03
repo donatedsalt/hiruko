@@ -2,8 +2,8 @@ import { z } from "zod";
 
 export const TransactionSchema = z
   .object({
-    userId: z.string().min(1, "User ID is required"),
-    account: z.string().min(1, "Account ID is required"),
+    userId: z.string().min(1, "User ID is required."),
+    account: z.string().min(1, "Account is required."),
     category: z.string().min(3).max(100),
     title: z
       .string()

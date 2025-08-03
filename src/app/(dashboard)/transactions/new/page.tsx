@@ -155,6 +155,14 @@ export default function Page() {
             <Skeleton className="w-full h-9" />
           ) : error ? (
             <ErrorMessage error={error} className="min-h-36" />
+          ) : !transactionAccount.length ? (
+            <Input
+              className="opacity-100! text-destructive"
+              value={
+                "No accounts found, Visit the overview page to create a account."
+              }
+              disabled
+            />
           ) : (
             <ToggleGroup
               type="single"
