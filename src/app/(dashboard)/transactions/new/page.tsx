@@ -38,12 +38,12 @@ export default function Page() {
       }
     }, 1000);
 
-    if (accounts && accounts.length > 0) {
+    if (accounts && accounts.length > 0 && transactionAccount === "") {
       setTransactionAccount(accounts[0]._id.toString());
     }
 
     return () => clearTimeout(timeout);
-  }, [accounts, smartRouter]);
+  }, [accounts, smartRouter, transactionAccount]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
