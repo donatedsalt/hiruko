@@ -16,15 +16,23 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 ## TODOS
 
-- [ ] add transction view
-- [ ] add transction edit
-- [ ] add account view
-- [ ] add account edit
-- [ ] add budget
-- [ ] add goal
-- [ ] add conuslt chatbot
-- [ ] add market tracking
-- [ ] add account edit
+### Todo
+
+- [ ] transction edit
+- [ ] checkbox to disable conformation and enable it in settings
+- [ ] account view
+- [ ] account edit
+- [ ] budget
+- [ ] goal
+- [ ] conuslt chatbot
+- [ ] market tracking
+- [ ] account edit
 - [ ] change lucide icons to tabler icons
-- [ ] add [simple icons](https://simpleicons.org/) for using brand icons
+- [ ] [simple icons](https://simpleicons.org/) for using brand icons
 - [ ] take image of reciepts to automatically add transactions
+
+### Done
+
+- [x] transction view
+- [x] transction delete
+- [x] transction delete confirmation
