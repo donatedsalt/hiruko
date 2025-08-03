@@ -9,21 +9,22 @@ import { ITransactionApiResponse } from "@/types/transaction";
 import api from "@/lib/axios";
 
 import { useAccounts } from "@/hooks/use-account";
-import { useSafeBack } from "@/hooks/use-safe-back";
+import { useSmartRouter } from "@/hooks/use-smart-router";
+
+import { TransactionSchema } from "@/validation/transaction";
 
 import { SiteHeader } from "@/components/site-header";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Button } from "@/components/ui/button";
-import { TransactionSchema } from "@/validation/transaction";
 import { DatePicker } from "@/components/ui/date-picker";
 import { Textarea } from "@/components/ui/textarea";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ErrorMessage } from "@/components/error-message";
 
 export default function Page() {
-  const safeBack = useSafeBack();
+  const smartRouter = useSmartRouter();
   const { accounts, loading, error } = useAccounts();
   const [transactionType, setTransactionType] = useState("expense");
   const [transactionAccount, setTransactionAccount] = useState("");
@@ -84,7 +85,7 @@ export default function Page() {
       if (response.success && response.data && !Array.isArray(response.data)) {
         toast.dismiss(loadingToast);
         toast.success("Transaction added");
-        safeBack();
+        smartRouter.back();
       } else {
         toast.dismiss(loadingToast);
         toast.error("Failed to create transaction.", {

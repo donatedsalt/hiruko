@@ -1,18 +1,19 @@
 "use client";
 
-import api from "@/lib/axios";
 import { toast } from "sonner";
 import { useState } from "react";
 import { format } from "date-fns";
 import { useParams } from "next/navigation";
+import { IconEdit, IconTrash } from "@tabler/icons-react";
+
+import api from "@/lib/axios";
 
 import { useTransaction } from "@/hooks/use-transaction";
-import { useSafeBack } from "@/hooks/use-safe-back";
+import { useSmartRouter } from "@/hooks/use-smart-router";
 
 import { SiteHeader } from "@/components/site-header";
 import { ErrorMessage } from "@/components/error-message";
 import { Button } from "@/components/ui/button";
-import { IconEdit, IconTrash } from "@tabler/icons-react";
 import {
   Dialog,
   DialogTrigger,
@@ -24,7 +25,7 @@ import {
 
 export default function Page() {
   const { id } = useParams();
-  const safeBack = useSafeBack();
+  const smartRouter = useSmartRouter();
   const { transaction, loading, error } = useTransaction(id as string);
   const [open, setOpen] = useState(false);
 
@@ -35,7 +36,7 @@ export default function Page() {
       if (res.status === 200) {
         toast.success("Transaction deleted");
         setOpen(false);
-        safeBack();
+        smartRouter.replaceWithBack();
       } else {
         toast.error("Failed to delete transaction");
       }

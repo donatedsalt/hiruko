@@ -12,6 +12,7 @@ import { AppSidebar } from "@/components/app-sidebar";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { Toaster } from "@/components/ui/sonner";
 import { FloatingButtons } from "@/components/floating-buttons";
+import { HistoryTracker } from "@/components/history-tracker";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -67,6 +68,7 @@ export default function RootLayout({
             </SidebarProvider>
             <Toaster />
             <FloatingButtons />
+            <HistoryTracker />
           </ThemeProvider>
         </body>
       </html>
