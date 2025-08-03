@@ -30,7 +30,6 @@ export function AccountsCards() {
       {loading ? (
         <>
           <AccountsCardSkeleton />
-          <AccountsCardSkeleton />
         </>
       ) : error ? (
         <ErrorMessage error={error} className="min-h-36" />

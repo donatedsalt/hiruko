@@ -135,14 +135,14 @@ export default function Page() {
             <ToggleGroupItem
               value="expense"
               aria-label="Toggle expense"
-              className="border dark:bg-input/30 data-[state=on]:bg-destructive text-destructive-foreground"
+              className="border dark:bg-input/30 data-[state=on]:bg-destructive! text-destructive-foreground"
             >
               <IconCaretDownFilled /> Expense
             </ToggleGroupItem>
             <ToggleGroupItem
               value="income"
               aria-label="Toggle income"
-              className="border dark:bg-input/30 data-[state=on]:bg-emerald-500 text-foreground"
+              className="border dark:bg-input/30 data-[state=on]:bg-emerald-500! text-foreground"
             >
               <IconCaretUpFilled /> Income
             </ToggleGroupItem>
