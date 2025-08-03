@@ -75,7 +75,6 @@ export function AddAccountCard({
   const [open, setOpen] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    console.log("Submitting new account...");
     e.preventDefault();
 
     const form = e.currentTarget;
@@ -94,8 +93,6 @@ export function AddAccountCard({
     }).safeParse(payload);
 
     if (!result.success) {
-      console.log(result.error);
-
       toast.dismiss(loadingToast);
       toast.warning("Validation error", {
         description: result.error.issues[0].message,
@@ -121,7 +118,6 @@ export function AddAccountCard({
       }
     } catch (err: any) {
       toast.dismiss(loadingToast);
-      console.log(err);
       toast.error("Something went wrong!", {
         description: err.response?.data?.error || err.message,
       });

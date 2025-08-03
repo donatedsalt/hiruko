@@ -43,7 +43,6 @@ export default function Page() {
       toast.error("Something went wrong", {
         description: err.response?.data?.error || err.message,
       });
-      console.log(err);
     } finally {
       toast.dismiss(loadingToast);
     }

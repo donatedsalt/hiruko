@@ -65,8 +65,6 @@ export default function Page() {
     const result = TransactionSchema.omit({ userId: true }).safeParse(payload);
 
     if (!result.success) {
-      console.log(result.error);
-
       toast.dismiss(loadingToast);
       result.error.issues.slice(0, 3).forEach((issue) => {
         toast.warning(issue.message, {
