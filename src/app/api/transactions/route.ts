@@ -1,4 +1,5 @@
 import z from "zod";
+import mongoose from "mongoose";
 import { NextRequest, NextResponse } from "next/server";
 
 import type { ITransaction, ITransactionDocument } from "@/types/transaction";
@@ -10,6 +11,7 @@ import { authUser } from "@/lib/auth-user";
 import { TransactionSchema } from "@/validation/transaction";
 
 import Transaction from "@/models/Transaction";
+import Account from "@/models/Account";
 
 /**
  * GET /api/transactions
@@ -68,14 +70,38 @@ export async function POST(request: NextRequest) {
       { status: 400 }
     );
   }
-  try {
-    const transaction = await Transaction.create(parsed.data);
 
-    return NextResponse.json(
-      { success: true, data: transaction },
-      { status: 201 }
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
+  try {
+    const transaction = await Transaction.create([parsed.data], { session });
+    const tx = transaction[0];
+
+    const { account, amount, type } = tx;
+
+    const balanceUpdate =
+      type === "income"
+        ? { $inc: { balance: amount, transactionsCount: 1 } }
+        : { $inc: { balance: -amount, transactionsCount: 1 } };
+
+    const accountUpdateResult = await Account.updateOne(
+      { _id: account, userId },
+      balanceUpdate,
+      { session }
     );
+
+    if (accountUpdateResult.modifiedCount === 0) {
+      throw new Error("Failed to update account balance.");
+    }
+
+    await session.commitTransaction();
+    session.endSession();
+
+    return NextResponse.json({ success: true, data: tx }, { status: 201 });
   } catch (error) {
+    await session.abortTransaction();
+    session.endSession();
     return handleError(error);
   }
 }
