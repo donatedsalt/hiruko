@@ -53,11 +53,11 @@ export default function Page() {
       <SiteHeader title="Transaction Details" />
 
       {loading || (!transaction && !error) ? (
-        <div className="text-center mt-6 text-muted-foreground">Loading...</div>
+        <div className="mt-6 text-center text-muted-foreground">Loading...</div>
       ) : error ? (
         <ErrorMessage error="Transaction not found." />
       ) : (
-        <div className="space-y-2 text-sm text-muted-foreground px-6 py-4 max-w-2xl mx-auto">
+        <div className="max-w-2xl px-6 py-4 mx-auto space-y-2 text-sm text-muted-foreground">
           <p className="flex justify-between gap-3">
             <span className="font-semibold text-foreground">Type:</span>
             <span>{transaction?.type}</span>

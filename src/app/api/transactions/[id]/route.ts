@@ -116,7 +116,6 @@ export async function DELETE(_request: NextRequest, { params }: RouteParams) {
 
     if (!transaction) {
       await session.abortTransaction();
-      session.endSession();
       return handleNotFound("Transaction");
     }
 
@@ -145,7 +144,8 @@ export async function DELETE(_request: NextRequest, { params }: RouteParams) {
     );
   } catch (err) {
     await session.abortTransaction();
-    session.endSession();
     return handleError(err);
+  } finally {
+    session.endSession();
   }
 }
