@@ -6,7 +6,7 @@ import {
 } from "@tabler/icons-react";
 import React from "react";
 
-import { ITransaction } from "@/types/transaction";
+import { ITransactionDocument } from "@/types/transaction";
 
 import { cn } from "@/lib/utils";
 
@@ -14,14 +14,15 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import Link from "next/link";
 
-function groupByDay(transactions: ITransaction[]) {
+function groupByDay(transactions: ITransactionDocument[]) {
   return transactions.reduce((groupedTransactions, transaction) => {
     const dateStr = new Date(transaction.transactionTime).toLocaleDateString();
     if (!groupedTransactions[dateStr]) groupedTransactions[dateStr] = [];
     groupedTransactions[dateStr].push(transaction);
     return groupedTransactions;
-  }, {} as Record<string, ITransaction[]>);
+  }, {} as Record<string, ITransactionDocument[]>);
 }
 
 function formatDisplayDate(dateStr: string) {
@@ -51,7 +52,11 @@ function formatDisplayDate(dateStr: string) {
   return `${weekday}, ${monthDay}`;
 }
 
-function RenderGroupedList({ transactions }: { transactions: ITransaction[] }) {
+function RenderGroupedList({
+  transactions,
+}: {
+  transactions: ITransactionDocument[];
+}) {
   const grouped = groupByDay(transactions);
   const dates = Object.keys(grouped).sort(
     (a, b) => new Date(b).getTime() - new Date(a).getTime()
@@ -79,9 +84,9 @@ export function DataList({
   incomeData,
   expenseData,
 }: {
-  allData: ITransaction[];
-  incomeData: ITransaction[];
-  expenseData: ITransaction[];
+  allData: ITransactionDocument[];
+  incomeData: ITransactionDocument[];
+  expenseData: ITransactionDocument[];
 }) {
   return (
     <Tabs
@@ -126,7 +131,7 @@ export function DataList({
   );
 }
 
-export function ListItem({ item }: { item: ITransaction }) {
+export function ListItem({ item }: { item: ITransactionDocument }) {
   return (
     <li>
       <Link
