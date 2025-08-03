@@ -1,8 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import { IconCaretDownFilled, IconCaretUpFilled } from "@tabler/icons-react";
 
 import { ITransactionApiResponse } from "@/types/transaction";
@@ -10,6 +9,7 @@ import { ITransactionApiResponse } from "@/types/transaction";
 import api from "@/lib/axios";
 
 import { useAccounts } from "@/hooks/use-account";
+import { useSafeBack } from "@/hooks/use-safe-back";
 
 import { SiteHeader } from "@/components/site-header";
 import { Label } from "@/components/ui/label";
@@ -23,7 +23,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { ErrorMessage } from "@/components/error-message";
 
 export default function Page() {
-  const router = useRouter();
+  const safeBack = useSafeBack();
   const { accounts, loading, error } = useAccounts();
   const [transactionType, setTransactionType] = useState("expense");
   const [transactionAccount, setTransactionAccount] = useState("");
@@ -84,7 +84,7 @@ export default function Page() {
       if (response.success && response.data && !Array.isArray(response.data)) {
         toast.dismiss(loadingToast);
         toast.success("Transaction added");
-        router.back();
+        safeBack();
       } else {
         toast.dismiss(loadingToast);
         toast.error("Failed to create transaction.", {
