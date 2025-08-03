@@ -152,7 +152,7 @@ export default function Page() {
           </Label>
           <input type="hidden" name="account" value={transactionAccount} />
           {loading ? (
-            <Skeleton className="h-9 w-full" />
+            <Skeleton className="w-full h-9" />
           ) : error ? (
             <ErrorMessage error={error} className="min-h-36" />
           ) : (
@@ -167,7 +167,7 @@ export default function Page() {
                 <ToggleGroupItem
                   key={account._id.toString()}
                   value={account._id.toString()}
-                  className="border dark:bg-input/30"
+                  className="border dark:bg-input/30 dark:data-[state=on]:bg-input"
                 >
                   {account.name}
                 </ToggleGroupItem>
