@@ -1,4 +1,5 @@
 import z from "zod";
+import mongoose from "mongoose";
 import { NextRequest, NextResponse } from "next/server";
 
 import type { ITransaction } from "@/types/transaction";
@@ -10,6 +11,7 @@ import { authUser } from "@/lib/auth-user";
 import { TransactionSchema } from "@/validation/transaction";
 
 import Transaction from "@/models/Transaction";
+import Account from "@/models/Account";
 
 interface RouteParams {
   params: { id: string };
@@ -103,18 +105,47 @@ export async function DELETE(_request: NextRequest, { params }: RouteParams) {
   const idValidationError = validateId(params.id, "Transaction ID");
   if (idValidationError) return idValidationError;
 
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
   try {
-    const transaction = await Transaction.findOneAndDelete({
-      _id: params.id,
-      userId,
-    });
-    if (!transaction) return handleNotFound("Transaction");
+    const transaction = await Transaction.findOneAndDelete(
+      { _id: params.id, userId },
+      { session }
+    );
+
+    if (!transaction) {
+      await session.abortTransaction();
+      session.endSession();
+      return handleNotFound("Transaction");
+    }
+
+    if (transaction.account) {
+      await Account.findByIdAndUpdate(
+        transaction.account,
+        {
+          $inc: {
+            balance:
+              transaction.type === "expense"
+                ? transaction.amount
+                : -transaction.amount,
+            transactionsCount: -1,
+          },
+        },
+        { session }
+      );
+    }
+
+    await session.commitTransaction();
+    session.endSession();
 
     return NextResponse.json(
       { success: true, data: transaction },
       { status: 200 }
     );
-  } catch (error) {
-    return handleError(error);
+  } catch (err) {
+    await session.abortTransaction();
+    session.endSession();
+    return handleError(err);
   }
 }
