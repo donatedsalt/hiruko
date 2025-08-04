@@ -114,6 +114,7 @@ export function AccountsCard({
         toast.dismiss(loadingToast);
         toast.success("Account deleted");
         setOpen(false);
+        window.location.reload();
       } else {
         toast.dismiss(loadingToast);
         toast.error("Failed to delete account.", {

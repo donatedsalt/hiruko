@@ -28,6 +28,7 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 - [ ] checkbox to disable conformation and enable it in settings
 - [ ] [simple icons](https://simpleicons.org/) for using brand icons
 - [ ] take image of reciepts to automatically add transactions
+- [ ] migrate to nextjs server component and fetch api
 
 ### Done
 
