@@ -208,7 +208,7 @@ export function AccountsCard({
                 >
                   Delete
                 </Button>
-                <div className="flex gap-2">
+                <div className="flex flex-col-reverse gap-2 sm:flex-row">
                   <DialogClose asChild>
                     <Button type="button" variant="outline">
                       Cancel
@@ -218,24 +218,22 @@ export function AccountsCard({
                 </div>
               </>
             ) : (
-              <div className="flex flex-col w-full gap-2">
-                <div className="flex justify-end gap-2">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => setShowConfirmDelete(false)}
-                  >
-                    Cancel
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="destructive"
-                    disabled={!done}
-                    onClick={handleDelete}
-                  >
-                    {done ? "Confirm Delete" : `Confirm in ${count}s`}
-                  </Button>
-                </div>
+              <div className="flex flex-col-reverse justify-end gap-2 sm:flex-row">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setShowConfirmDelete(false)}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="button"
+                  variant="destructive"
+                  disabled={!done}
+                  onClick={handleDelete}
+                >
+                  {done ? "Confirm Delete" : `Confirm in ${count}s`}
+                </Button>
               </div>
             )}
           </DialogFooter>
