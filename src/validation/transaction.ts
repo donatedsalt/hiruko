@@ -11,8 +11,10 @@ export const TransactionSchema = z
       .default(""),
     note: z.string().default(""),
     type: z.enum(["income", "expense"], "Type must be income or expense."),
-    amount: z.number().positive("Amount must de a positive number."),
-    transactionTime: z.coerce.date("Time must be a valid date."),
+    amount: z.number().positive("Amount must be a positive number."),
+    transactionTime: z.coerce
+      .date("Time must be a valid date.")
+      .default(() => new Date()),
   })
   .strict();
 
