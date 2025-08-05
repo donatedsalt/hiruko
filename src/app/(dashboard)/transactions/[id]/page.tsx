@@ -1,14 +1,22 @@
 "use client";
 
 import { toast } from "sonner";
-import { useState } from "react";
-import { format } from "date-fns";
+import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-import { IconEdit, IconTrash } from "@tabler/icons-react";
+import {
+  IconCaretDownFilled,
+  IconCaretUpFilled,
+  IconLoader2,
+} from "@tabler/icons-react";
+
+import { ITransactionApiResponse } from "@/types/transaction";
 
 import api from "@/lib/axios";
 
+import { TransactionSchema } from "@/validation/transaction";
+
 import { useTransaction } from "@/hooks/use-transaction";
+import { useAccounts } from "@/hooks/use-account";
 import { useSmartRouter } from "@/hooks/use-smart-router";
 
 import { SiteHeader } from "@/components/site-header";
@@ -22,12 +30,41 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Textarea } from "@/components/ui/textarea";
+import { DatePicker } from "@/components/ui/date-picker";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
 export default function Page() {
   const { id } = useParams();
   const smartRouter = useSmartRouter();
   const { transaction, loading, error } = useTransaction(id as string);
+  const { accounts, loading: accLoading, error: accError } = useAccounts();
+  const [transactionType, setTransactionType] = useState("expense");
+  const [transactionAccount, setTransactionAccount] = useState("");
+  const [transactionTime, setTransactionTime] = useState({
+    date: "",
+    time: "",
+  });
   const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    if (transaction) {
+      setTransactionAccount(transaction.account._id.toString());
+
+      setTransactionType(transaction.type);
+
+      const date = new Date(transaction.transactionTime)
+        .toISOString()
+        .split("T")[0]; // YYYY-MM-DD
+      const time = new Date(transaction.transactionTime)
+        .toTimeString()
+        .slice(0, 5); // HH:MM
+      setTransactionTime({ date: date, time: time });
+    }
+  }, [transaction]);
 
   const handleDelete = async () => {
     const loadingToast = toast.loading("Deleting transaction...");
@@ -49,65 +86,224 @@ export default function Page() {
     }
   };
 
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    const formData = new FormData(e.currentTarget);
+
+    const loadingToast = toast.loading("Processing request...");
+
+    const account = formData.get("account") as string;
+    const category = formData.get("category") as string;
+    const amount = parseFloat(formData.get("amount") as string);
+    const type = formData.get("type") as "income" | "expense";
+    const title = formData.get("title") as string;
+    const note = formData.get("note") as string;
+    const date = formData.get("date") as string;
+    const time = formData.get("time") as string;
+
+    const transactionTime = new Date(`${date}T${time}`);
+
+    const payload = {
+      account,
+      category,
+      amount,
+      type,
+      title: title || undefined,
+      note: note || undefined,
+      transactionTime,
+    };
+
+    const result = TransactionSchema.omit({ userId: true }).safeParse(payload);
+
+    if (!result.success) {
+      toast.dismiss(loadingToast);
+      result.error.issues.slice(0, 3).forEach((issue) => {
+        toast.warning(issue.message, {
+          description: "Please check your input.",
+        });
+      });
+      if (result.error.issues.length > 3) {
+        toast.warning("Some other fields may have issues too.", {
+          description: "Scroll to review your form.",
+        });
+      }
+      return;
+    }
+
+    try {
+      const res = await api.put<ITransactionApiResponse>(
+        `/transactions/${id}`,
+        result.data
+      );
+      const response = res.data;
+
+      if (response.success && response.data && !Array.isArray(response.data)) {
+        toast.dismiss(loadingToast);
+        toast.success("Transaction updated");
+        smartRouter.back();
+      } else {
+        toast.dismiss(loadingToast);
+        toast.error("Failed to update transaction.", {
+          description: response.error,
+        });
+      }
+    } catch (err: any) {
+      toast.dismiss(loadingToast);
+      toast.error("Something went wrong!", {
+        description: err.response?.data?.error || err.message,
+      });
+    }
+  };
+
   return (
     <>
-      <SiteHeader title="Transaction Details" />
+      <SiteHeader title="Edit Transaction" />
 
       {loading || (!transaction && !error) ? (
-        <div className="mt-6 text-center text-muted-foreground">Loading...</div>
+        <div className="flex items-center justify-center h-full gap-2 text-muted-foreground">
+          <IconLoader2 className="animate-spin" />
+          <span>Loading...</span>
+        </div>
       ) : error ? (
         <ErrorMessage error="Transaction not found." />
       ) : (
-        <div className="max-w-2xl px-6 py-4 mx-auto space-y-2 text-sm text-muted-foreground">
-          <p className="flex justify-between gap-3">
-            <span className="font-semibold text-foreground">Type:</span>
-            <span>{transaction?.type}</span>
-          </p>
-          <p className="flex justify-between gap-3">
-            <span className="font-semibold text-foreground">Category:</span>
-            <span>{transaction?.category}</span>
-          </p>
-          {transaction?.title && (
-            <p className="flex justify-between gap-3">
-              <span className="font-semibold text-foreground">Title:</span>
-              <span>{transaction.title}</span>
-            </p>
-          )}
-          {transaction?.note && (
-            <p className="flex justify-between gap-3">
-              <span className="font-semibold text-foreground">Note:</span>
-              <span>{transaction.note}</span>
-            </p>
-          )}
-          <p className="flex justify-between gap-3">
-            <span className="font-semibold text-foreground">Amount:</span>
-            <span>
-              {transaction?.amount.toLocaleString("en-US", {
-                style: "currency",
-                currency: "USD",
-              })}
-            </span>
-          </p>
-          <p className="flex justify-between gap-3">
-            <span className="font-semibold text-foreground">
-              Transaction Time:
-            </span>
-            {format(new Date(transaction!.transactionTime), "PPPpp")}
-          </p>
-          <p className="flex justify-between gap-3">
-            <span className="font-semibold text-foreground">Account:</span>
-            <span>
-              {(transaction?.account as { name?: string })?.name ?? "-"}
-            </span>
-          </p>
-          <div className="flex justify-end gap-3">
+        <form onSubmit={handleSubmit} className="grid gap-6 m-4 md:m-6">
+          <div className="grid gap-3 *:w-full">
+            <Label htmlFor="category">
+              Category<span className="text-destructive">*</span>
+            </Label>
+            <Input
+              id="category"
+              name="category"
+              type="text"
+              placeholder="Shopping"
+              defaultValue={transaction?.category}
+              required
+            />
+          </div>
+          <div className="grid gap-3 *:w-full">
+            <Label htmlFor="type">
+              Type<span className="text-destructive">*</span>
+            </Label>
+            <input type="hidden" name="type" value={transactionType} />
+            <ToggleGroup
+              type="single"
+              value={transactionType}
+              onValueChange={(val: string) => {
+                if (val) setTransactionType(val);
+              }}
+            >
+              <ToggleGroupItem
+                value="expense"
+                aria-label="Toggle expense"
+                className="border dark:bg-input/30 data-[state=on]:bg-destructive! text-destructive-foreground"
+              >
+                <IconCaretDownFilled />
+                <span>Expense</span>
+              </ToggleGroupItem>
+              <ToggleGroupItem
+                value="income"
+                aria-label="Toggle income"
+                className="border dark:bg-input/30 data-[state=on]:bg-emerald-500! text-foreground"
+              >
+                <IconCaretUpFilled />
+                <span>Income</span>
+              </ToggleGroupItem>
+            </ToggleGroup>
+          </div>
+          <div className="grid gap-3 *:w-full">
+            <Label htmlFor="account">
+              Account<span className="text-destructive">*</span>
+            </Label>
+            <input type="hidden" name="account" value={transactionAccount} />
+            {accLoading ? (
+              <Skeleton className="w-full h-9" />
+            ) : accError ? (
+              <ErrorMessage error={accError} className="min-h-36" />
+            ) : (
+              <ToggleGroup
+                type="single"
+                value={transactionAccount}
+                onValueChange={(val: string) => {
+                  if (val) setTransactionAccount(val);
+                }}
+              >
+                {accounts.map((account) => (
+                  <ToggleGroupItem
+                    key={account._id.toString()}
+                    value={account._id.toString()}
+                    className="border dark:bg-input/30 dark:data-[state=on]:bg-input"
+                  >
+                    {account.name}
+                  </ToggleGroupItem>
+                ))}
+              </ToggleGroup>
+            )}
+          </div>
+          <div className="grid gap-3 *:w-full">
+            <Label htmlFor="amount">
+              Amount<span className="text-destructive">*</span>
+            </Label>
+            <Input
+              id="amount"
+              name="amount"
+              type="number"
+              placeholder="99.99"
+              defaultValue={transaction?.amount}
+              required
+              min="0.01"
+              step="0.01"
+            />
+          </div>
+          <div className="grid gap-3 *:w-full">
+            <Label htmlFor="title">Title</Label>
+            <Input
+              id="title"
+              name="title"
+              type="text"
+              placeholder="Shopping"
+              defaultValue={transaction?.title}
+            />
+          </div>
+          <div className="grid gap-3 *:w-full">
+            <Label htmlFor="note">Note</Label>
+            <Textarea
+              id="note"
+              name="note"
+              rows={4}
+              placeholder="something related to current transaction..."
+              defaultValue={transaction?.note}
+              className="resize-none"
+            />
+          </div>
+          <div className="grid gap-3 *:w-full">
+            <Label htmlFor="date">
+              Date<span className="text-destructive">*</span>
+            </Label>
+            <DatePicker
+              id="date"
+              name="date"
+              defaultValue={transactionTime.date}
+            />
+          </div>
+          <div className="grid gap-3 *:w-full">
+            <Label htmlFor="time">
+              Time<span className="text-destructive">*</span>
+            </Label>
+            <Input
+              id="time"
+              name="time"
+              type="time"
+              defaultValue={transactionTime.time}
+              required
+            />
+          </div>
+          <div className="flex flex-col-reverse justify-between gap-3 sm:flex-row">
             <Dialog open={open} onOpenChange={setOpen}>
               <DialogTrigger asChild>
-                <Button variant="destructive">
-                  <IconTrash /> Delete
-                </Button>
+                <Button variant="destructive">Delete</Button>
               </DialogTrigger>
-
               <DialogContent>
                 <DialogHeader>
                   <DialogTitle>Delete Transaction</DialogTitle>
@@ -126,8 +322,19 @@ export default function Page() {
                 </DialogFooter>
               </DialogContent>
             </Dialog>
+
+            <div className="flex flex-col-reverse gap-3 sm:flex-row">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={smartRouter.back}
+              >
+                Cancel
+              </Button>
+              <Button type="submit">Save changes</Button>
+            </div>
           </div>
-        </div>
+        </form>
       )}
     </>
   );
