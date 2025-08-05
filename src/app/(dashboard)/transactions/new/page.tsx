@@ -82,6 +82,11 @@ export default function Page() {
           description: "Please check your input.",
         });
       });
+      if (result.error.issues.length > 3) {
+        toast.warning("Some other fields may have issues too.", {
+          description: "Scroll to review your form.",
+        });
+      }
       return;
     }
 
@@ -146,14 +151,16 @@ export default function Page() {
               aria-label="Toggle expense"
               className="border dark:bg-input/30 data-[state=on]:bg-destructive! text-destructive-foreground"
             >
-              <IconCaretDownFilled /> Expense
+              <IconCaretDownFilled />
+              <span>Expense</span>
             </ToggleGroupItem>
             <ToggleGroupItem
               value="income"
               aria-label="Toggle income"
               className="border dark:bg-input/30 data-[state=on]:bg-emerald-500! text-foreground"
             >
-              <IconCaretUpFilled /> Income
+              <IconCaretUpFilled />
+              <span>Income</span>
             </ToggleGroupItem>
           </ToggleGroup>
         </div>
