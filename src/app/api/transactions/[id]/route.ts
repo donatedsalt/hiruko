@@ -61,7 +61,15 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
   if (idValidationError) return idValidationError;
 
   const body: Partial<ITransaction> = await request.json();
-  const parsed = TransactionSchema.safeParse({ ...body, userId });
+
+  if (Object.keys(body).length === 0) {
+    return NextResponse.json(
+      { success: false, error: "At least one field must be provided." },
+      { status: 400 }
+    );
+  }
+
+  const parsed = TransactionSchema.partial().safeParse({ ...body, userId });
 
   if (!parsed.success) {
     const errorTree = z.treeifyError(parsed.error);
@@ -71,24 +79,95 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
     );
   }
 
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
   try {
-    const transaction = await Transaction.findOneAndUpdate(
+    const existingTransaction = await Transaction.findOne(
       { _id: params.id, userId },
-      parsed.data,
+      null,
+      { session }
+    );
+
+    if (!existingTransaction) {
+      await session.abortTransaction();
+      return handleNotFound("Transaction");
+    }
+
+    const updatedData = parsed.data;
+
+    const amountChanged =
+      updatedData.amount !== undefined &&
+      updatedData.amount !== existingTransaction.amount;
+
+    const accountChanged =
+      updatedData.account !== undefined &&
+      updatedData.account.toString() !==
+        existingTransaction.account?.toString();
+
+    const typeChanged =
+      updatedData.type !== undefined &&
+      updatedData.type !== existingTransaction.type;
+
+    const updatedTransaction = await Transaction.findOneAndUpdate(
+      { _id: params.id, userId },
+      updatedData,
       {
         new: true,
         runValidators: true,
+        session,
       }
     );
 
-    if (!transaction) return handleNotFound("Transaction");
+    if (!updatedTransaction) {
+      await session.abortTransaction();
+      return handleNotFound("Transaction");
+    }
+
+    if (
+      existingTransaction.account &&
+      (amountChanged || accountChanged || typeChanged)
+    ) {
+      const oldMultiplier = existingTransaction.type === "expense" ? 1 : -1;
+
+      await Account.findByIdAndUpdate(
+        existingTransaction.account,
+        {
+          $inc: {
+            balance: oldMultiplier * existingTransaction.amount,
+            ...(accountChanged ? { transactionsCount: -1 } : {}),
+          },
+        },
+        { session }
+      );
+    }
+
+    if (updatedTransaction.account) {
+      const newMultiplier = updatedTransaction.type === "expense" ? -1 : 1;
+
+      await Account.findByIdAndUpdate(
+        updatedTransaction.account,
+        {
+          $inc: {
+            balance: newMultiplier * updatedTransaction.amount,
+            ...(accountChanged ? { transactionsCount: 1 } : {}),
+          },
+        },
+        { session }
+      );
+    }
+
+    await session.commitTransaction();
 
     return NextResponse.json(
-      { success: true, data: transaction },
+      { success: true, data: updatedTransaction },
       { status: 200 }
     );
   } catch (error) {
+    await session.abortTransaction();
     return handleError(error);
+  } finally {
+    session.endSession();
   }
 }
 
