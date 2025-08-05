@@ -56,12 +56,12 @@ export function AccountsCard({
     const loadingToast = toast.loading("Processing request...");
 
     const name = formData.get("name") as string;
+    const balance = parseFloat(formData.get("balance") as string);
 
-    const payload = { name };
+    const payload = { name, balance };
 
     const result = AccountSchema.omit({
       userId: true,
-      balance: true,
       transactionsCount: true,
     }).safeParse(payload);
 
@@ -86,6 +86,7 @@ export function AccountsCard({
         toast.success("Account updated");
         form.reset();
         setOpen(false);
+        window.location.reload();
       } else {
         toast.dismiss(loadingToast);
         toast.error("Failed to update account.", {
@@ -196,6 +197,17 @@ export function AccountsCard({
                   required
                 />
               </div>
+              <div className="grid gap-3">
+                <Label htmlFor="balance">Correct Balance</Label>
+                <Input
+                  id="balance"
+                  name="balance"
+                  type="number"
+                  defaultValue={account.balance}
+                  required
+                  step="0.01"
+                />
+              </div>
             </div>
           )}
           <DialogFooter className="justify-between!">
@@ -218,7 +230,7 @@ export function AccountsCard({
                 </div>
               </>
             ) : (
-              <div className="flex flex-col-reverse justify-end gap-2 sm:flex-row">
+              <div className="flex flex-col-reverse justify-end gap-2 grow sm:flex-row">
                 <Button
                   type="button"
                   variant="outline"
