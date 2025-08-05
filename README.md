@@ -18,6 +18,7 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 ### Todo
 
+- [ ] disable buttons when action is being performed (submit button when form is being submitted)
 - [ ] budget
 - [ ] goal
 - [ ] conuslt chatbot
