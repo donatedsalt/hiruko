@@ -7,15 +7,21 @@ import { IconCirclePlusFilled } from "@tabler/icons-react";
 
 import { Button } from "@/components/ui/button";
 
-const hiddenRoutes = ["/transactions/new", "/transactions/edit", "/settings"];
+// Hide Floating Button on:
+// - /transactions/* (but not /transactions)
+// - /settings and all its nested routes
+const hiddenPatterns = [
+  /^\/transactions\/.+$/, // Matches /transactions/anything (but not /transactions)
+  /^\/settings(\/.*)?$/, // Matches /settings and any nested route
+];
 
 export function FloatingButtons() {
   const pathname = usePathname();
 
-  if (hiddenRoutes.includes(pathname)) return null;
+  if (hiddenPatterns.some((pattern) => pattern.test(pathname))) return null;
 
   return (
-    <div className="fixed z-50 flex flex-col items-end gap-4 bottom-6 right-6">
+    <div className="fixed z-50 flex flex-col items-end gap-4 bottom-4 md:bottom-6 right-4 md:right-6">
       <Button floating asChild>
         <Link href="/transactions/new">
           <IconCirclePlusFilled className="!size-6" />
