@@ -346,7 +346,6 @@ export function AddAccountCard({
                 type="number"
                 defaultValue={0}
                 required
-                min="0"
                 step="0.01"
               />
             </div>

@@ -16,7 +16,6 @@ const accountSchema: Schema<IAccountDocument> = new Schema(
     },
     balance: {
       type: Number,
-      min: [0, "Account balance cannot be negative"],
       default: 0,
     },
     transactionsCount: {
