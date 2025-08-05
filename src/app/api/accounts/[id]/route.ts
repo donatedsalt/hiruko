@@ -35,7 +35,8 @@ export async function GET(_request: NextRequest, { params }: RouteParams) {
     const account = await Account.findOne({
       _id: params.id,
       userId,
-    }).populate("account");
+    });
+
     if (!account) return handleNotFound("Account");
 
     return NextResponse.json({ success: true, data: account }, { status: 200 });
