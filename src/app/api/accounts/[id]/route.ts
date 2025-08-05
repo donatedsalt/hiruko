@@ -179,10 +179,22 @@ export async function DELETE(_request: NextRequest, { params }: RouteParams) {
       return handleNotFound("Account");
     }
 
-    await Transaction.deleteMany({ account: account._id, userId }, { session });
+    const transactionsDeleteResult = await Transaction.deleteMany(
+      { account: account._id, userId },
+      { session }
+    );
 
     await session.commitTransaction();
-    return NextResponse.json({ success: true, data: account }, { status: 200 });
+    return NextResponse.json(
+      {
+        success: true,
+        data: {
+          account,
+          transactionsDeleted: transactionsDeleteResult.deletedCount,
+        },
+      },
+      { status: 200 }
+    );
   } catch (err) {
     await session.abortTransaction();
     return handleError(err);
