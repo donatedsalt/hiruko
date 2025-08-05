@@ -12,6 +12,7 @@ import { AccountSchema } from "@/validation/account";
 
 import Account from "@/models/Account";
 import Transaction from "@/models/Transaction";
+import { TransactionSchema } from "@/validation/transaction";
 
 interface RouteParams {
   params: { id: string };
@@ -68,21 +69,84 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
     );
   }
 
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
   try {
+    const existingAccount = await Account.findOne({
+      _id: params.id,
+      userId,
+    }).session(session);
+    if (!existingAccount) {
+      await session.abortTransaction();
+      return handleNotFound("Account");
+    }
+
+    const oldBalance = existingAccount.balance;
+    const newBalance = parsed.data.balance;
+
     const account = await Account.findOneAndUpdate(
       { _id: params.id, userId },
       parsed.data,
       {
         new: true,
         runValidators: true,
+        session,
       }
     );
 
-    if (!account) return handleNotFound("Account");
+    if (!account) {
+      await session.abortTransaction();
+      return handleNotFound("Account");
+    }
+
+    if (
+      typeof newBalance === "number" &&
+      typeof oldBalance === "number" &&
+      newBalance !== oldBalance
+    ) {
+      const difference = newBalance - oldBalance;
+      const type = difference > 0 ? "income" : "expense";
+
+      const correctionTransaction = {
+        userId,
+        account: account._id.toString(),
+        category: "balance correction",
+        type,
+        note: "Balance manually adjusted",
+        amount: Math.abs(difference),
+        transactionTime: new Date(),
+      };
+
+      const transactionParse = TransactionSchema.safeParse(
+        correctionTransaction
+      );
+      if (!transactionParse.success) {
+        await session.abortTransaction();
+        const errorTree = z.treeifyError(transactionParse.error);
+        return NextResponse.json(
+          { success: false, error: errorTree },
+          { status: 400 }
+        );
+      }
+
+      await Transaction.create([transactionParse.data], { session });
+
+      await Account.findByIdAndUpdate(
+        account._id,
+        { $inc: { transactionsCount: 1 } },
+        { session }
+      );
+    }
+
+    await session.commitTransaction();
 
     return NextResponse.json({ success: true, data: account }, { status: 200 });
   } catch (error) {
+    await session.abortTransaction();
     return handleError(error);
+  } finally {
+    session.endSession();
   }
 }
 
