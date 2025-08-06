@@ -277,29 +277,31 @@ export default function Page() {
               className="resize-none"
             />
           </div>
-          <div className="grid gap-3 *:w-full">
-            <Label htmlFor="date">
-              Date<span className="text-destructive">*</span>
-            </Label>
-            <DatePicker
-              id="date"
-              name="date"
-              defaultValue={transactionTime.date}
-            />
+          <div className="grid gap-6 sm:grid-cols-2">
+            <div className="grid gap-3 *:w-full">
+              <Label htmlFor="date">
+                Date<span className="text-destructive">*</span>
+              </Label>
+              <DatePicker
+                id="date"
+                name="date"
+                defaultValue={transactionTime.date}
+              />
+            </div>
+            <div className="grid gap-3 *:w-full">
+              <Label htmlFor="time">
+                Time<span className="text-destructive">*</span>
+              </Label>
+              <Input
+                id="time"
+                name="time"
+                type="time"
+                defaultValue={transactionTime.time}
+                required
+              />
+            </div>
           </div>
-          <div className="grid gap-3 *:w-full">
-            <Label htmlFor="time">
-              Time<span className="text-destructive">*</span>
-            </Label>
-            <Input
-              id="time"
-              name="time"
-              type="time"
-              defaultValue={transactionTime.time}
-              required
-            />
-          </div>
-          <div className="flex flex-col-reverse justify-between gap-3 sm:flex-row">
+          <div className="flex flex-col-reverse justify-between gap-6 sm:flex-row">
             <Dialog open={open} onOpenChange={setOpen}>
               <DialogTrigger asChild>
                 <Button variant="destructive">Delete</Button>

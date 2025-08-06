@@ -221,23 +221,26 @@ export default function Page() {
             className="resize-none"
           />
         </div>
-        <div className="grid gap-3 *:w-full">
-          <Label htmlFor="date">
-            Date<span className="text-destructive">*</span>
-          </Label>
-          <DatePicker id="date" name="date" defaultValue={currentDate} />
+        <div className="grid gap-6 sm:grid-cols-2">
+          <div className="grid gap-3 *:w-full">
+            <Label htmlFor="date">
+              Date<span className="text-destructive">*</span>
+            </Label>
+            <DatePicker id="date" name="date" defaultValue={currentDate} />
+          </div>
+          <div className="grid gap-3 *:w-full">
+            <Label htmlFor="time">
+              Time<span className="text-destructive">*</span>
+            </Label>
+            <Input
+              id="time"
+              name="time"
+              type="time"
+              defaultValue={currentTime}
+              required
+            />
+          </div>
         </div>
-        <div className="grid gap-3 *:w-full">
-          <Label htmlFor="time">
-            Time<span className="text-destructive">*</span>
-          </Label>
-          <Input
-            id="time"
-            name="time"
-            type="time"
-            defaultValue={currentTime}
-            required
-          />
         <div className="flex flex-col-reverse justify-end gap-3 sm:flex-row">
           <Button type="button" variant="outline" onClick={smartRouter.back}>
             Cancel
