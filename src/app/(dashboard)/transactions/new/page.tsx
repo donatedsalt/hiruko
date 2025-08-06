@@ -238,8 +238,12 @@ export default function Page() {
             defaultValue={currentTime}
             required
           />
+        <div className="flex flex-col-reverse justify-end gap-3 sm:flex-row">
+          <Button type="button" variant="outline" onClick={smartRouter.back}>
+            Cancel
+          </Button>
+          <Button type="submit">Add Transaction</Button>
         </div>
-        <Button type="submit">Add Transaction</Button>
       </form>
     </>
   );
