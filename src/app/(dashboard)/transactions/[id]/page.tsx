@@ -49,6 +49,7 @@ export default function Page() {
     time: "",
   });
   const [open, setOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     if (transaction) {
@@ -67,6 +68,7 @@ export default function Page() {
   }, [transaction]);
 
   const handleDelete = async () => {
+    setIsSubmitting(true);
     const loadingToast = toast.loading("Deleting transaction...");
     try {
       const res = await api.delete(`/transactions/${id}`);
@@ -82,12 +84,14 @@ export default function Page() {
         description: err.response?.data?.error || err.message,
       });
     } finally {
+      setIsSubmitting(false);
       toast.dismiss(loadingToast);
     }
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setIsSubmitting(true);
 
     const formData = new FormData(e.currentTarget);
 
@@ -150,6 +154,7 @@ export default function Page() {
         description: err.response?.data?.error || err.message,
       });
     } finally {
+      setIsSubmitting(false);
       toast.dismiss(loadingToast);
     }
   };
@@ -302,7 +307,9 @@ export default function Page() {
           <div className="flex flex-col-reverse justify-between gap-6 sm:flex-row">
             <Dialog open={open} onOpenChange={setOpen}>
               <DialogTrigger asChild>
-                <Button variant="destructive">Delete</Button>
+                <Button variant="destructive" disabled={isSubmitting}>
+                  Delete
+                </Button>
               </DialogTrigger>
               <DialogContent>
                 <DialogHeader>
@@ -313,10 +320,18 @@ export default function Page() {
                   cannot be undone.
                 </p>
                 <DialogFooter className="mt-4">
-                  <Button variant="outline" onClick={() => setOpen(false)}>
+                  <Button
+                    variant="outline"
+                    onClick={() => setOpen(false)}
+                    disabled={isSubmitting}
+                  >
                     Cancel
                   </Button>
-                  <Button variant="destructive" onClick={handleDelete}>
+                  <Button
+                    variant="destructive"
+                    onClick={handleDelete}
+                    disabled={isSubmitting}
+                  >
                     Confirm
                   </Button>
                 </DialogFooter>
@@ -328,10 +343,13 @@ export default function Page() {
                 type="button"
                 variant="outline"
                 onClick={smartRouter.back}
+                disabled={isSubmitting}
               >
                 Cancel
               </Button>
-              <Button type="submit">Save changes</Button>
+              <Button type="submit" disabled={isSubmitting}>
+                Save changes
+              </Button>
             </div>
           </div>
         </form>

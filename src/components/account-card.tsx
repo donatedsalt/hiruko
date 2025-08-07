@@ -46,9 +46,11 @@ export function AccountsCard({
   const [open, setOpen] = useState(false);
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
   const { count, done } = useCountdown(3, showConfirmDelete);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setIsSubmitting(true);
 
     const form = e.currentTarget;
     const formData = new FormData(form);
@@ -95,11 +97,13 @@ export function AccountsCard({
         description: err.response?.data?.error || err.message,
       });
     } finally {
+      setIsSubmitting(false);
       toast.dismiss(loadingToast);
     }
   };
 
   const handleDelete = async () => {
+    setIsSubmitting(true);
     const loadingToast = toast.loading("Deleting account...");
 
     try {
@@ -123,6 +127,7 @@ export function AccountsCard({
         description: err.response?.data?.error || err.message,
       });
     } finally {
+      setIsSubmitting(false);
       toast.dismiss(loadingToast);
     }
   };
@@ -214,16 +219,23 @@ export function AccountsCard({
                   type="button"
                   variant="destructive"
                   onClick={() => setShowConfirmDelete(true)}
+                  disabled={isSubmitting}
                 >
                   Delete
                 </Button>
                 <div className="flex flex-col-reverse gap-2 sm:flex-row">
                   <DialogClose asChild>
-                    <Button type="button" variant="outline">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      disabled={isSubmitting}
+                    >
                       Cancel
                     </Button>
                   </DialogClose>
-                  <Button type="submit">Save changes</Button>
+                  <Button type="submit" disabled={isSubmitting}>
+                    Save changes
+                  </Button>
                 </div>
               </>
             ) : (
@@ -232,14 +244,15 @@ export function AccountsCard({
                   type="button"
                   variant="outline"
                   onClick={() => setShowConfirmDelete(false)}
+                  disabled={isSubmitting}
                 >
                   Cancel
                 </Button>
                 <Button
                   type="button"
                   variant="destructive"
-                  disabled={!done}
                   onClick={handleDelete}
+                  disabled={isSubmitting || !done}
                 >
                   {done ? "Confirm Delete" : `Confirm in ${count}s`}
                 </Button>
@@ -262,9 +275,11 @@ export function AddAccountCard({
   onAdd: (acc: IAccountDocument) => void;
 }) {
   const [open, setOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setIsSubmitting(true);
 
     const form = e.currentTarget;
     const formData = new FormData(form);
@@ -282,7 +297,6 @@ export function AddAccountCard({
     }).safeParse(payload);
 
     if (!result.success) {
-      toast.dismiss(loadingToast);
       toast.warning("Validation error", {
         description: result.error.issues[0].message,
       });
@@ -295,21 +309,21 @@ export function AddAccountCard({
 
       if (response.success && response.data && !Array.isArray(response.data)) {
         onAdd(response.data);
-        toast.dismiss(loadingToast);
         toast.success("Account added");
         form.reset();
         setOpen(false);
       } else {
-        toast.dismiss(loadingToast);
         toast.error("Failed to create account.", {
           description: response.error,
         });
       }
     } catch (err: any) {
-      toast.dismiss(loadingToast);
       toast.error("Something went wrong!", {
         description: err.response?.data?.error || err.message,
       });
+    } finally {
+      setIsSubmitting(false);
+      toast.dismiss(loadingToast);
     }
   };
 
@@ -361,9 +375,13 @@ export function AddAccountCard({
           </div>
           <DialogFooter>
             <DialogClose asChild>
-              <Button variant="outline">Cancel</Button>
+              <Button variant="outline" disabled={isSubmitting}>
+                Cancel
+              </Button>
             </DialogClose>
-            <Button type="submit">Save changes</Button>
+            <Button type="submit" disabled={isSubmitting}>
+              Save changes
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>

@@ -28,6 +28,7 @@ export default function Page() {
   const { accounts, loading, error } = useAccounts();
   const [transactionType, setTransactionType] = useState("expense");
   const [transactionAccount, setTransactionAccount] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     const timeout = setTimeout(() => {
@@ -47,6 +48,7 @@ export default function Page() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setIsSubmitting(true);
 
     const formData = new FormData(e.currentTarget);
 
@@ -109,6 +111,7 @@ export default function Page() {
         description: err.response?.data?.error || err.message,
       });
     } finally {
+      setIsSubmitting(false);
       toast.dismiss(loadingToast);
     }
   };
@@ -240,10 +243,17 @@ export default function Page() {
           </div>
         </div>
         <div className="flex flex-col-reverse justify-end gap-3 sm:flex-row">
-          <Button type="button" variant="outline" onClick={smartRouter.back}>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={smartRouter.back}
+            disabled={isSubmitting}
+          >
             Cancel
           </Button>
-          <Button type="submit">Add Transaction</Button>
+          <Button type="submit" disabled={isSubmitting}>
+            Add Transaction
+          </Button>
         </div>
       </form>
     </>
