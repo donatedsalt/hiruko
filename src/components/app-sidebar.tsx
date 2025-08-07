@@ -5,6 +5,7 @@ import Link from "next/link";
 import {
   IconCash,
   IconChartCandle,
+  IconChartPie,
   IconCoin,
   IconHelp,
   IconMessageCircleQuestion,
@@ -42,6 +43,11 @@ const data = {
       title: "Transactions",
       url: "/transactions",
       icon: IconCash,
+    },
+    {
+      title: "Statistics",
+      url: "#",
+      icon: IconChartPie,
     },
     {
       title: "Budgets",
