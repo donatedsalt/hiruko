@@ -50,6 +50,7 @@ export default function Page() {
   });
   const [open, setOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
     if (transaction) {
@@ -171,8 +172,8 @@ export default function Page() {
       ) : error ? (
         <ErrorMessage error="Transaction not found." />
       ) : (
-        <form onSubmit={handleSubmit} className="grid gap-6 m-4 md:m-6">
-          <div className="grid gap-3 *:w-full">
+        <form onSubmit={handleSubmit} className="grid gap-6 m-4 md:m-6 ">
+          <div className="grid **:disabled:opacity-75 gap-3 *:w-full">
             <Label htmlFor="category">
               Category<span className="text-destructive">*</span>
             </Label>
@@ -183,19 +184,26 @@ export default function Page() {
               placeholder="Shopping"
               defaultValue={transaction?.category}
               required
+              disabled={!isEditing}
             />
           </div>
-          <div className="grid gap-3 *:w-full">
+          <div className="grid **:disabled:opacity-75 gap-3 *:w-full">
             <Label htmlFor="type">
               Type<span className="text-destructive">*</span>
             </Label>
-            <input type="hidden" name="type" value={transactionType} />
+            <input
+              type="hidden"
+              name="type"
+              value={transactionType}
+              disabled={!isEditing}
+            />
             <ToggleGroup
               type="single"
               value={transactionType}
               onValueChange={(val: string) => {
                 if (val) setTransactionType(val);
               }}
+              disabled={!isEditing}
             >
               <ToggleGroupItem
                 value="expense"
@@ -215,11 +223,16 @@ export default function Page() {
               </ToggleGroupItem>
             </ToggleGroup>
           </div>
-          <div className="grid gap-3 *:w-full">
+          <div className="grid **:disabled:opacity-75 gap-3 *:w-full">
             <Label htmlFor="account">
               Account<span className="text-destructive">*</span>
             </Label>
-            <input type="hidden" name="account" value={transactionAccount} />
+            <input
+              type="hidden"
+              name="account"
+              value={transactionAccount}
+              disabled={!isEditing}
+            />
             {accLoading ? (
               <Skeleton className="w-full h-9" />
             ) : accError ? (
@@ -231,6 +244,7 @@ export default function Page() {
                 onValueChange={(val: string) => {
                   if (val) setTransactionAccount(val);
                 }}
+                disabled={!isEditing}
               >
                 {accounts.map((account) => (
                   <ToggleGroupItem
@@ -244,7 +258,7 @@ export default function Page() {
               </ToggleGroup>
             )}
           </div>
-          <div className="grid gap-3 *:w-full">
+          <div className="grid **:disabled:opacity-75 gap-3 *:w-full">
             <Label htmlFor="amount">
               Amount<span className="text-destructive">*</span>
             </Label>
@@ -257,9 +271,10 @@ export default function Page() {
               required
               min="0.01"
               step="0.01"
+              disabled={!isEditing}
             />
           </div>
-          <div className="grid gap-3 *:w-full">
+          <div className="grid **:disabled:opacity-75 gap-3 *:w-full">
             <Label htmlFor="title">Title</Label>
             <Input
               id="title"
@@ -267,9 +282,10 @@ export default function Page() {
               type="text"
               placeholder="Shopping"
               defaultValue={transaction?.title}
+              disabled={!isEditing}
             />
           </div>
-          <div className="grid gap-3 *:w-full">
+          <div className="grid **:disabled:opacity-75 gap-3 *:w-full">
             <Label htmlFor="note">Note</Label>
             <Textarea
               id="note"
@@ -278,9 +294,10 @@ export default function Page() {
               placeholder="something related to current transaction..."
               defaultValue={transaction?.note}
               className="resize-none"
+              disabled={!isEditing}
             />
           </div>
-          <div className="grid gap-6 sm:grid-cols-2">
+          <div className="grid **:disabled:opacity-75 gap-6 sm:grid-cols-2">
             <div className="grid gap-3 *:w-full">
               <Label htmlFor="date">
                 Date<span className="text-destructive">*</span>
@@ -289,6 +306,7 @@ export default function Page() {
                 id="date"
                 name="date"
                 defaultValue={transactionTime.date}
+                disabled={!isEditing}
               />
             </div>
             <div className="grid gap-3 *:w-full">
@@ -301,6 +319,7 @@ export default function Page() {
                 type="time"
                 defaultValue={transactionTime.time}
                 required
+                disabled={!isEditing}
               />
             </div>
           </div>
@@ -342,14 +361,29 @@ export default function Page() {
               <Button
                 type="button"
                 variant="outline"
-                onClick={smartRouter.back}
+                onClick={() => {
+                  if (isEditing) {
+                    setIsEditing(false);
+                  } else {
+                    smartRouter.back();
+                  }
+                }}
                 disabled={isSubmitting}
               >
                 Cancel
               </Button>
-              <Button type="submit" disabled={isSubmitting}>
-                Save changes
-              </Button>
+              {isEditing ? (
+                <Button type="submit" disabled={isSubmitting}>
+                  Save changes
+                </Button>
+              ) : (
+                // idk whats wrong with this but it doesnt work normally
+                <Button asChild>
+                  <button type="button" onClick={() => setIsEditing(true)}>
+                    Enable Editing
+                  </button>
+                </Button>
+              )}
             </div>
           </div>
         </form>

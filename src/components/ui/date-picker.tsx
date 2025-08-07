@@ -15,10 +15,12 @@ function DatePicker({
   id,
   name,
   defaultValue,
+  disabled = false,
 }: {
   id?: string;
   name?: string;
   defaultValue?: string;
+  disabled?: boolean;
 }) {
   const [open, setOpen] = React.useState(false);
   const [date, setDate] = React.useState<Date | undefined>(
@@ -33,6 +35,7 @@ function DatePicker({
             id={id}
             variant="outline"
             className="w-32 justify-between font-normal"
+            disabled={disabled}
           >
             {date ? date.toLocaleDateString() : "Select date"}
             <ChevronDownIcon />
@@ -47,6 +50,7 @@ function DatePicker({
               setDate(date);
               setOpen(false);
             }}
+            disabled={disabled}
           />
         </PopoverContent>
       </Popover>
@@ -56,6 +60,7 @@ function DatePicker({
           type="hidden"
           name={name}
           value={date.toISOString().split("T")[0]}
+          disabled={disabled}
         />
       )}
     </>
