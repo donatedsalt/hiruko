@@ -66,7 +66,6 @@ export function AccountsCard({
     }).safeParse(payload);
 
     if (!result.success) {
-      toast.dismiss(loadingToast);
       toast.warning("Validation error", {
         description: result.error.issues[0].message,
       });
@@ -82,22 +81,21 @@ export function AccountsCard({
 
       if (response.success && response.data && !Array.isArray(response.data)) {
         onUpdate(response.data);
-        toast.dismiss(loadingToast);
         toast.success("Account updated");
         form.reset();
         setOpen(false);
         window.location.reload();
       } else {
-        toast.dismiss(loadingToast);
         toast.error("Failed to update account.", {
           description: response.error,
         });
       }
     } catch (err: any) {
-      toast.dismiss(loadingToast);
       toast.error("Something went wrong!", {
         description: err.response?.data?.error || err.message,
       });
+    } finally {
+      toast.dismiss(loadingToast);
     }
   };
 
@@ -112,21 +110,20 @@ export function AccountsCard({
 
       if (response.success && response.data && !Array.isArray(response.data)) {
         onRemove(response.data);
-        toast.dismiss(loadingToast);
         toast.success("Account deleted");
         setOpen(false);
         window.location.reload();
       } else {
-        toast.dismiss(loadingToast);
         toast.error("Failed to delete account.", {
           description: response.error,
         });
       }
     } catch (err: any) {
-      toast.dismiss(loadingToast);
       toast.error("Something went wrong!", {
         description: err.response?.data?.error || err.message,
       });
+    } finally {
+      toast.dismiss(loadingToast);
     }
   };
 

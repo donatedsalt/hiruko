@@ -117,7 +117,6 @@ export default function Page() {
     const result = TransactionSchema.omit({ userId: true }).safeParse(payload);
 
     if (!result.success) {
-      toast.dismiss(loadingToast);
       result.error.issues.slice(0, 3).forEach((issue) => {
         toast.warning(issue.message, {
           description: "Please check your input.",
@@ -139,20 +138,19 @@ export default function Page() {
       const response = res.data;
 
       if (response.success && response.data && !Array.isArray(response.data)) {
-        toast.dismiss(loadingToast);
         toast.success("Transaction updated");
         smartRouter.back();
       } else {
-        toast.dismiss(loadingToast);
         toast.error("Failed to update transaction.", {
           description: response.error,
         });
       }
     } catch (err: any) {
-      toast.dismiss(loadingToast);
       toast.error("Something went wrong!", {
         description: err.response?.data?.error || err.message,
       });
+    } finally {
+      toast.dismiss(loadingToast);
     }
   };
 
