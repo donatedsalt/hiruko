@@ -1,6 +1,7 @@
 "use client";
 
-import { useTransactions } from "@/hooks/use-transactions";
+import { useQuery } from "convex/react";
+import { api } from "@/convex/_generated/api";
 
 import {
   ChartAreaInteractive,
@@ -12,7 +13,8 @@ import { SiteHeader } from "@/components/site-header";
 import { ErrorMessage } from "@/components/error-message";
 
 export default function Page() {
-  const { all, income, expense, loading, error } = useTransactions();
+  const transactions = useQuery(api.transactions.queries.listAllVariants);
+  const loading = transactions === undefined;
 
   return (
     <>
@@ -24,19 +26,23 @@ export default function Page() {
           <div className="px-4 lg:px-6">
             {loading ? (
               <ChartAreaInteractiveSkeleton />
-            ) : !error ? (
-              <ChartAreaInteractive data={all} />
+            ) : transactions ? (
+              <ChartAreaInteractive data={transactions.all} />
             ) : (
-              <ErrorMessage error={error} />
+              <ErrorMessage error={"Failed to load transactions"} />
             )}
           </div>
 
           {loading ? (
             <DataListSkeleton />
-          ) : !error ? (
-            <DataList allData={all} incomeData={income} expenseData={expense} />
+          ) : transactions ? (
+            <DataList
+              allData={transactions.all}
+              incomeData={transactions.income}
+              expenseData={transactions.expense}
+            />
           ) : (
-            <ErrorMessage error={error} />
+            <ErrorMessage error={"Failed to load transactions"} />
           )}
         </div>
       </div>

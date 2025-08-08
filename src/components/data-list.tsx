@@ -6,7 +6,7 @@ import {
 } from "@tabler/icons-react";
 import React from "react";
 
-import { ITransactionDocument } from "@/types/transaction";
+import { ITransaction } from "@/types/transaction";
 
 import { cn } from "@/lib/utils";
 
@@ -16,13 +16,18 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Link from "next/link";
 
-function groupByDay(transactions: ITransactionDocument[]) {
-  return transactions.reduce((groupedTransactions, transaction) => {
-    const dateStr = new Date(transaction.transactionTime).toLocaleDateString();
-    if (!groupedTransactions[dateStr]) groupedTransactions[dateStr] = [];
-    groupedTransactions[dateStr].push(transaction);
-    return groupedTransactions;
-  }, {} as Record<string, ITransactionDocument[]>);
+function groupByDay(transactions: ITransaction[]) {
+  return transactions.reduce(
+    (groupedTransactions, transaction) => {
+      const dateStr = new Date(
+        transaction.transactionTime
+      ).toLocaleDateString();
+      if (!groupedTransactions[dateStr]) groupedTransactions[dateStr] = [];
+      groupedTransactions[dateStr].push(transaction);
+      return groupedTransactions;
+    },
+    {} as Record<string, ITransaction[]>
+  );
 }
 
 function formatDisplayDate(dateStr: string) {
@@ -52,11 +57,7 @@ function formatDisplayDate(dateStr: string) {
   return `${weekday}, ${monthDay}`;
 }
 
-function RenderGroupedList({
-  transactions,
-}: {
-  transactions: ITransactionDocument[];
-}) {
+function RenderGroupedList({ transactions }: { transactions: ITransaction[] }) {
   const grouped = groupByDay(transactions);
   const dates = Object.keys(grouped).sort(
     (a, b) => new Date(b).getTime() - new Date(a).getTime()
@@ -87,9 +88,9 @@ export function DataList({
   incomeData,
   expenseData,
 }: {
-  allData: ITransactionDocument[];
-  incomeData: ITransactionDocument[];
-  expenseData: ITransactionDocument[];
+  allData: ITransaction[];
+  incomeData: ITransaction[];
+  expenseData: ITransaction[];
 }) {
   return (
     <Tabs
@@ -134,7 +135,7 @@ export function DataList({
   );
 }
 
-export function ListItem({ item }: { item: ITransactionDocument }) {
+export function ListItem({ item }: { item: ITransaction }) {
   return (
     <li>
       <Link

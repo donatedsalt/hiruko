@@ -4,9 +4,8 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { IconCirclePlusFilled } from "@tabler/icons-react";
 
-import { IAccountApiResponse, IAccountDocument } from "@/types/account";
-
-import api from "@/lib/axios";
+import { useMutation } from "convex/react";
+import { api } from "@/convex/_generated/api";
 
 import { useCountdown } from "@/hooks/use-countdown";
 
@@ -29,24 +28,19 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
+import { IAccount } from "@/types/account";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 
-export function AccountsCard({
-  account,
-  onUpdate,
-  onRemove,
-}: {
-  account: IAccountDocument;
-  onUpdate: (acc: IAccountDocument) => void;
-  onRemove: (acc: IAccountDocument) => void;
-}) {
+export function AccountsCard({ account }: { account: IAccount }) {
   const [open, setOpen] = useState(false);
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
   const { count, done } = useCountdown(3, showConfirmDelete);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const updateAccount = useMutation(api.accounts.mutations.update);
+  const deleteAccount = useMutation(api.accounts.mutations.remove);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -54,9 +48,6 @@ export function AccountsCard({
 
     const form = e.currentTarget;
     const formData = new FormData(form);
-
-    const loadingToast = toast.loading("Processing request...");
-
     const name = formData.get("name") as string;
     const balance = parseFloat(formData.get("balance") as string);
 
@@ -75,60 +66,35 @@ export function AccountsCard({
     }
 
     try {
-      const res = await api.put<IAccountApiResponse>(
-        `/accounts/${account._id}`,
-        result.data
-      );
-      const response = res.data;
-
-      if (response.success && response.data && !Array.isArray(response.data)) {
-        onUpdate(response.data);
-        toast.success("Account updated");
-        form.reset();
-        setOpen(false);
-        window.location.reload();
-      } else {
-        toast.error("Failed to update account.", {
-          description: response.error,
-        });
-      }
+      await updateAccount({
+        id: account._id,
+        ...result.data,
+      });
+      toast.success("Account added");
+      form.reset();
+      setOpen(false);
     } catch (err: any) {
       toast.error("Something went wrong!", {
-        description: err.response?.data?.error || err.message,
+        description: err.message,
       });
     } finally {
       setIsSubmitting(false);
-      toast.dismiss(loadingToast);
     }
   };
 
   const handleDelete = async () => {
     setIsSubmitting(true);
-    const loadingToast = toast.loading("Deleting account...");
 
     try {
-      const res = await api.delete<IAccountApiResponse>(
-        `/accounts/${account._id}`
-      );
-      const response = res.data;
-
-      if (response.success && response.data && !Array.isArray(response.data)) {
-        onRemove(response.data);
-        toast.success("Account deleted");
-        setOpen(false);
-        window.location.reload();
-      } else {
-        toast.error("Failed to delete account.", {
-          description: response.error,
-        });
-      }
+      await deleteAccount({ id: account._id });
+      toast.success("Account deleted");
+      setOpen(false);
     } catch (err: any) {
       toast.error("Something went wrong!", {
-        description: err.response?.data?.error || err.message,
+        description: err.message,
       });
     } finally {
       setIsSubmitting(false);
-      toast.dismiss(loadingToast);
     }
   };
 
@@ -269,13 +235,10 @@ export function AccountsCardSkeleton() {
   return <Skeleton className="min-h-36 aspect-3/2" />;
 }
 
-export function AddAccountCard({
-  onAdd,
-}: {
-  onAdd: (acc: IAccountDocument) => void;
-}) {
+export function AddAccountCard() {
   const [open, setOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const createAccount = useMutation(api.accounts.mutations.create);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -283,9 +246,6 @@ export function AddAccountCard({
 
     const form = e.currentTarget;
     const formData = new FormData(form);
-
-    const loadingToast = toast.loading("Processing request...");
-
     const name = formData.get("name") as string;
     const balance = parseFloat(formData.get("balance") as string);
 
@@ -304,26 +264,16 @@ export function AddAccountCard({
     }
 
     try {
-      const res = await api.post<IAccountApiResponse>("/accounts", result.data);
-      const response = res.data;
-
-      if (response.success && response.data && !Array.isArray(response.data)) {
-        onAdd(response.data);
-        toast.success("Account added");
-        form.reset();
-        setOpen(false);
-      } else {
-        toast.error("Failed to create account.", {
-          description: response.error,
-        });
-      }
+      await createAccount(result.data);
+      toast.success("Account added");
+      form.reset();
+      setOpen(false);
     } catch (err: any) {
       toast.error("Something went wrong!", {
-        description: err.response?.data?.error || err.message,
+        description: err.message,
       });
     } finally {
       setIsSubmitting(false);
-      toast.dismiss(loadingToast);
     }
   };
 

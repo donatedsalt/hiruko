@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { ClerkProvider } from "@clerk/nextjs";
 import { shadcn } from "@clerk/themes";
 import { Geist, Geist_Mono } from "next/font/google";
+import ConvexClientProvider from "@/components/convex-client-provider";
 
 import { BaseTheme } from "@clerk/types";
 
@@ -40,38 +41,40 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <ClerkProvider
-      appearance={{
-        baseTheme: shadcn as BaseTheme,
-      }}
-    >
-      <html lang="en" suppressHydrationWarning>
-        <body
-          className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+    <html lang="en" suppressHydrationWarning>
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+      >
+        <ClerkProvider
+          appearance={{
+            baseTheme: shadcn as BaseTheme,
+          }}
         >
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            enableSystem
-            disableTransitionOnChange
-          >
-            <SidebarProvider
-              style={
-                {
-                  "--sidebar-width": "calc(var(--spacing) * 72)",
-                  "--header-height": "calc(var(--spacing) * 12)",
-                } as React.CSSProperties
-              }
+          <ConvexClientProvider>
+            <ThemeProvider
+              attribute="class"
+              defaultTheme="system"
+              enableSystem
+              disableTransitionOnChange
             >
-              <AppSidebar variant="inset" />
-              <SidebarInset>{children}</SidebarInset>
-            </SidebarProvider>
-            <Toaster />
-            <FloatingButtons />
-            <HistoryTracker />
-          </ThemeProvider>
-        </body>
-      </html>
-    </ClerkProvider>
+              <SidebarProvider
+                style={
+                  {
+                    "--sidebar-width": "calc(var(--spacing) * 72)",
+                    "--header-height": "calc(var(--spacing) * 12)",
+                  } as React.CSSProperties
+                }
+              >
+                <AppSidebar variant="inset" />
+                <SidebarInset>{children}</SidebarInset>
+              </SidebarProvider>
+              <Toaster />
+              <FloatingButtons />
+              <HistoryTracker />
+            </ThemeProvider>
+          </ConvexClientProvider>
+        </ClerkProvider>
+      </body>
+    </html>
   );
 }

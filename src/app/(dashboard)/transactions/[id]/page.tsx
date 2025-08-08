@@ -3,24 +3,19 @@
 import { toast } from "sonner";
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
+import { api } from "@/convex/_generated/api";
+import { Id } from "@/convex/_generated/dataModel";
+import { useMutation, useQuery } from "convex/react";
 import {
   IconCaretDownFilled,
   IconCaretUpFilled,
   IconLoader2,
 } from "@tabler/icons-react";
 
-import { ITransactionApiResponse } from "@/types/transaction";
-
-import api from "@/lib/axios";
-
 import { TransactionSchema } from "@/validation/transaction";
 
-import { useTransaction } from "@/hooks/use-transaction";
-import { useAccounts } from "@/hooks/use-account";
 import { useSmartRouter } from "@/hooks/use-smart-router";
 
-import { SiteHeader } from "@/components/site-header";
-import { ErrorMessage } from "@/components/error-message";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -34,16 +29,30 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
+import { SiteHeader } from "@/components/site-header";
 import { DatePicker } from "@/components/ui/date-picker";
+import { ErrorMessage } from "@/components/error-message";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { ITransaction } from "@/types/transaction";
 
 export default function Page() {
   const { id } = useParams();
   const smartRouter = useSmartRouter();
-  const { transaction, loading, error } = useTransaction(id as string);
-  const { accounts, loading: accLoading, error: accError } = useAccounts();
-  const [transactionType, setTransactionType] = useState("expense");
-  const [transactionAccount, setTransactionAccount] = useState("");
+  const transaction = useQuery(api.transactions.queries.getTransactionById, {
+    id: id as Id<"transactions">,
+  });
+  const loading = transaction === undefined;
+  const accounts = useQuery(api.accounts.queries.list);
+  const accLoading = accounts === undefined;
+  const updateTransaction = useMutation(api.transactions.mutations.update);
+  const deleteTransaction = useMutation(api.transactions.mutations.remove);
+
+  const [transactionType, setTransactionType] = useState<"income" | "expense">(
+    "expense"
+  );
+  const [transactionAccount, setTransactionAccount] = useState<
+    Id<"accounts"> | ""
+  >("");
   const [transactionTime, setTransactionTime] = useState({
     date: "",
     time: "",
@@ -54,39 +63,33 @@ export default function Page() {
 
   useEffect(() => {
     if (transaction) {
-      setTransactionAccount(transaction.account._id.toString());
+      setTransactionAccount(transaction.accountId);
 
       setTransactionType(transaction.type);
 
       const date = new Date(transaction.transactionTime)
         .toISOString()
-        .split("T")[0]; // YYYY-MM-DD
+        .split("T")[0];
       const time = new Date(transaction.transactionTime)
         .toTimeString()
-        .slice(0, 5); // HH:MM
+        .slice(0, 5);
       setTransactionTime({ date: date, time: time });
     }
   }, [transaction]);
 
   const handleDelete = async () => {
     setIsSubmitting(true);
-    const loadingToast = toast.loading("Deleting transaction...");
     try {
-      const res = await api.delete(`/transactions/${id}`);
-      if (res.status === 200) {
-        toast.success("Transaction deleted");
-        setOpen(false);
-        smartRouter.replaceWithBack();
-      } else {
-        toast.error("Failed to delete transaction");
-      }
+      await deleteTransaction({ id: transaction?._id as Id<"transactions"> });
+      toast.success("Transaction deleted");
+      setOpen(false);
+      smartRouter.replaceWithBack();
     } catch (err: any) {
-      toast.error("Something went wrong", {
-        description: err.response?.data?.error || err.message,
+      toast.error("Something went wrong!", {
+        description: err.message,
       });
     } finally {
       setIsSubmitting(false);
-      toast.dismiss(loadingToast);
     }
   };
 
@@ -94,11 +97,10 @@ export default function Page() {
     e.preventDefault();
     setIsSubmitting(true);
 
-    const formData = new FormData(e.currentTarget);
+    const form = e.currentTarget;
+    const formData = new FormData(form);
 
-    const loadingToast = toast.loading("Processing request...");
-
-    const account = formData.get("account") as string;
+    const accountId = formData.get("account") as Id<"accounts">;
     const category = formData.get("category") as string;
     const amount = parseFloat(formData.get("amount") as string);
     const type = formData.get("type") as "income" | "expense";
@@ -107,10 +109,10 @@ export default function Page() {
     const date = formData.get("date") as string;
     const time = formData.get("time") as string;
 
-    const transactionTime = new Date(`${date}T${time}`);
+    const transactionTime = new Date(`${date}T${time}`).getTime();
 
     const payload = {
-      account,
+      accountId,
       category,
       amount,
       type,
@@ -136,27 +138,19 @@ export default function Page() {
     }
 
     try {
-      const res = await api.put<ITransactionApiResponse>(
-        `/transactions/${id}`,
-        result.data
-      );
-      const response = res.data;
-
-      if (response.success && response.data && !Array.isArray(response.data)) {
-        toast.success("Transaction updated");
-        smartRouter.back();
-      } else {
-        toast.error("Failed to update transaction.", {
-          description: response.error,
-        });
-      }
+      await updateTransaction({
+        id: transaction!._id,
+        updates: result.data as ITransaction,
+      });
+      toast.success("Transaction updated");
+      form.reset();
+      smartRouter.back();
     } catch (err: any) {
       toast.error("Something went wrong!", {
-        description: err.response?.data?.error || err.message,
+        description: err.message,
       });
     } finally {
       setIsSubmitting(false);
-      toast.dismiss(loadingToast);
     }
   };
 
@@ -164,14 +158,12 @@ export default function Page() {
     <>
       <SiteHeader title="Edit Transaction" />
 
-      {loading || (!transaction && !error) ? (
+      {loading ? (
         <div className="flex items-center justify-center h-full gap-2 text-muted-foreground">
           <IconLoader2 className="animate-spin" />
           <span>Loading...</span>
         </div>
-      ) : error ? (
-        <ErrorMessage error="Transaction not found." />
-      ) : (
+      ) : transaction ? (
         <form onSubmit={handleSubmit} className="grid gap-6 m-4 md:m-6 ">
           <div className="grid **:disabled:opacity-75 gap-3 *:w-full">
             <Label htmlFor="category">
@@ -200,7 +192,7 @@ export default function Page() {
             <ToggleGroup
               type="single"
               value={transactionType}
-              onValueChange={(val: string) => {
+              onValueChange={(val: "income" | "expense") => {
                 if (val) setTransactionType(val);
               }}
               disabled={!isEditing}
@@ -235,13 +227,11 @@ export default function Page() {
             />
             {accLoading ? (
               <Skeleton className="w-full h-9" />
-            ) : accError ? (
-              <ErrorMessage error={accError} className="min-h-36" />
-            ) : (
+            ) : accounts ? (
               <ToggleGroup
                 type="single"
                 value={transactionAccount}
-                onValueChange={(val: string) => {
+                onValueChange={(val: Id<"accounts">) => {
                   if (val) setTransactionAccount(val);
                 }}
                 disabled={!isEditing}
@@ -256,6 +246,11 @@ export default function Page() {
                   </ToggleGroupItem>
                 ))}
               </ToggleGroup>
+            ) : (
+              <ErrorMessage
+                error={"Failed to load accounts"}
+                className="min-h-36"
+              />
             )}
           </div>
           <div className="grid **:disabled:opacity-75 gap-3 *:w-full">
@@ -387,6 +382,8 @@ export default function Page() {
             </div>
           </div>
         </form>
+      ) : (
+        <ErrorMessage error="Transaction not found." />
       )}
     </>
   );

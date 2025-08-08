@@ -2,13 +2,11 @@
 
 import { toast } from "sonner";
 import { useEffect, useState } from "react";
+import { useMutation, useQuery } from "convex/react";
+import { api } from "@/convex/_generated/api";
+import { Id } from "@/convex/_generated/dataModel";
 import { IconCaretDownFilled, IconCaretUpFilled } from "@tabler/icons-react";
 
-import { ITransactionApiResponse } from "@/types/transaction";
-
-import api from "@/lib/axios";
-
-import { useAccounts } from "@/hooks/use-account";
 import { useSmartRouter } from "@/hooks/use-smart-router";
 
 import { TransactionSchema } from "@/validation/transaction";
@@ -16,45 +14,45 @@ import { TransactionSchema } from "@/validation/transaction";
 import { SiteHeader } from "@/components/site-header";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Button } from "@/components/ui/button";
-import { DatePicker } from "@/components/ui/date-picker";
 import { Textarea } from "@/components/ui/textarea";
 import { Skeleton } from "@/components/ui/skeleton";
+import { DatePicker } from "@/components/ui/date-picker";
 import { ErrorMessage } from "@/components/error-message";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
 export default function Page() {
   const smartRouter = useSmartRouter();
-  const { accounts, loading, error } = useAccounts();
-  const [transactionType, setTransactionType] = useState("expense");
-  const [transactionAccount, setTransactionAccount] = useState("");
+  const accounts = useQuery(api.accounts.queries.list);
+  const loading = accounts === undefined;
+
+  const [transactionType, setTransactionType] = useState<"income" | "expense">(
+    "expense"
+  );
+  const [transactionAccount, setTransactionAccount] = useState<
+    Id<"accounts"> | ""
+  >("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const createTransaction = useMutation(api.transactions.mutations.create);
 
   useEffect(() => {
-    const timeout = setTimeout(() => {
-      if (accounts.length === 0) {
-        smartRouter.push("/");
-        toast.info("Please create an account to continue");
-        return;
-      }
-    }, 1000);
-
-    if (accounts && accounts.length > 0 && transactionAccount === "") {
-      setTransactionAccount(accounts[0]._id.toString());
+    if (accounts && accounts.length === 0) {
+      toast.info("Please create an account to continue");
+      smartRouter.push("/");
     }
-
-    return () => clearTimeout(timeout);
+    if (accounts && accounts.length > 0 && transactionAccount === "") {
+      setTransactionAccount(accounts?.[0]?._id);
+    }
   }, [accounts, smartRouter, transactionAccount]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsSubmitting(true);
 
-    const formData = new FormData(e.currentTarget);
+    const form = e.currentTarget;
+    const formData = new FormData(form);
 
-    const loadingToast = toast.loading("Processing request...");
-
-    const account = formData.get("account") as string;
+    const accountId = formData.get("account") as Id<"accounts">;
     const category = formData.get("category") as string;
     const amount = parseFloat(formData.get("amount") as string);
     const type = formData.get("type") as "income" | "expense";
@@ -63,10 +61,10 @@ export default function Page() {
     const date = formData.get("date") as string;
     const time = formData.get("time") as string;
 
-    const transactionTime = new Date(`${date}T${time}`);
+    const transactionTime = new Date(`${date}T${time}`).getTime();
 
     const payload = {
-      account,
+      accountId,
       category,
       amount,
       type,
@@ -88,31 +86,21 @@ export default function Page() {
           description: "Scroll to review your form.",
         });
       }
+      setIsSubmitting(false);
       return;
     }
 
     try {
-      const res = await api.post<ITransactionApiResponse>(
-        "/transactions",
-        result.data
-      );
-      const response = res.data;
-
-      if (response.success && response.data && !Array.isArray(response.data)) {
-        toast.success("Transaction added");
-        smartRouter.back();
-      } else {
-        toast.error("Failed to create transaction.", {
-          description: response.error,
-        });
-      }
+      await createTransaction(result.data);
+      toast.success("Transaction added");
+      form.reset();
+      smartRouter.back();
     } catch (err: any) {
       toast.error("Something went wrong!", {
-        description: err.response?.data?.error || err.message,
+        description: err.message,
       });
     } finally {
       setIsSubmitting(false);
-      toast.dismiss(loadingToast);
     }
   };
 
@@ -143,7 +131,7 @@ export default function Page() {
           <ToggleGroup
             type="single"
             value={transactionType}
-            onValueChange={(val: string) => {
+            onValueChange={(val: "income" | "expense") => {
               if (val) setTransactionType(val);
             }}
           >
@@ -172,26 +160,29 @@ export default function Page() {
           <input type="hidden" name="account" value={transactionAccount} />
           {loading ? (
             <Skeleton className="w-full h-9" />
-          ) : error ? (
-            <ErrorMessage error={error} className="min-h-36" />
-          ) : (
+          ) : accounts ? (
             <ToggleGroup
               type="single"
               value={transactionAccount}
-              onValueChange={(val: string) => {
+              onValueChange={(val: Id<"accounts">) => {
                 if (val) setTransactionAccount(val);
               }}
             >
               {accounts.map((account) => (
                 <ToggleGroupItem
-                  key={account._id.toString()}
-                  value={account._id.toString()}
+                  key={account._id}
+                  value={account._id}
                   className="border dark:bg-input/30 dark:data-[state=on]:bg-input"
                 >
                   {account.name}
                 </ToggleGroupItem>
               ))}
             </ToggleGroup>
+          ) : (
+            <ErrorMessage
+              error={"Failed to load accounts"}
+              className="min-h-36"
+            />
           )}
         </div>
         <div className="grid gap-3 *:w-full">
