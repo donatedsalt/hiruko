@@ -16,6 +16,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Link from "next/link";
 
+// TODO: use the already defined groupByDay convex function
 function groupByDay(transactions: ITransaction[]) {
   return transactions.reduce(
     (groupedTransactions, transaction) => {
@@ -76,7 +77,7 @@ function RenderGroupedList({ transactions }: { transactions: ITransaction[] }) {
           </ul>
         </div>
       ))}
-      <div className="grid place-items-center py-12">
+      <div className="grid py-12 place-items-center">
         <p>End of list 🫡</p>
       </div>
     </div>
@@ -182,16 +183,19 @@ function ListItemIcon({ item }: { item: string }) {
 
 export function DataListSkeleton() {
   return (
-    <div className="flex flex-col justify-start w-full gap-4 md:gap-6">
-      <div className="px-4 lg:px-6">
-        <Skeleton className="h-8 w-42" />
-      </div>
-      <div className="flex flex-col px-4 lg:px-6">
-        <ul className="grid gap-4">
-          {[...Array(12)].map((_, i) => (
-            <ListItemSkeleton key={i} />
-          ))}
-        </ul>
+    <div>
+      <div className="flex flex-col justify-start w-full gap-4 md:gap-6">
+        <div className="px-4 lg:px-6">
+          <Skeleton className="h-8 w-42" />
+        </div>
+        <div className="flex flex-col px-4 lg:px-6">
+          <Skeleton className="w-32 h-4 my-3" />
+          <ul className="grid gap-4">
+            {[...Array(4)].map((_, i) => (
+              <ListItemSkeleton key={i} />
+            ))}
+          </ul>
+        </div>
       </div>
     </div>
   );
