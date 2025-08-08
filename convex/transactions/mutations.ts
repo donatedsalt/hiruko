@@ -98,13 +98,13 @@ export const update = mutation({
         -1
       );
       await adjustAccount(ctx, newAccount, newAmount, newType, 1);
-
-      await ctx.db.patch(id, {
-        ...updates,
-        accountId: newAccountId,
-        updatedAt: Date.now(),
-      });
     }
+
+    await ctx.db.patch(id, {
+      ...updates,
+      accountId: newAccountId,
+      updatedAt: Date.now(),
+    });
     return id;
   },
 });
