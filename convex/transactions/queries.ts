@@ -4,6 +4,9 @@ import { v } from "convex/values";
 import { getUserId } from "../utils/auth";
 import { getUserTransactions } from "../utils/db/transactions";
 
+/**
+ * Get all transactions for the authenticated user.
+ */
 export const list = query({
   args: {
     type: v.optional(v.union(v.literal("income"), v.literal("expense"))),
@@ -19,6 +22,9 @@ export const list = query({
   },
 });
 
+/**
+ * Get all transactions and filtered transactions (income & expense) for the authenticated user.
+ */
 export const listAllVariants = query({
   args: {},
   handler: async (ctx) => {
@@ -33,6 +39,9 @@ export const listAllVariants = query({
 });
 
 export const getTransactionById = query({
+/**
+ * Get a single transaction by ID.
+ */
   args: { id: v.id("transactions") },
   handler: async (ctx, args) => {
     const userId = await getUserId(ctx);
@@ -47,6 +56,9 @@ export const getTransactionById = query({
   },
 });
 
+/**
+ * Get all transactions grouped by date for the authenticated user.
+ */
 export const groupByDate = query({
   args: {},
   handler: async (ctx) => {
@@ -70,6 +82,9 @@ export const groupByDate = query({
   },
 });
 
+/**
+ * Get all transactions grouped by month for the authenticated user.
+ */
 export const groupByMonth = query({
   args: {},
   handler: async (ctx) => {
@@ -90,6 +105,9 @@ export const groupByMonth = query({
   },
 });
 
+/**
+ * Get all transactions grouped by category for the authenticated user.
+ */
 export const groupByCategory = query({
   args: {},
   handler: async (ctx) => {

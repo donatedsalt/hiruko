@@ -4,6 +4,9 @@ import { v } from "convex/values";
 import { getUserId } from "../utils/auth";
 import { adjustAccount } from "../utils/db/accounts";
 
+/**
+ * Create a new transaction.
+ */
 export const create = mutation({
   args: {
     category: v.string(),
@@ -46,6 +49,9 @@ export const create = mutation({
   },
 });
 
+/**
+ * Update a transaction.
+ */
 export const update = mutation({
   args: {
     id: v.id("transactions"),
@@ -109,6 +115,9 @@ export const update = mutation({
   },
 });
 
+/**
+ * Delete a transaction.
+ */
 export const remove = mutation({
   args: { id: v.id("transactions") },
   handler: async (ctx, { id }) => {
