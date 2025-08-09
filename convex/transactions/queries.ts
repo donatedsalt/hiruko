@@ -38,10 +38,10 @@ export const listAllVariants = query({
   },
 });
 
-export const getTransactionById = query({
 /**
  * Get a single transaction by ID.
  */
+export const getById = query({
   args: { id: v.id("transactions") },
   handler: async (ctx, args) => {
     const userId = await getUserId(ctx);

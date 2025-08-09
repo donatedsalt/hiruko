@@ -38,7 +38,7 @@ import { ITransaction } from "@/types/transaction";
 export default function Page() {
   const { id } = useParams();
   const smartRouter = useSmartRouter();
-  const transaction = useQuery(api.transactions.queries.getTransactionById, {
+  const transaction = useQuery(api.transactions.queries.getById, {
     id: id as Id<"transactions">,
   });
   const loading = transaction === undefined;
