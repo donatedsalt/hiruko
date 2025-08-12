@@ -6,7 +6,7 @@ import {
 } from "@tabler/icons-react";
 import React from "react";
 
-import { Transaction } from "@/types/convex";
+import { Transaction, TransactionGroups } from "@/types/convex";
 
 import { cn } from "@/lib/utils";
 
@@ -18,17 +18,12 @@ import Link from "next/link";
 
 // TODO: use the already defined groupByDay convex function
 function groupByDay(transactions: Transaction[]) {
-  return transactions.reduce(
-    (groupedTransactions, transaction) => {
-      const dateStr = new Date(
-        transaction.transactionTime
-      ).toLocaleDateString();
-      if (!groupedTransactions[dateStr]) groupedTransactions[dateStr] = [];
-      groupedTransactions[dateStr].push(transaction);
-      return groupedTransactions;
-    },
-    {} as Record<string, Transaction[]>
-  );
+  return transactions.reduce((groupedTransactions, transaction) => {
+    const dateStr = new Date(transaction.transactionTime).toLocaleDateString();
+    if (!groupedTransactions[dateStr]) groupedTransactions[dateStr] = [];
+    groupedTransactions[dateStr].push(transaction);
+    return groupedTransactions;
+  }, {} as TransactionGroups);
 }
 
 function formatDisplayDate(dateStr: string) {

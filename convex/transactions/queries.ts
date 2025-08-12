@@ -2,6 +2,8 @@ import { v } from "convex/values";
 
 import { query } from "@/convex/_generated/server";
 
+import { TransactionGroups } from "@/types/convex";
+
 import { getUserId } from "@/convex/utils/auth";
 import { getUserTransactions } from "@/convex/utils/db/transactions";
 
@@ -68,17 +70,12 @@ export const groupByDate = query({
 
     transactions.sort((a, b) => b.transactionTime - a.transactionTime);
 
-    const grouped = transactions.reduce(
-      (acc, txn) => {
-        const dateKey = new Date(txn.transactionTime)
-          .toISOString()
-          .split("T")[0];
-        if (!acc[dateKey]) acc[dateKey] = [];
-        acc[dateKey].push(txn);
-        return acc;
-      },
-      {} as Record<string, typeof transactions>
-    );
+    const grouped = transactions.reduce((acc, txn) => {
+      const dateKey = new Date(txn.transactionTime).toISOString().split("T")[0];
+      if (!acc[dateKey]) acc[dateKey] = [];
+      acc[dateKey].push(txn);
+      return acc;
+    }, {} as TransactionGroups);
 
     return grouped;
   },
@@ -92,16 +89,13 @@ export const groupByMonth = query({
   handler: async (ctx) => {
     const transactions = await getUserTransactions(ctx);
 
-    const grouped = transactions.reduce(
-      (acc, txn) => {
-        const date = new Date(txn.transactionTime);
-        const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
-        if (!acc[key]) acc[key] = [];
-        acc[key].push(txn);
-        return acc;
-      },
-      {} as Record<string, typeof transactions>
-    );
+    const grouped = transactions.reduce((acc, txn) => {
+      const date = new Date(txn.transactionTime);
+      const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
+      if (!acc[key]) acc[key] = [];
+      acc[key].push(txn);
+      return acc;
+    }, {} as TransactionGroups);
 
     return grouped;
   },
@@ -117,15 +111,12 @@ export const groupByCategory = query({
 
     transactions.sort((a, b) => b.transactionTime - a.transactionTime);
 
-    const grouped = transactions.reduce(
-      (acc, txn) => {
-        const key = txn.category;
-        if (!acc[key]) acc[key] = [];
-        acc[key].push(txn);
-        return acc;
-      },
-      {} as Record<string, typeof transactions>
-    );
+    const grouped = transactions.reduce((acc, txn) => {
+      const key = txn.category;
+      if (!acc[key]) acc[key] = [];
+      acc[key].push(txn);
+      return acc;
+    }, {} as TransactionGroups);
 
     return grouped;
   },
