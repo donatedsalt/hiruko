@@ -6,7 +6,7 @@ import {
 } from "@tabler/icons-react";
 import React from "react";
 
-import { ITransaction } from "@/types/transaction";
+import { Transaction } from "@/types/convex";
 
 import { cn } from "@/lib/utils";
 
@@ -17,7 +17,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Link from "next/link";
 
 // TODO: use the already defined groupByDay convex function
-function groupByDay(transactions: ITransaction[]) {
+function groupByDay(transactions: Transaction[]) {
   return transactions.reduce(
     (groupedTransactions, transaction) => {
       const dateStr = new Date(
@@ -27,7 +27,7 @@ function groupByDay(transactions: ITransaction[]) {
       groupedTransactions[dateStr].push(transaction);
       return groupedTransactions;
     },
-    {} as Record<string, ITransaction[]>
+    {} as Record<string, Transaction[]>
   );
 }
 
@@ -58,7 +58,7 @@ function formatDisplayDate(dateStr: string) {
   return `${weekday}, ${monthDay}`;
 }
 
-function RenderGroupedList({ transactions }: { transactions: ITransaction[] }) {
+function RenderGroupedList({ transactions }: { transactions: Transaction[] }) {
   const grouped = groupByDay(transactions);
   const dates = Object.keys(grouped).sort(
     (a, b) => new Date(b).getTime() - new Date(a).getTime()
@@ -89,9 +89,9 @@ export function DataList({
   incomeData,
   expenseData,
 }: {
-  allData: ITransaction[];
-  incomeData: ITransaction[];
-  expenseData: ITransaction[];
+  allData: Transaction[];
+  incomeData: Transaction[];
+  expenseData: Transaction[];
 }) {
   return (
     <Tabs
@@ -136,11 +136,11 @@ export function DataList({
   );
 }
 
-export function ListItem({ item }: { item: ITransaction }) {
+export function ListItem({ item }: { item: Transaction }) {
   return (
     <li>
       <Link
-        href={`/transactions/${item._id}`}
+        href={`/transactions/${item._id.toString()}`}
         className="flex items-center justify-between gap-2"
       >
         <div className="flex items-center gap-2">

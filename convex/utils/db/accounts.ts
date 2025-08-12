@@ -1,9 +1,9 @@
 import { MutationCtx } from "@/convex/_generated/server";
-import { Id } from "@/convex/_generated/dataModel";
+import { AccountId } from "@/types/convex";
 
 export const adjustAccount = async (
   ctx: MutationCtx,
-  account: { _id: Id<"accounts">; balance: number; transactionsCount?: number },
+  account: { _id: AccountId; balance: number; transactionsCount?: number },
   amount: number,
   type: "income" | "expense",
   delta: number

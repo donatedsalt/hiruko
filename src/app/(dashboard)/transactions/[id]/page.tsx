@@ -4,13 +4,14 @@ import { toast } from "sonner";
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { api } from "@/convex/_generated/api";
-import { Id } from "@/convex/_generated/dataModel";
 import { useMutation, useQuery } from "convex/react";
 import {
   IconCaretDownFilled,
   IconCaretUpFilled,
   IconLoader2,
 } from "@tabler/icons-react";
+
+import { AccountId, Transaction, TransactionId } from "@/types/convex";
 
 import { TransactionSchema } from "@/validation/transaction";
 
@@ -33,13 +34,12 @@ import { SiteHeader } from "@/components/site-header";
 import { DatePicker } from "@/components/ui/date-picker";
 import { ErrorMessage } from "@/components/error-message";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import { ITransaction } from "@/types/transaction";
 
 export default function Page() {
   const { id } = useParams();
   const smartRouter = useSmartRouter();
   const transaction = useQuery(api.transactions.queries.getById, {
-    id: id as Id<"transactions">,
+    id: id as TransactionId,
   });
   const loading = transaction === undefined;
   const accounts = useQuery(api.accounts.queries.list);
@@ -50,9 +50,9 @@ export default function Page() {
   const [transactionType, setTransactionType] = useState<"income" | "expense">(
     "expense"
   );
-  const [transactionAccount, setTransactionAccount] = useState<
-    Id<"accounts"> | ""
-  >("");
+  const [transactionAccount, setTransactionAccount] = useState<AccountId | "">(
+    ""
+  );
   const [transactionTime, setTransactionTime] = useState({
     date: "",
     time: "",
@@ -80,7 +80,7 @@ export default function Page() {
   const handleDelete = async () => {
     setIsSubmitting(true);
     try {
-      await deleteTransaction({ id: transaction?._id as Id<"transactions"> });
+      await deleteTransaction({ id: transaction?._id as TransactionId });
       toast.success("Transaction deleted");
       setOpen(false);
       smartRouter.replaceWithBack();
@@ -100,7 +100,7 @@ export default function Page() {
     const form = e.currentTarget;
     const formData = new FormData(form);
 
-    const accountId = formData.get("account") as Id<"accounts">;
+    const accountId = formData.get("account") as AccountId;
     const category = formData.get("category") as string;
     const amount = parseFloat(formData.get("amount") as string);
     const type = formData.get("type") as "income" | "expense";
@@ -140,7 +140,7 @@ export default function Page() {
     try {
       await updateTransaction({
         id: transaction!._id,
-        updates: result.data as ITransaction,
+        updates: result.data as Transaction,
       });
       toast.success("Transaction updated");
       form.reset();
@@ -231,7 +231,7 @@ export default function Page() {
               <ToggleGroup
                 type="single"
                 value={transactionAccount}
-                onValueChange={(val: Id<"accounts">) => {
+                onValueChange={(val: AccountId) => {
                   if (val) setTransactionAccount(val);
                 }}
                 disabled={!isEditing}

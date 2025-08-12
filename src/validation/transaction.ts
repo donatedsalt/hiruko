@@ -1,5 +1,6 @@
-import { Id } from "@/convex/_generated/dataModel";
 import { z } from "zod";
+
+import { AccountId } from "@/types/convex";
 
 export const TransactionSchema = z
   .object({
@@ -7,7 +8,7 @@ export const TransactionSchema = z
     accountId: z
       .string()
       .min(1, "Account is required.")
-      .transform((val) => val as Id<"accounts">),
+      .transform((val) => val as AccountId),
     category: z.string().min(1, "Category is required").max(100),
     title: z
       .string()

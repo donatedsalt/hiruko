@@ -7,9 +7,11 @@ import { IconCirclePlusFilled } from "@tabler/icons-react";
 import { useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 
-import { useCountdown } from "@/hooks/use-countdown";
+import { Account } from "@/types/convex";
 
 import { AccountSchema } from "@/validation/account";
+
+import { useCountdown } from "@/hooks/use-countdown";
 
 import {
   Card,
@@ -28,13 +30,12 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { IAccount } from "@/types/account";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 
-export function AccountsCard({ account }: { account: IAccount }) {
+export function AccountsCard({ account }: { account: Account }) {
   const [open, setOpen] = useState(false);
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
   const { count, done } = useCountdown(3, showConfirmDelete);

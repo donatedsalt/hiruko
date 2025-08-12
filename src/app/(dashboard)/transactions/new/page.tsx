@@ -4,12 +4,13 @@ import { toast } from "sonner";
 import { useEffect, useState } from "react";
 import { useMutation, useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
-import { Id } from "@/convex/_generated/dataModel";
 import { IconCaretDownFilled, IconCaretUpFilled } from "@tabler/icons-react";
 
-import { useSmartRouter } from "@/hooks/use-smart-router";
+import { AccountId } from "@/types/convex";
 
 import { TransactionSchema } from "@/validation/transaction";
+
+import { useSmartRouter } from "@/hooks/use-smart-router";
 
 import { SiteHeader } from "@/components/site-header";
 import { Label } from "@/components/ui/label";
@@ -29,9 +30,9 @@ export default function Page() {
   const [transactionType, setTransactionType] = useState<"income" | "expense">(
     "expense"
   );
-  const [transactionAccount, setTransactionAccount] = useState<
-    Id<"accounts"> | ""
-  >("");
+  const [transactionAccount, setTransactionAccount] = useState<AccountId | "">(
+    ""
+  );
   const [isSubmitting, setIsSubmitting] = useState(false);
   const createTransaction = useMutation(api.transactions.mutations.create);
 
@@ -52,7 +53,7 @@ export default function Page() {
     const form = e.currentTarget;
     const formData = new FormData(form);
 
-    const accountId = formData.get("account") as Id<"accounts">;
+    const accountId = formData.get("account") as AccountId;
     const category = formData.get("category") as string;
     const amount = parseFloat(formData.get("amount") as string);
     const type = formData.get("type") as "income" | "expense";
@@ -164,7 +165,7 @@ export default function Page() {
             <ToggleGroup
               type="single"
               value={transactionAccount}
-              onValueChange={(val: Id<"accounts">) => {
+              onValueChange={(val: AccountId) => {
                 if (val) setTransactionAccount(val);
               }}
             >
