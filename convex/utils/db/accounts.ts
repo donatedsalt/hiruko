@@ -1,5 +1,5 @@
-import { MutationCtx } from "../../_generated/server";
-import { Id } from "../../_generated/dataModel";
+import { MutationCtx } from "@/convex/_generated/server";
+import { Id } from "@/convex/_generated/dataModel";
 
 export const adjustAccount = async (
   ctx: MutationCtx,

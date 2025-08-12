@@ -1,7 +1,8 @@
-import { query } from "../_generated/server";
 import { v } from "convex/values";
 
-import { getUserId } from "../utils/auth";
+import { query } from "@/convex/_generated/server";
+
+import { getUserId } from "@/convex/utils/auth";
 
 /**
  * Get all accounts for the authenticated user.

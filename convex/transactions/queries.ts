@@ -1,8 +1,9 @@
-import { query } from "../_generated/server";
 import { v } from "convex/values";
 
-import { getUserId } from "../utils/auth";
-import { getUserTransactions } from "../utils/db/transactions";
+import { query } from "@/convex/_generated/server";
+
+import { getUserId } from "@/convex/utils/auth";
+import { getUserTransactions } from "@/convex/utils/db/transactions";
 
 /**
  * Get all transactions for the authenticated user.
@@ -23,7 +24,8 @@ export const list = query({
 });
 
 /**
- * Get all transactions and filtered transactions (income & expense) for the authenticated user.
+ * Get all transactions and filtered transactions (income & expense)
+ * for the authenticated user in a single query.
  */
 export const listAllVariants = query({
   args: {},
@@ -39,7 +41,7 @@ export const listAllVariants = query({
 });
 
 /**
- * Get a single transaction by ID.
+ * Get a single transaction by ID for the authenticated user.
  */
 export const getById = query({
   args: { id: v.id("transactions") },
@@ -57,7 +59,7 @@ export const getById = query({
 });
 
 /**
- * Get all transactions grouped by date for the authenticated user.
+ * Get all transactions grouped by date (YYYY-MM-DD) for the authenticated user.
  */
 export const groupByDate = query({
   args: {},
@@ -83,7 +85,7 @@ export const groupByDate = query({
 });
 
 /**
- * Get all transactions grouped by month for the authenticated user.
+ * Get all transactions grouped by month (YYYY-MM) for the authenticated user.
  */
 export const groupByMonth = query({
   args: {},

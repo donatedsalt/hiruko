@@ -1,6 +1,6 @@
-import { QueryCtx } from "../../_generated/server";
+import { QueryCtx } from "@/convex/_generated/server";
 
-import { getUserId } from "../../utils/auth";
+import { getUserId } from "@/convex/utils/auth";
 
 export const getUserTransactions = async (ctx: QueryCtx) => {
   const userId = await getUserId(ctx);

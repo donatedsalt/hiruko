@@ -1,7 +1,8 @@
-import { mutation } from "../_generated/server";
 import { v } from "convex/values";
 
-import { getUserId } from "../utils/auth";
+import { mutation } from "@/convex/_generated/server";
+
+import { getUserId } from "@/convex/utils/auth";
 
 /**
  * Create a new account.

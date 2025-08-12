@@ -1,8 +1,9 @@
-import { mutation } from "../_generated/server";
 import { v } from "convex/values";
 
-import { getUserId } from "../utils/auth";
-import { adjustAccount } from "../utils/db/accounts";
+import { mutation } from "@/convex/_generated/server";
+
+import { getUserId } from "@/convex/utils/auth";
+import { adjustAccount } from "@/convex/utils/db/accounts";
 
 /**
  * Create a new transaction.
