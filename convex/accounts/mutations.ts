@@ -32,7 +32,7 @@ export const create = mutation({
         userId,
         name: "Balance Correction",
         icon: "⚖️",
-        color: "#888888",
+        // color: "#888888",
       });
     }
 
@@ -108,7 +108,7 @@ export const update = mutation({
           userId,
           name: "Balance Correction",
           icon: "⚖️",
-          color: "#888888",
+          // color: "#888888",
         });
       }
 

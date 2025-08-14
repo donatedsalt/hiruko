@@ -11,7 +11,7 @@ export const create = mutation({
   args: {
     name: v.string(),
     icon: v.string(),
-    color: v.string(),
+    // color: v.string(),
   },
   handler: async (ctx, args) => {
     const userId = await getUserId(ctx);
@@ -21,7 +21,7 @@ export const create = mutation({
       userId,
       name: args.name,
       icon: args.icon,
-      color: args.color,
+      // color: args.color,
     });
   },
 });
@@ -45,9 +45,9 @@ export const createDefaultCategories = mutation({
     }
 
     const defaultCategories = [
-      { name: "Income", icon: "💰", color: "#16a34a" },
-      { name: "Food", icon: "🍔", color: "#ef4444" },
-      { name: "Shopping", icon: "🛒", color: "#f97316" },
+      { name: "Income", icon: "💰" /* color: "#16a34a" */ },
+      { name: "Food", icon: "🍔" /* color: "#ef4444" */ },
+      { name: "Shopping", icon: "🛒" /* color: "#f97316" */ },
     ];
 
     for (const category of defaultCategories) {
@@ -69,7 +69,7 @@ export const update = mutation({
     id: v.id("categories"),
     name: v.optional(v.string()),
     icon: v.optional(v.string()),
-    color: v.optional(v.string()),
+    // color: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     const userId = await getUserId(ctx);
@@ -83,7 +83,7 @@ export const update = mutation({
     const updates: Partial<typeof category> = {};
     if (args.name !== undefined) updates.name = args.name;
     if (args.icon !== undefined) updates.icon = args.icon;
-    if (args.color !== undefined) updates.color = args.color;
+    // if (args.color !== undefined) updates.color = args.color;
 
     await ctx.db.patch(args.id, updates);
 
