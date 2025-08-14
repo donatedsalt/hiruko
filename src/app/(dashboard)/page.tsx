@@ -14,7 +14,8 @@ import { SiteHeader } from "@/components/site-header";
 
 export default function Page() {
   const transactions = useQuery(api.transactions.queries.listAllVariants);
-  const loading = transactions === undefined;
+  const categories = useQuery(api.categories.queries.list);
+  const loading = transactions === undefined || categories === undefined;
 
   return (
     <>
@@ -28,13 +29,14 @@ export default function Page() {
               <ChartAreaInteractiveSkeleton />
               <DataListSkeleton />
             </>
-          ) : transactions ? (
+          ) : transactions && categories ? (
             <>
               <ChartAreaInteractive data={transactions.all} />
               <DataList
                 allData={transactions.all}
                 incomeData={transactions.income}
                 expenseData={transactions.expense}
+                categories={categories}
               />
             </>
           ) : (

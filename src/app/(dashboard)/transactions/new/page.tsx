@@ -1,23 +1,30 @@
 "use client";
 
 import { toast } from "sonner";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useMutation, useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { IconCaretDownFilled, IconCaretUpFilled } from "@tabler/icons-react";
 
-import { AccountId } from "@/types/convex";
+import { AccountId, CategoryId } from "@/types/convex";
 
 import { TransactionSchema } from "@/validation/transaction";
 
 import { useSmartRouter } from "@/hooks/use-smart-router";
 
-import { SiteHeader } from "@/components/site-header";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Skeleton } from "@/components/ui/skeleton";
+import { SiteHeader } from "@/components/site-header";
 import { DatePicker } from "@/components/ui/date-picker";
 import { ErrorMessage } from "@/components/error-message";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
@@ -25,26 +32,53 @@ import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 export default function Page() {
   const smartRouter = useSmartRouter();
   const accounts = useQuery(api.accounts.queries.list);
-  const loading = accounts === undefined;
+  const accLoading = accounts === undefined;
+  const categories = useQuery(api.categories.queries.list);
+  const catLoading = categories === undefined;
 
-  const [transactionType, setTransactionType] = useState<"income" | "expense">(
-    "expense"
-  );
-  const [transactionAccount, setTransactionAccount] = useState<AccountId | "">(
-    ""
-  );
+  const [txnType, setTxnType] = useState<"income" | "expense">("expense");
+  const [txnAccount, setTxnAccount] = useState<AccountId | "">("");
+  const [txnCategory, setTxnCategory] = useState<CategoryId | "">("");
+
   const [isSubmitting, setIsSubmitting] = useState(false);
   const createTransaction = useMutation(api.transactions.mutations.create);
+  const createDefaults = useMutation(
+    api.categories.mutations.createDefaultCategories
+  );
+
+  const toastShown = useRef(false);
 
   useEffect(() => {
+    if (toastShown.current) return;
+
     if (accounts && accounts.length === 0) {
       toast.info("Please create an account to continue");
       smartRouter.push("/");
+      toastShown.current = true;
+      return;
     }
-    if (accounts && accounts.length > 0 && transactionAccount === "") {
-      setTransactionAccount(accounts?.[0]?._id);
+
+    if (accounts && accounts.length > 0 && txnAccount === "") {
+      setTxnAccount(accounts[0]?._id);
     }
-  }, [accounts, smartRouter, transactionAccount]);
+
+    if (categories && categories.length === 0) {
+      toast.info("No categories found. Creating defaults...");
+      createDefaults();
+      toastShown.current = true;
+    }
+
+    if (categories && categories.length > 0 && txnCategory === "") {
+      setTxnCategory(categories[0]?._id);
+    }
+  }, [
+    accounts,
+    categories,
+    createDefaults,
+    smartRouter,
+    txnAccount,
+    txnCategory,
+  ]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -53,8 +87,8 @@ export default function Page() {
     const form = e.currentTarget;
     const formData = new FormData(form);
 
-    const accountId = formData.get("account") as AccountId;
-    const category = formData.get("category") as string;
+    const accountId = formData.get("accountId") as AccountId;
+    const categoryId = formData.get("categoryId") as CategoryId;
     const amount = parseFloat(formData.get("amount") as string);
     const type = formData.get("type") as "income" | "expense";
     const title = formData.get("title") as string;
@@ -66,7 +100,7 @@ export default function Page() {
 
     const payload = {
       accountId,
-      category,
+      categoryId,
       amount,
       type,
       title: title || undefined,
@@ -113,27 +147,47 @@ export default function Page() {
       <SiteHeader title="Add Transaction" />
       <form onSubmit={handleSubmit} className="grid gap-6 m-4 md:m-6">
         <div className="grid gap-3 *:w-full">
-          <Label htmlFor="category">
+          <Label htmlFor="categoryId">
             Category<span className="text-destructive">*</span>
           </Label>
-          <Input
-            id="category"
-            name="category"
-            type="text"
-            placeholder="Shopping"
-            required
-          />
+          {catLoading ? (
+            <Skeleton className="w-full h-9" />
+          ) : categories ? (
+            <Select
+              name="categoryId"
+              value={txnCategory}
+              onValueChange={(value: CategoryId) => {
+                setTxnCategory(value);
+              }}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select a category" />
+              </SelectTrigger>
+              <SelectContent>
+                {categories.map((cat) => (
+                  <SelectItem key={cat._id} value={cat._id}>
+                    {cat.icon} {cat.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          ) : (
+            <ErrorMessage
+              error={"Failed to load categories"}
+              className="min-h-36"
+            />
+          )}
         </div>
         <div className="grid gap-3 *:w-full">
           <Label htmlFor="type">
             Type<span className="text-destructive">*</span>
           </Label>
-          <input type="hidden" name="type" value={transactionType} />
+          <input type="hidden" name="type" value={txnType} />
           <ToggleGroup
             type="single"
-            value={transactionType}
+            value={txnType}
             onValueChange={(val: "income" | "expense") => {
-              if (val) setTransactionType(val);
+              if (val) setTxnType(val);
             }}
           >
             <ToggleGroupItem
@@ -155,18 +209,18 @@ export default function Page() {
           </ToggleGroup>
         </div>
         <div className="grid gap-3 *:w-full">
-          <Label htmlFor="account">
+          <Label htmlFor="accountId">
             Account<span className="text-destructive">*</span>
           </Label>
-          <input type="hidden" name="account" value={transactionAccount} />
-          {loading ? (
+          <input type="hidden" name="accountId" value={txnAccount} />
+          {accLoading ? (
             <Skeleton className="w-full h-9" />
           ) : accounts ? (
             <ToggleGroup
               type="single"
-              value={transactionAccount}
+              value={txnAccount}
               onValueChange={(val: AccountId) => {
-                if (val) setTransactionAccount(val);
+                if (val) setTxnAccount(val);
               }}
             >
               {accounts.map((account) => (

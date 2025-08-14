@@ -1,12 +1,12 @@
+import Link from "next/link";
 import {
   IconCash,
   IconMoneybag,
   IconCaretDownFilled,
   IconCaretUpFilled,
 } from "@tabler/icons-react";
-import React from "react";
 
-import { Transaction, TransactionGroups } from "@/types/convex";
+import type { Category, Transaction, TransactionGroups } from "@/types/convex";
 
 import { cn } from "@/lib/utils";
 
@@ -14,7 +14,6 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import Link from "next/link";
 
 // TODO: use the already defined groupByDay convex function
 function groupByDay(transactions: Transaction[]) {
@@ -53,11 +52,18 @@ function formatDisplayDate(dateStr: string) {
   return `${weekday}, ${monthDay}`;
 }
 
-function RenderGroupedList({ transactions }: { transactions: Transaction[] }) {
+function RenderGroupedList({
+  transactions,
+  categories,
+}: {
+  transactions: Transaction[];
+  categories: Category[];
+}) {
   const grouped = groupByDay(transactions);
   const dates = Object.keys(grouped).sort(
     (a, b) => new Date(b).getTime() - new Date(a).getTime()
   );
+
   return (
     <div className="grid gap-6">
       {dates.map((date) => (
@@ -66,9 +72,11 @@ function RenderGroupedList({ transactions }: { transactions: Transaction[] }) {
             {formatDisplayDate(date)}
           </div>
           <ul className="grid gap-4">
-            {grouped[date].map((item, idx) => (
-              <ListItem key={idx} item={item} />
-            ))}
+            {grouped[date].map((txn) => {
+              const cat = categories.find((c) => c._id === txn.categoryId);
+              if (!cat) return null;
+              return <ListItem key={txn._id.toString()} txn={txn} cat={cat} />;
+            })}
           </ul>
         </div>
       ))}
@@ -83,11 +91,17 @@ export function DataList({
   allData,
   incomeData,
   expenseData,
+  categories,
+  loading,
 }: {
   allData: Transaction[];
   incomeData: Transaction[];
   expenseData: Transaction[];
+  categories: Category[];
+  loading?: boolean;
 }) {
+  if (loading) return <DataListSkeleton />;
+
   return (
     <Tabs
       defaultValue="all"
@@ -100,65 +114,74 @@ export function DataList({
           <TabsTrigger value="expense">Expense</TabsTrigger>
         </TabsList>
       </div>
+
+      {/* All */}
       <TabsContent value="all" className="flex flex-col px-4 lg:px-6">
         {allData.length ? (
-          <RenderGroupedList transactions={allData} />
+          <RenderGroupedList transactions={allData} categories={categories} />
         ) : (
-          <div className="grid border border-dashed rounded-lg place-items-center aspect-video">
-            <p className="text-xl font-semibold">No transactions found. 😲</p>
-          </div>
+          <EmptyState text="No transactions found. 😲" />
         )}
       </TabsContent>
+
+      {/* Income */}
       <TabsContent value="income" className="flex flex-col px-4 lg:px-6">
         {incomeData.length ? (
-          <RenderGroupedList transactions={incomeData} />
+          <RenderGroupedList
+            transactions={incomeData}
+            categories={categories}
+          />
         ) : (
-          <div className="grid border border-dashed rounded-lg place-items-center aspect-video">
-            <p className="text-xl font-semibold">No income found. 😬</p>
-          </div>
+          <EmptyState text="No income found. 😬" />
         )}
       </TabsContent>
+
+      {/* Expense */}
       <TabsContent value="expense" className="flex flex-col px-4 lg:px-6">
         {expenseData.length ? (
-          <RenderGroupedList transactions={expenseData} />
+          <RenderGroupedList
+            transactions={expenseData}
+            categories={categories}
+          />
         ) : (
-          <div className="grid border border-dashed rounded-lg place-items-center aspect-video">
-            <p className="text-xl font-semibold">No expense found. 🤯</p>
-          </div>
+          <EmptyState text="No expense found. 🤯" />
         )}
       </TabsContent>
     </Tabs>
   );
 }
 
-export function ListItem({ item }: { item: Transaction }) {
+export function ListItem({ txn, cat }: { txn: Transaction; cat: Category }) {
   return (
     <li>
       <Link
-        href={`/transactions/${item._id.toString()}`}
+        href={`/transactions/${txn._id.toString()}`}
         className="flex items-center justify-between gap-2"
       >
         <div className="flex items-center gap-2">
-          <Avatar className="items-center justify-center border size-12">
-            <ListItemIcon item={item.type} />
+          <Avatar
+            className="items-center justify-center border size-12"
+            // style={{ backgroundColor: cat.color }}
+          >
+            {cat.icon || <ListItemIcon item={txn.type} />}
           </Avatar>
           <div>
-            <h3 className="font-semibold">{item.title || item.category}</h3>
-            {item.title && <Badge variant={"outline"}>{item.category}</Badge>}
+            <h3 className="font-semibold">{txn.title || cat.name}</h3>
+            {txn.title && <Badge variant={"outline"}>{cat.name}</Badge>}
           </div>
         </div>
         <p
           className={cn(
             "flex items-center text-lg font-semibold [&>svg]:size-4",
-            item.type === "income" ? "text-emerald-500" : "text-destructive"
+            txn.type === "income" ? "text-emerald-500" : "text-destructive"
           )}
         >
-          {item.type === "income" ? (
+          {txn.type === "income" ? (
             <IconCaretUpFilled />
           ) : (
             <IconCaretDownFilled />
           )}
-          {item.amount}
+          {txn.amount}
         </p>
       </Link>
     </li>
@@ -176,21 +199,27 @@ function ListItemIcon({ item }: { item: string }) {
   }
 }
 
+function EmptyState({ text }: { text: string }) {
+  return (
+    <div className="grid border border-dashed rounded-lg place-items-center aspect-video">
+      <p className="text-xl font-semibold">{text}</p>
+    </div>
+  );
+}
+
 export function DataListSkeleton() {
   return (
-    <div>
-      <div className="flex flex-col justify-start w-full gap-4 md:gap-6">
-        <div className="px-4 lg:px-6">
-          <Skeleton className="h-8 w-42" />
-        </div>
-        <div className="flex flex-col px-4 lg:px-6">
-          <Skeleton className="w-32 h-4 my-3" />
-          <ul className="grid gap-4">
-            {[...Array(4)].map((_, i) => (
-              <ListItemSkeleton key={i} />
-            ))}
-          </ul>
-        </div>
+    <div className="flex flex-col justify-start w-full gap-4 md:gap-6">
+      <div className="px-4 lg:px-6">
+        <Skeleton className="h-8 w-42" />
+      </div>
+      <div className="flex flex-col px-4 lg:px-6">
+        <Skeleton className="w-32 h-4 my-3" />
+        <ul className="grid gap-4">
+          {[...Array(4)].map((_, i) => (
+            <ListItemSkeleton key={i} />
+          ))}
+        </ul>
       </div>
     </div>
   );

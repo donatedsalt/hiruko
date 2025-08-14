@@ -15,6 +15,8 @@ import type {
 } from "convex/server";
 import type * as accounts_mutations from "../accounts/mutations.js";
 import type * as accounts_queries from "../accounts/queries.js";
+import type * as categories_mutations from "../categories/mutations.js";
+import type * as categories_queries from "../categories/queries.js";
 import type * as transactions_mutations from "../transactions/mutations.js";
 import type * as transactions_queries from "../transactions/queries.js";
 import type * as utils_auth from "../utils/auth.js";
@@ -32,6 +34,8 @@ import type * as utils_db_transactions from "../utils/db/transactions.js";
 declare const fullApi: ApiFromModules<{
   "accounts/mutations": typeof accounts_mutations;
   "accounts/queries": typeof accounts_queries;
+  "categories/mutations": typeof categories_mutations;
+  "categories/queries": typeof categories_queries;
   "transactions/mutations": typeof transactions_mutations;
   "transactions/queries": typeof transactions_queries;
   "utils/auth": typeof utils_auth;

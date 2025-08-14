@@ -16,6 +16,7 @@ export function AccountsCards() {
     return (
       <div className="flex gap-4 px-4 overflow-auto lg:px-6 scrollbar-none">
         <AccountsCardSkeleton />
+        <AddAccountCard />
       </div>
     );
   }

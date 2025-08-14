@@ -112,7 +112,7 @@ export const groupByCategory = query({
     transactions.sort((a, b) => b.transactionTime - a.transactionTime);
 
     const grouped = transactions.reduce((acc, txn) => {
-      const key = txn.category;
+      const key = txn.categoryId;
       if (!acc[key]) acc[key] = [];
       acc[key].push(txn);
       return acc;

@@ -9,7 +9,8 @@ import { DataList, DataListSkeleton } from "@/components/data-list";
 
 export default function Page() {
   const transactions = useQuery(api.transactions.queries.listAllVariants);
-  const loading = transactions === undefined;
+  const categories = useQuery(api.categories.queries.list);
+  const loading = transactions === undefined || categories === undefined;
 
   return (
     <>
@@ -17,11 +18,12 @@ export default function Page() {
       <div className="grid h-full my-4">
         {loading ? (
           <DataListSkeleton />
-        ) : transactions ? (
+        ) : transactions && categories ? (
           <DataList
             allData={transactions.all}
             incomeData={transactions.income}
             expenseData={transactions.expense}
+            categories={categories}
           />
         ) : (
           <ErrorMessage error={"Failed to load transactions"} />

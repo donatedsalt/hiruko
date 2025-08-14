@@ -11,13 +11,17 @@ import {
   IconLoader2,
 } from "@tabler/icons-react";
 
-import { AccountId, Transaction, TransactionId } from "@/types/convex";
+import {
+  AccountId,
+  CategoryId,
+  Transaction,
+  TransactionId,
+} from "@/types/convex";
 
 import { TransactionSchema } from "@/validation/transaction";
 
 import { useSmartRouter } from "@/hooks/use-smart-router";
 
-import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogTrigger,
@@ -26,8 +30,16 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
 import { SiteHeader } from "@/components/site-header";
@@ -44,16 +56,16 @@ export default function Page() {
   const loading = transaction === undefined;
   const accounts = useQuery(api.accounts.queries.list);
   const accLoading = accounts === undefined;
+  const categories = useQuery(api.categories.queries.list);
+  const catLoading = categories === undefined;
+
   const updateTransaction = useMutation(api.transactions.mutations.update);
   const deleteTransaction = useMutation(api.transactions.mutations.remove);
 
-  const [transactionType, setTransactionType] = useState<"income" | "expense">(
-    "expense"
-  );
-  const [transactionAccount, setTransactionAccount] = useState<AccountId | "">(
-    ""
-  );
-  const [transactionTime, setTransactionTime] = useState({
+  const [txnType, setTxnType] = useState<"income" | "expense">("expense");
+  const [txnAccount, setTxnAccount] = useState<AccountId | "">("");
+  const [txnCategory, setTxnCategory] = useState<CategoryId | "">("");
+  const [txnTime, setTxnTime] = useState({
     date: "",
     time: "",
   });
@@ -63,9 +75,11 @@ export default function Page() {
 
   useEffect(() => {
     if (transaction) {
-      setTransactionAccount(transaction.accountId);
+      setTxnAccount(transaction.accountId);
 
-      setTransactionType(transaction.type);
+      setTxnType(transaction.type);
+
+      setTxnCategory(transaction.categoryId);
 
       const date = new Date(transaction.transactionTime)
         .toISOString()
@@ -73,7 +87,7 @@ export default function Page() {
       const time = new Date(transaction.transactionTime)
         .toTimeString()
         .slice(0, 5);
-      setTransactionTime({ date: date, time: time });
+      setTxnTime({ date: date, time: time });
     }
   }, [transaction]);
 
@@ -100,8 +114,8 @@ export default function Page() {
     const form = e.currentTarget;
     const formData = new FormData(form);
 
-    const accountId = formData.get("account") as AccountId;
-    const category = formData.get("category") as string;
+    const accountId = formData.get("accountId") as AccountId;
+    const categoryId = formData.get("categoryId") as CategoryId;
     const amount = parseFloat(formData.get("amount") as string);
     const type = formData.get("type") as "income" | "expense";
     const title = formData.get("title") as string;
@@ -113,7 +127,7 @@ export default function Page() {
 
     const payload = {
       accountId,
-      category,
+      categoryId,
       amount,
       type,
       title: title || undefined,
@@ -166,18 +180,36 @@ export default function Page() {
       ) : transaction ? (
         <form onSubmit={handleSubmit} className="grid gap-6 m-4 md:m-6 ">
           <div className="grid **:disabled:opacity-75 gap-3 *:w-full">
-            <Label htmlFor="category">
+            <Label htmlFor="categoryId">
               Category<span className="text-destructive">*</span>
             </Label>
-            <Input
-              id="category"
-              name="category"
-              type="text"
-              placeholder="Shopping"
-              defaultValue={transaction?.category}
-              required
-              disabled={!isEditing}
-            />
+            {catLoading ? (
+              <Skeleton className="w-full h-9" />
+            ) : categories ? (
+              <Select
+                name="categoryId"
+                value={txnCategory}
+                onValueChange={(value: CategoryId) => {
+                  setTxnCategory(value);
+                }}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select a category" />
+                </SelectTrigger>
+                <SelectContent>
+                  {categories.map((cat) => (
+                    <SelectItem key={cat._id} value={cat._id}>
+                      {cat.icon} {cat.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            ) : (
+              <ErrorMessage
+                error={"Failed to load categories"}
+                className="min-h-36"
+              />
+            )}
           </div>
           <div className="grid **:disabled:opacity-75 gap-3 *:w-full">
             <Label htmlFor="type">
@@ -186,14 +218,14 @@ export default function Page() {
             <input
               type="hidden"
               name="type"
-              value={transactionType}
+              value={txnType}
               disabled={!isEditing}
             />
             <ToggleGroup
               type="single"
-              value={transactionType}
+              value={txnType}
               onValueChange={(val: "income" | "expense") => {
-                if (val) setTransactionType(val);
+                if (val) setTxnType(val);
               }}
               disabled={!isEditing}
             >
@@ -216,13 +248,13 @@ export default function Page() {
             </ToggleGroup>
           </div>
           <div className="grid **:disabled:opacity-75 gap-3 *:w-full">
-            <Label htmlFor="account">
+            <Label htmlFor="accountId">
               Account<span className="text-destructive">*</span>
             </Label>
             <input
               type="hidden"
-              name="account"
-              value={transactionAccount}
+              name="accountId"
+              value={txnAccount}
               disabled={!isEditing}
             />
             {accLoading ? (
@@ -230,9 +262,9 @@ export default function Page() {
             ) : accounts ? (
               <ToggleGroup
                 type="single"
-                value={transactionAccount}
+                value={txnAccount}
                 onValueChange={(val: AccountId) => {
-                  if (val) setTransactionAccount(val);
+                  if (val) setTxnAccount(val);
                 }}
                 disabled={!isEditing}
               >
@@ -300,7 +332,7 @@ export default function Page() {
               <DatePicker
                 id="date"
                 name="date"
-                defaultValue={transactionTime.date}
+                defaultValue={txnTime.date}
                 disabled={!isEditing}
               />
             </div>
@@ -312,7 +344,7 @@ export default function Page() {
                 id="time"
                 name="time"
                 type="time"
-                defaultValue={transactionTime.time}
+                defaultValue={txnTime.time}
                 required
                 disabled={!isEditing}
               />

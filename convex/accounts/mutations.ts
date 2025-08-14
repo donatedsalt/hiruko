@@ -16,27 +16,48 @@ export const create = mutation({
     const userId = await getUserId(ctx);
     if (!userId) return [];
 
+    const now = Date.now();
+
+    let categoryId = (
+      await ctx.db
+        .query("categories")
+        .withIndex("by_userId_name", (q) =>
+          q.eq("userId", userId).eq("name", "Balance Correction")
+        )
+        .unique()
+    )?._id;
+
+    if (!categoryId) {
+      categoryId = await ctx.db.insert("categories", {
+        userId,
+        name: "Balance Correction",
+        icon: "⚖️",
+        color: "#888888",
+      });
+    }
+
     const accountId = await ctx.db.insert("accounts", {
       userId,
       name: args.name,
       balance: args.balance,
       transactionsCount: 0,
-      updatedAt: Date.now(),
+      updatedAt: now,
     });
 
     if (args.balance !== 0) {
-      await ctx.db.insert("transactions", {
-        userId,
-        accountId,
-        amount: Math.abs(args.balance),
-        type: args.balance > 0 ? "income" : "expense",
-        category: "balance correction",
-        note: "Initial balance",
-        transactionTime: Date.now(),
-        updatedAt: Date.now(),
-      });
-
-      await ctx.db.patch(accountId, { transactionsCount: 1 });
+      await Promise.all([
+        ctx.db.insert("transactions", {
+          userId,
+          accountId,
+          amount: Math.abs(args.balance),
+          type: args.balance > 0 ? "income" : "expense",
+          categoryId,
+          note: "Initial balance",
+          transactionTime: now,
+          updatedAt: now,
+        }),
+        ctx.db.patch(accountId, { transactionsCount: 1 }),
+      ]);
     }
 
     return accountId;
@@ -71,16 +92,35 @@ export const update = mutation({
     ) {
       const difference = args.balance - account.balance;
       const type = difference > 0 ? "income" : "expense";
+      const now = Date.now();
+
+      let categoryId = (
+        await ctx.db
+          .query("categories")
+          .withIndex("by_userId_name", (q) =>
+            q.eq("userId", userId).eq("name", "Balance Correction")
+          )
+          .unique()
+      )?._id;
+
+      if (!categoryId) {
+        categoryId = await ctx.db.insert("categories", {
+          userId,
+          name: "Balance Correction",
+          icon: "⚖️",
+          color: "#888888",
+        });
+      }
 
       await ctx.db.insert("transactions", {
-        userId: userId,
+        userId,
         accountId: args.id,
         type,
         amount: Math.abs(difference),
-        category: "balance correction",
+        categoryId,
         note: "Balance manually adjusted",
-        transactionTime: Date.now(),
-        updatedAt: Date.now(),
+        transactionTime: now,
+        updatedAt: now,
       });
 
       updates.balance = args.balance;
@@ -88,7 +128,6 @@ export const update = mutation({
     }
 
     await ctx.db.patch(args.id, updates);
-
     return await ctx.db.get(args.id);
   },
 });

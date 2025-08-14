@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { AccountId } from "@/types/convex";
+import { AccountId, CategoryId } from "@/types/convex";
 
 export const TransactionSchema = z
   .object({
@@ -9,7 +9,10 @@ export const TransactionSchema = z
       .string()
       .min(1, "Account is required.")
       .transform((val) => val as AccountId),
-    category: z.string().min(1, "Category is required").max(100),
+    categoryId: z
+      .string()
+      .min(1, "Category is required.")
+      .transform((val) => val as CategoryId),
     title: z
       .string()
       .max(100, "Title must be less than 100 characters.")

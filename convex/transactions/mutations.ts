@@ -10,7 +10,7 @@ import { adjustAccount } from "@/convex/utils/db/accounts";
  */
 export const create = mutation({
   args: {
-    category: v.string(),
+    categoryId: v.id("categories"),
     accountId: v.id("accounts"),
     type: v.union(v.literal("income"), v.literal("expense")),
     amount: v.number(),
@@ -29,7 +29,7 @@ export const create = mutation({
 
     const transaction = await ctx.db.insert("transactions", {
       userId,
-      category: args.category,
+      categoryId: args.categoryId,
       accountId: args.accountId,
       type: args.type,
       amount: args.amount,
