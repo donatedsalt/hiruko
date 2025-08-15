@@ -49,7 +49,7 @@ export const create = mutation({
           userId,
           accountId,
           amount: Math.abs(args.balance),
-          type: args.balance > 0 ? "income" : "expense",
+          type,
           categoryId,
           note: "Initial balance",
           transactionTime: now,
@@ -92,6 +92,7 @@ export const update = mutation({
       const difference = args.balance - account.balance;
       const type = difference > 0 ? "income" : "expense";
       const now = Date.now();
+      const absDiff = Math.abs(difference);
 
       let categoryId = (
         await ctx.db
@@ -114,7 +115,7 @@ export const update = mutation({
         userId,
         accountId: args.id,
         type,
-        amount: Math.abs(difference),
+        amount: absDiff,
         categoryId,
         note: "Balance manually adjusted",
         transactionTime: now,
@@ -122,7 +123,7 @@ export const update = mutation({
       });
 
       updates.balance = args.balance;
-      updates.transactionCount = (account.transactionCount || 0) + 1;
+      updates.transactionCount = account.transactionCount + 1;
     }
 
     await ctx.db.patch(args.id, updates);

@@ -43,7 +43,7 @@ export const create = mutation({
 
     await ctx.db.patch(args.accountId, {
       balance: account.balance + balanceDelta,
-      transactionCount: (account.transactionCount ?? 0) + 1,
+      transactionCount: account.transactionCount + 1,
     });
 
     return transaction;
@@ -140,7 +140,7 @@ export const remove = mutation({
 
     await ctx.db.patch(transaction.accountId, {
       balance: account.balance + balanceDelta,
-      transactionCount: Math.max((account.transactionCount ?? 1) - 1, 0),
+      transactionCount: Math.max(account.transactionCount - 1, 0),
     });
 
     await ctx.db.delete(id);
