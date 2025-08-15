@@ -46,6 +46,7 @@ import { SiteHeader } from "@/components/site-header";
 import { DatePicker } from "@/components/ui/date-picker";
 import { ErrorMessage } from "@/components/error-message";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { AddCategoryButton } from "@/components/add-category-button";
 
 export default function Page() {
   const { id } = useParams();
@@ -183,33 +184,36 @@ export default function Page() {
             <Label htmlFor="categoryId">
               Category<span className="text-destructive">*</span>
             </Label>
-            {catLoading ? (
-              <Skeleton className="w-full h-9" />
-            ) : categories ? (
-              <Select
-                name="categoryId"
-                value={txnCategory}
-                onValueChange={(value: CategoryId) => {
-                  setTxnCategory(value);
-                }}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select a category" />
-                </SelectTrigger>
-                <SelectContent>
-                  {categories.map((cat) => (
-                    <SelectItem key={cat._id} value={cat._id}>
-                      {cat.icon} {cat.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            ) : (
-              <ErrorMessage
-                error={"Failed to load categories"}
-                className="min-h-36"
-              />
-            )}
+            <div className="flex gap-3">
+              {catLoading ? (
+                <Skeleton className="w-full h-9" />
+              ) : categories ? (
+                <Select
+                  name="categoryId"
+                  value={txnCategory}
+                  onValueChange={(value: CategoryId) => {
+                    setTxnCategory(value);
+                  }}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Select a category" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {categories.map((cat) => (
+                      <SelectItem key={cat._id} value={cat._id}>
+                        {cat.icon} {cat.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              ) : (
+                <ErrorMessage
+                  error={"Failed to load categories"}
+                  className="min-h-36"
+                />
+              )}
+              <AddCategoryButton />
+            </div>
           </div>
           <div className="grid **:disabled:opacity-75 gap-3 *:w-full">
             <Label htmlFor="type">
