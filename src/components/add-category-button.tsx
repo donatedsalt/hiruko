@@ -4,7 +4,11 @@ import { toast } from "sonner";
 import { useState } from "react";
 import { useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
-import { IconPlus } from "@tabler/icons-react";
+import {
+  IconCaretDownFilled,
+  IconCaretUpFilled,
+  IconPlus,
+} from "@tabler/icons-react";
 
 import { CategorySchema } from "@/validation/category";
 
@@ -21,40 +25,41 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import EmojiPickerButton from "@/components/emoji-picker-button";
+import { ToggleGroup, ToggleGroupItem } from "./ui/toggle-group";
 
 export function AddCategoryButton() {
   const [open, setOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const createCategory = useMutation(api.categories.mutations.create);
+  const [name, setName] = useState("");
   const [icon, setIcon] = useState("😀");
+  const [type, setType] = useState<"income" | "expense">("expense");
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const handleSubmit = async () => {
     setIsSubmitting(true);
 
-    const form = e.currentTarget;
-    const formData = new FormData(form);
-    const name = formData.get("name") as string;
-    const icon = formData.get("icon") as string;
-    // const color = formData.get("color") as string;
-
-    const payload = { name, icon /* color */ };
+    const payload = { name, icon, type };
 
     const result = CategorySchema.omit({
       userId: true,
+      transactionCount: true,
+      transactionAmount: true,
     }).safeParse(payload);
 
     if (!result.success) {
       toast.warning("Validation error", {
         description: result.error.issues[0].message,
       });
+      setIsSubmitting(false);
       return;
     }
 
     try {
       await createCategory(result.data);
       toast.success("Category added");
-      form.reset();
+      setName("");
+      setIcon("😀");
+      setType("expense");
       setOpen(false);
     } catch (err: any) {
       toast.error("Something went wrong!", {
@@ -66,71 +71,98 @@ export function AddCategoryButton() {
   };
 
   return (
-    <>
-      <Dialog open={open} onOpenChange={setOpen}>
-        <DialogTrigger asChild>
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button
+          size={"icon"}
+          variant={"outline"}
+          type="button"
+          disabled={isSubmitting}
+        >
+          <IconPlus />
+        </Button>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Create Category</DialogTitle>
+          <DialogDescription>
+            Create a new transaction category.
+          </DialogDescription>
+        </DialogHeader>
+        <div className="grid gap-4">
+          <div className="grid gap-3 *:w-full">
+            <Label htmlFor="type">
+              Type<span className="text-destructive">*</span>
+            </Label>
+            <input type="hidden" name="type" value={type} />
+            <ToggleGroup
+              type="single"
+              value={type}
+              onValueChange={(val: "income" | "expense") => {
+                if (val) setType(val);
+              }}
+            >
+              <ToggleGroupItem
+                value="expense"
+                aria-label="Toggle expense"
+                className="border dark:bg-input/30 data-[state=on]:bg-destructive! text-destructive-foreground"
+              >
+                <IconCaretDownFilled />
+                <span>Expense</span>
+              </ToggleGroupItem>
+              <ToggleGroupItem
+                value="income"
+                aria-label="Toggle income"
+                className="border dark:bg-input/30 data-[state=on]:bg-emerald-500! text-foreground"
+              >
+                <IconCaretUpFilled />
+                <span>Income</span>
+              </ToggleGroupItem>
+            </ToggleGroup>
+          </div>
+          <div className="flex gap-4">
+            <div className="grid gap-3">
+              <Label htmlFor="icon">Icon</Label>
+              <input
+                id="icon"
+                name="icon"
+                type="hidden"
+                value={icon}
+                required
+              />
+              <EmojiPickerButton
+                value={icon}
+                onChange={(val) => setIcon(val)}
+              />
+            </div>
+            <div className="grid gap-3 grow">
+              <Label htmlFor="name">Name</Label>
+              <Input
+                id="name"
+                name="name"
+                type="text"
+                placeholder="Shopping"
+                value={name}
+                onChange={(val) => setName(val.target.value)}
+                required
+              />
+            </div>
+          </div>
+        </div>
+        <DialogFooter className="mt-4">
           <Button
-            size={"icon"}
-            variant={"outline"}
             type="button"
+            variant="outline"
+            onClick={() => setOpen(false)}
             disabled={isSubmitting}
           >
-            <IconPlus />
+            Cancel
           </Button>
-        </DialogTrigger>
-        <DialogContent>
-          <form onSubmit={handleSubmit} className="grid gap-4">
-            <DialogHeader>
-              <DialogTitle>Create Category</DialogTitle>
-              <DialogDescription>
-                Create a new transaction category.
-              </DialogDescription>
-            </DialogHeader>
-            <div className="grid gap-4">
-              <div className="flex gap-4">
-                <div className="grid gap-3">
-                  <Label htmlFor="icon">Icon</Label>
-                  <input
-                    id="icon"
-                    name="icon"
-                    type="hidden"
-                    value={icon}
-                    required
-                  />
-                  <EmojiPickerButton
-                    value={icon}
-                    onChange={(val) => {
-                      console.log(val);
-                      setIcon(val);
-                    }}
-                  />
-                </div>
-                <div className="grid gap-3 grow">
-                  <Label htmlFor="name">Name</Label>
-                  <Input
-                    id="name"
-                    name="name"
-                    type="text"
-                    placeholder="Shopping"
-                    required
-                  />
-                </div>
-              </div>
-            </div>
-            <DialogFooter className="mt-4">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => setOpen(false)}
-                disabled={isSubmitting}
-              >
-                Cancel
-              </Button>
-              <Button disabled={isSubmitting}>Confirm</Button>
-            </DialogFooter>
-          </form>
-        </DialogContent>
-      </Dialog>
-    </>
+          <Button type="button" onClick={handleSubmit} disabled={isSubmitting}>
+            Confirm
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }

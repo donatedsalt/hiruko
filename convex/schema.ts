@@ -13,6 +13,9 @@ export default defineSchema({
     userId: v.string(),
     name: v.string(),
     icon: v.string(),
+    transactionCount: v.number(),
+    transactionAmount: v.number(),
+    type: v.union(v.literal("income"), v.literal("expense")),
   })
     .index("by_userId", ["userId"])
     .index("by_userId_name", ["userId", "name"]),

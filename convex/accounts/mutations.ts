@@ -2,6 +2,8 @@ import { v } from "convex/values";
 
 import { mutation } from "@/convex/_generated/server";
 
+import { CategoryId } from "@/types/convex";
+
 import { getUserId } from "@/convex/utils/auth";
 
 /**
@@ -18,21 +20,40 @@ export const create = mutation({
 
     const now = Date.now();
 
-    let categoryId = (
-      await ctx.db
+    let categoryId: CategoryId | undefined;
+
+    if (args.balance !== 0) {
+      const type = args.balance > 0 ? "income" : "expense";
+      const absBalance = Math.abs(args.balance);
+
+      const categoryName =
+        type === "income"
+          ? "Balance Correction (Income)"
+          : "Balance Correction (Expense)";
+
+      const category = await ctx.db
         .query("categories")
         .withIndex("by_userId_name", (q) =>
-          q.eq("userId", userId).eq("name", "Balance Correction")
+          q.eq("userId", userId).eq("name", categoryName)
         )
-        .unique()
-    )?._id;
+        .unique();
 
-    if (!categoryId) {
-      categoryId = await ctx.db.insert("categories", {
-        userId,
-        name: "Balance Correction",
-        icon: "⚖️",
-      });
+      if (!category) {
+        categoryId = await ctx.db.insert("categories", {
+          userId,
+          name: categoryName,
+          icon: "⚖️",
+          transactionCount: 1,
+          transactionAmount: absBalance,
+          type,
+        });
+      } else {
+        categoryId = category._id;
+        await ctx.db.patch(category._id, {
+          transactionCount: (category.transactionCount || 0) + 1,
+          transactionAmount: (category.transactionAmount || 0) + absBalance,
+        });
+      }
     }
 
     const accountId = await ctx.db.insert("accounts", {
@@ -43,7 +64,8 @@ export const create = mutation({
       updatedAt: now,
     });
 
-    if (args.balance !== 0) {
+    if (args.balance !== 0 && categoryId) {
+      const type = args.balance > 0 ? "income" : "expense";
       await Promise.all([
         ctx.db.insert("transactions", {
           userId,
@@ -94,20 +116,33 @@ export const update = mutation({
       const now = Date.now();
       const absDiff = Math.abs(difference);
 
-      let categoryId = (
-        await ctx.db
-          .query("categories")
-          .withIndex("by_userId_name", (q) =>
-            q.eq("userId", userId).eq("name", "Balance Correction")
-          )
-          .unique()
-      )?._id;
+      const categoryName =
+        type === "income"
+          ? "Balance Correction (Income)"
+          : "Balance Correction (Expense)";
 
-      if (!categoryId) {
+      const category = await ctx.db
+        .query("categories")
+        .withIndex("by_userId_name", (q) =>
+          q.eq("userId", userId).eq("name", categoryName)
+        )
+        .unique();
+
+      let categoryId: CategoryId | undefined;
+      if (!category) {
         categoryId = await ctx.db.insert("categories", {
           userId,
-          name: "Balance Correction",
+          name: categoryName,
           icon: "⚖️",
+          type,
+          transactionCount: 1,
+          transactionAmount: absDiff,
+        });
+      } else {
+        categoryId = category._id;
+        await ctx.db.patch(category._id, {
+          transactionCount: category.transactionCount + 1,
+          transactionAmount: category.transactionAmount + absDiff,
         });
       }
 

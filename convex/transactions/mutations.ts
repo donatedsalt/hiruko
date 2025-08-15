@@ -27,6 +27,11 @@ export const create = mutation({
       throw new Error("Invalid account");
     }
 
+    const category = await ctx.db.get(args.categoryId);
+    if (!category || category.userId !== userId) {
+      throw new Error("Invalid category");
+    }
+
     const transaction = await ctx.db.insert("transactions", {
       userId,
       categoryId: args.categoryId,
@@ -46,6 +51,11 @@ export const create = mutation({
       transactionCount: account.transactionCount + 1,
     });
 
+    await ctx.db.patch(args.categoryId, {
+      transactionCount: category.transactionCount + 1,
+      transactionAmount: category.transactionAmount + args.amount,
+    });
+
     return transaction;
   },
 });
@@ -57,7 +67,7 @@ export const update = mutation({
   args: {
     id: v.id("transactions"),
     updates: v.object({
-      category: v.optional(v.string()),
+      categoryId: v.optional(v.id("categories")),
       accountId: v.optional(v.id("accounts")),
       amount: v.optional(v.number()),
       type: v.optional(v.union(v.literal("income"), v.literal("expense"))),
@@ -80,10 +90,21 @@ export const update = mutation({
       throw new Error("Original account not found");
     }
 
+    const originalCategory = await ctx.db.get(transaction.categoryId);
+    if (!originalCategory || originalCategory.userId !== userId) {
+      throw new Error("Original category not found");
+    }
+
     const newAccountId = updates.accountId ?? transaction.accountId;
     const newAccount = await ctx.db.get(newAccountId);
     if (!newAccount || newAccount.userId !== userId) {
       throw new Error("Target account not found");
+    }
+
+    const newCategoryId = updates.categoryId ?? transaction.categoryId;
+    const newCategory = await ctx.db.get(newCategoryId);
+    if (!newCategory || newCategory.userId !== userId) {
+      throw new Error("Target category not found");
     }
 
     const oldAmount = transaction.amount;
@@ -93,25 +114,35 @@ export const update = mutation({
     const newType = updates.type ?? oldType;
 
     const accountChanged = transaction.accountId !== newAccountId;
+    const categoryChanged = transaction.categoryId !== newCategoryId;
     const amountChanged = newAmount !== oldAmount;
     const typeChanged = oldType !== newType;
 
     if (accountChanged || amountChanged || typeChanged) {
-      await adjustAccount(
-        ctx,
-        originalAccount,
-        transaction.amount,
-        oldType,
-        -1
-      );
+      await adjustAccount(ctx, originalAccount, oldAmount, oldType, -1);
       await adjustAccount(ctx, newAccount, newAmount, newType, 1);
+    }
+
+    if (categoryChanged || amountChanged || typeChanged) {
+      await ctx.db.patch(originalCategory._id, {
+        transactionCount: originalCategory.transactionCount - 1,
+        transactionAmount:
+          originalCategory.transactionAmount - transaction.amount,
+      });
+
+      await ctx.db.patch(newCategory._id, {
+        transactionCount: newCategory.transactionCount + 1,
+        transactionAmount: newCategory.transactionAmount + newAmount,
+      });
     }
 
     await ctx.db.patch(id, {
       ...updates,
       accountId: newAccountId,
+      categoryId: newCategoryId,
       updatedAt: Date.now(),
     });
+
     return id;
   },
 });

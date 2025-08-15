@@ -11,6 +11,7 @@ export const create = mutation({
   args: {
     name: v.string(),
     icon: v.string(),
+    type: v.union(v.literal("income"), v.literal("expense")),
   },
   handler: async (ctx, args) => {
     const userId = await getUserId(ctx);
@@ -20,12 +21,16 @@ export const create = mutation({
       userId,
       name: args.name,
       icon: args.icon,
+      type: args.type,
+      transactionCount: 0,
+      transactionAmount: 0,
     });
   },
 });
 
 /**
- * Create default categories only if user has no categories.
+ * Create default categories only if user has no categories
+ * or only Balance Correction categories exist.
  */
 export const createDefaultCategories = mutation({
   args: {},
@@ -33,25 +38,33 @@ export const createDefaultCategories = mutation({
     const userId = await getUserId(ctx);
     if (!userId) throw new Error("Unauthorized");
 
-    const existingCount = await ctx.db
+    const existingCategories = await ctx.db
       .query("categories")
       .withIndex("by_userId", (q) => q.eq("userId", userId))
       .collect();
 
-    if (existingCount.length > 0) {
+    const hasOnlyBalanceCorrection =
+      existingCategories.length <= 2 &&
+      existingCategories.every((cat) =>
+        cat.name.trim().toLowerCase().startsWith("balance correction")
+      );
+
+    if (existingCategories.length > 0 && !hasOnlyBalanceCorrection) {
       return { success: false, message: "Categories already exist" };
     }
 
     const defaultCategories = [
-      { name: "Income", icon: "💰" },
-      { name: "Food", icon: "🍔" },
-      { name: "Shopping", icon: "🛒" },
+      { name: "Income", icon: "💰", type: "income" as const },
+      { name: "Food", icon: "🍔", type: "expense" as const },
+      { name: "Shopping", icon: "🛒", type: "expense" as const },
     ];
 
     for (const category of defaultCategories) {
       await ctx.db.insert("categories", {
         userId,
         ...category,
+        transactionCount: 0,
+        transactionAmount: 0,
       });
     }
 
@@ -67,6 +80,7 @@ export const update = mutation({
     id: v.id("categories"),
     name: v.optional(v.string()),
     icon: v.optional(v.string()),
+    type: v.union(v.literal("income"), v.literal("expense")),
   },
   handler: async (ctx, args) => {
     const userId = await getUserId(ctx);
@@ -80,6 +94,7 @@ export const update = mutation({
     const updates: Partial<typeof category> = {};
     if (args.name !== undefined) updates.name = args.name;
     if (args.icon !== undefined) updates.icon = args.icon;
+    if (args.type !== undefined) updates.type = args.type;
 
     await ctx.db.patch(args.id, updates);
 

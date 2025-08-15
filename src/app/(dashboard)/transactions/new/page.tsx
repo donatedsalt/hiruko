@@ -51,27 +51,38 @@ export default function Page() {
 
   useEffect(() => {
     if (toastShown.current) return;
+    if (!accounts || !categories) return;
 
-    if (accounts && accounts.length === 0) {
+    let toastTriggered = false;
+
+    if (accounts.length === 0) {
       toast.info("Please create an account to continue");
       smartRouter.push("/");
-      toastShown.current = true;
-      return;
+      toastTriggered = true;
+    } else {
+      if (txnAccount === "") {
+        setTxnAccount(accounts[0]?._id);
+      }
+
+      const onlyBalanceCorrection =
+        categories.length > 0 &&
+        categories.length <= 2 &&
+        categories.every((cat) =>
+          cat.name.trim().toLowerCase().startsWith("balance correction")
+        );
+
+      if (categories.length === 0 || onlyBalanceCorrection) {
+        toast.info("No categories found. Creating defaults...");
+        createDefaults();
+        toastTriggered = true;
+      }
+
+      if (categories.length > 0 && txnCategory === "") {
+        setTxnCategory(categories[0]?._id);
+      }
     }
 
-    if (accounts && accounts.length > 0 && txnAccount === "") {
-      setTxnAccount(accounts[0]?._id);
-    }
-
-    if (categories && categories.length === 0) {
-      toast.info("No categories found. Creating defaults...");
-      createDefaults();
-      toastShown.current = true;
-    }
-
-    if (categories && categories.length > 0 && txnCategory === "") {
-      setTxnCategory(categories[0]?._id);
-    }
+    if (toastTriggered) toastShown.current = true;
   }, [
     accounts,
     categories,
