@@ -1,14 +1,17 @@
 "use client";
 
 import { toast } from "sonner";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import {
   IconCaretDownFilled,
   IconCaretUpFilled,
   IconPlus,
+  IconEdit,
 } from "@tabler/icons-react";
+
+import { CategoryId } from "@/types/convex";
 
 import { CategorySchema } from "@/validation/category";
 
@@ -25,26 +28,52 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import EmojiPickerButton from "@/components/emoji-picker-button";
-import { ToggleGroup, ToggleGroupItem } from "./ui/toggle-group";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
-export function AddCategoryButton() {
+type CategoryFormValues = {
+  name: string;
+  icon: string;
+  type: "income" | "expense";
+};
+
+interface CategoryDialogProps {
+  mode?: "add" | "edit";
+  initialValues?: Partial<CategoryFormValues> & { id?: CategoryId };
+  trigger?: React.ReactNode;
+}
+
+export function CategoryDialog({
+  mode = "add",
+  initialValues = {},
+  trigger,
+}: CategoryDialogProps) {
   const [open, setOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
   const createCategory = useMutation(api.categories.mutations.create);
-  const [name, setName] = useState("");
-  const [icon, setIcon] = useState("😀");
-  const [type, setType] = useState<"income" | "expense">("expense");
+  const updateCategory = useMutation(api.categories.mutations.update);
+
+  const [name, setName] = useState(initialValues.name || "");
+  const [icon, setIcon] = useState(initialValues.icon || "😀");
+  const [type, setType] = useState<"income" | "expense">(
+    initialValues.type || "expense"
+  );
+
+  useEffect(() => {
+    if (!open) return;
+    setName(initialValues.name || "");
+    setIcon(initialValues.icon || "😀");
+    setType(initialValues.type || "expense");
+  }, [open, initialValues]);
 
   const handleSubmit = async () => {
     setIsSubmitting(true);
-
-    const payload = { name, icon, type };
 
     const result = CategorySchema.omit({
       userId: true,
       transactionCount: true,
       transactionAmount: true,
-    }).safeParse(payload);
+    }).safeParse({ name, icon, type });
 
     if (!result.success) {
       toast.warning("Validation error", {
@@ -55,11 +84,13 @@ export function AddCategoryButton() {
     }
 
     try {
-      await createCategory(result.data);
-      toast.success("Category added");
-      setName("");
-      setIcon("😀");
-      setType("expense");
+      if (mode === "edit" && initialValues.id) {
+        await updateCategory({ id: initialValues.id, ...result.data });
+        toast.success("Category updated");
+      } else {
+        await createCategory(result.data);
+        toast.success("Category added");
+      }
       setOpen(false);
     } catch (err: any) {
       toast.error("Something went wrong!", {
@@ -73,28 +104,36 @@ export function AddCategoryButton() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button
-          size={"icon"}
-          variant={"outline"}
-          type="button"
-          disabled={isSubmitting}
-        >
-          <IconPlus />
-        </Button>
+        {trigger ? (
+          trigger
+        ) : mode === "add" ? (
+          <Button size="icon" variant="outline">
+            <IconPlus />
+          </Button>
+        ) : (
+          <Button size="icon" variant="ghost">
+            <IconEdit />
+          </Button>
+        )}
       </DialogTrigger>
+
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Create Category</DialogTitle>
+          <DialogTitle>
+            {mode === "edit" ? "Edit Category" : "Create Category"}
+          </DialogTitle>
           <DialogDescription>
-            Create a new transaction category.
+            {mode === "edit"
+              ? "Update the selected transaction category."
+              : "Create a new transaction category."}
           </DialogDescription>
         </DialogHeader>
+
         <div className="grid gap-4">
           <div className="grid gap-3 *:w-full">
             <Label htmlFor="type">
               Type<span className="text-destructive">*</span>
             </Label>
-            <input type="hidden" name="type" value={type} />
             <ToggleGroup
               type="single"
               value={type}
@@ -120,16 +159,10 @@ export function AddCategoryButton() {
               </ToggleGroupItem>
             </ToggleGroup>
           </div>
+
           <div className="flex gap-4">
             <div className="grid gap-3">
               <Label htmlFor="icon">Icon</Label>
-              <input
-                id="icon"
-                name="icon"
-                type="hidden"
-                value={icon}
-                required
-              />
               <EmojiPickerButton
                 value={icon}
                 onChange={(val) => setIcon(val)}
@@ -149,6 +182,7 @@ export function AddCategoryButton() {
             </div>
           </div>
         </div>
+
         <DialogFooter className="mt-4">
           <Button
             type="button"
@@ -158,8 +192,12 @@ export function AddCategoryButton() {
           >
             Cancel
           </Button>
-          <Button type="button" onClick={handleSubmit} disabled={isSubmitting}>
-            Confirm
+          <Button
+            type="button"
+            onClick={handleSubmit}
+            disabled={isSubmitting || !name.trim()}
+          >
+            {mode === "edit" ? "Save Changes" : "Confirm"}
           </Button>
         </DialogFooter>
       </DialogContent>

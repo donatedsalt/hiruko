@@ -27,7 +27,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { SiteHeader } from "@/components/site-header";
 import { DatePicker } from "@/components/ui/date-picker";
 import { ErrorMessage } from "@/components/error-message";
-import { AddCategoryButton } from "@/components/add-category-button";
+import { CategoryDialog } from "@/components/category-dialog";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
 export default function Page() {
@@ -190,7 +190,7 @@ export default function Page() {
                 className="min-h-9"
               />
             )}
-            <AddCategoryButton />
+            <CategoryDialog />
           </div>
         </div>
         <div className="grid gap-3 *:w-full">

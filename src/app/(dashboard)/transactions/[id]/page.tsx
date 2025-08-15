@@ -45,8 +45,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { SiteHeader } from "@/components/site-header";
 import { DatePicker } from "@/components/ui/date-picker";
 import { ErrorMessage } from "@/components/error-message";
+import { CategoryDialog } from "@/components/category-dialog";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import { AddCategoryButton } from "@/components/add-category-button";
 
 export default function Page() {
   const { id } = useParams();
@@ -212,7 +212,7 @@ export default function Page() {
                   className="min-h-36"
                 />
               )}
-              <AddCategoryButton />
+              <CategoryDialog />
             </div>
           </div>
           <div className="grid **:disabled:opacity-75 gap-3 *:w-full">
