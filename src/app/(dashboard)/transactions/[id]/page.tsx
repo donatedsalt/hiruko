@@ -89,7 +89,7 @@ export default function Page() {
         .slice(0, 5);
       setTxnTime({ date: date, time: time });
     }
-  }, [transaction]);
+  }, [transaction, categories]);
 
   const handleDelete = async () => {
     setIsSubmitting(true);
