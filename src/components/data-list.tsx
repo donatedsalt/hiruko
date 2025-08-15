@@ -159,10 +159,7 @@ export function ListItem({ txn, cat }: { txn: Transaction; cat: Category }) {
         className="flex items-center justify-between gap-2"
       >
         <div className="flex items-center gap-2">
-          <Avatar
-            className="items-center justify-center border size-12"
-            // style={{ backgroundColor: cat.color }}
-          >
+          <Avatar className="items-center justify-center border size-12">
             {cat.icon || <ListItemIcon item={txn.type} />}
           </Avatar>
           <div>

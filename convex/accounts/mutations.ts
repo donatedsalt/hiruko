@@ -32,7 +32,6 @@ export const create = mutation({
         userId,
         name: "Balance Correction",
         icon: "⚖️",
-        // color: "#888888",
       });
     }
 
@@ -40,7 +39,7 @@ export const create = mutation({
       userId,
       name: args.name,
       balance: args.balance,
-      transactionsCount: 0,
+      transactionCount: 0,
       updatedAt: now,
     });
 
@@ -56,7 +55,7 @@ export const create = mutation({
           transactionTime: now,
           updatedAt: now,
         }),
-        ctx.db.patch(accountId, { transactionsCount: 1 }),
+        ctx.db.patch(accountId, { transactionCount: 1 }),
       ]);
     }
 
@@ -108,7 +107,6 @@ export const update = mutation({
           userId,
           name: "Balance Correction",
           icon: "⚖️",
-          // color: "#888888",
         });
       }
 
@@ -124,7 +122,7 @@ export const update = mutation({
       });
 
       updates.balance = args.balance;
-      updates.transactionsCount = (account.transactionsCount || 0) + 1;
+      updates.transactionCount = (account.transactionCount || 0) + 1;
     }
 
     await ctx.db.patch(args.id, updates);

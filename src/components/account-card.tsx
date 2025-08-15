@@ -56,7 +56,7 @@ export function AccountsCard({ account }: { account: Account }) {
 
     const result = AccountSchema.omit({
       userId: true,
-      transactionsCount: true,
+      transactionCount: true,
     }).safeParse(payload);
 
     if (!result.success) {
@@ -125,7 +125,7 @@ export function AccountsCard({ account }: { account: Account }) {
           </CardHeader>
           <CardFooter className="text-sm">
             <p className="text-muted-foreground">
-              {account.transactionsCount} Transactions
+              {account.transactionCount} Transactions
             </p>
           </CardFooter>
         </Card>
@@ -145,7 +145,7 @@ export function AccountsCard({ account }: { account: Account }) {
                   </span>
                   <br />
                   <span className="text-destructive">
-                    {account.transactionsCount} Transactions will be deleted
+                    {account.transactionCount} Transactions will be deleted
                   </span>
                 </>
               ) : (
@@ -254,7 +254,7 @@ export function AddAccountCard() {
 
     const result = AccountSchema.omit({
       userId: true,
-      transactionsCount: true,
+      transactionCount: true,
     }).safeParse(payload);
 
     if (!result.success) {

@@ -5,7 +5,6 @@ export const CategorySchema = z
     userId: z.string().min(1, "User ID is required."),
     name: z.string().min(1, "Name is required").max(100),
     icon: z.string().min(1, "Icon is required").max(100),
-    // color: z.string().min(1, "Color is required").max(100),
   })
   .strict();
 
