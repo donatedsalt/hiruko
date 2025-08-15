@@ -32,6 +32,8 @@ export default function EmojiPickerButton({
             onChange(emojiData.emoji);
             setOpen(false);
           }}
+          lazyLoadEmojis={true}
+          skinTonesDisabled={true}
           theme={Theme.AUTO}
           width={300}
           height={400}
