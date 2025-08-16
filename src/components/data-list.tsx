@@ -1,9 +1,9 @@
 import Link from "next/link";
 import {
-  IconCash,
-  IconMoneybag,
   IconCaretDownFilled,
   IconCaretUpFilled,
+  IconCashBanknoteMinus,
+  IconCashBanknotePlus,
 } from "@tabler/icons-react";
 
 import type { Category, Transaction, TransactionGroups } from "@/types/convex";
@@ -188,9 +188,9 @@ export function ListItem({ txn, cat }: { txn: Transaction; cat: Category }) {
 function ListItemIcon({ item }: { item: string }) {
   switch (item) {
     case "income":
-      return <IconCash />;
+      return <IconCashBanknotePlus />;
     case "expense":
-      return <IconMoneybag />;
+      return <IconCashBanknoteMinus />;
     default:
       return null;
   }
