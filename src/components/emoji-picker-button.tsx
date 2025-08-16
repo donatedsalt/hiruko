@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import EmojiPicker, { Theme } from "emoji-picker-react";
 
 import {
   Popover,
@@ -9,6 +8,12 @@ import {
   PopoverContent,
 } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
+import {
+  EmojiPicker,
+  EmojiPickerContent,
+  EmojiPickerFooter,
+  EmojiPickerSearch,
+} from "@/components/ui/emoji-picker";
 
 export default function EmojiPickerButton({
   value,
@@ -17,27 +22,28 @@ export default function EmojiPickerButton({
   value: string;
   onChange: (emoji: string) => void;
 }) {
-  const [open, setOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
+    <Popover onOpenChange={setIsOpen} open={isOpen}>
       <PopoverTrigger asChild>
         <Button variant="outline" size="icon" type="button" className="text-lg">
           {value}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="p-0 border-none shadow-none">
+      <PopoverContent className="w-fit p-0">
         <EmojiPicker
-          onEmojiClick={(emojiData) => {
-            onChange(emojiData.emoji);
-            setOpen(false);
+          className="h-[342px]"
+          onEmojiSelect={({ emoji }) => {
+            onChange(emoji);
+            setIsOpen(false);
+            console.log(emoji);
           }}
-          lazyLoadEmojis={true}
-          skinTonesDisabled={true}
-          theme={Theme.AUTO}
-          width={300}
-          height={400}
-        />
+        >
+          <EmojiPickerSearch />
+          <EmojiPickerContent />
+          <EmojiPickerFooter />
+        </EmojiPicker>
       </PopoverContent>
     </Popover>
   );
