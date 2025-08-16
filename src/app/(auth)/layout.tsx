@@ -9,6 +9,7 @@ import { BaseTheme } from "@clerk/types";
 import "@/app/globals.css";
 
 import { ThemeProvider } from "@/components/theme-provider";
+import { ThemeChangeButton } from "@/components/theme-change-button";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -53,6 +54,7 @@ export default function RootLayout({
               disableTransitionOnChange
             >
               {children}
+              <ThemeChangeButton className="fixed bottom-6 left-6" />
             </ThemeProvider>
           </ConvexClientProvider>
         </ClerkProvider>

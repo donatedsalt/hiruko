@@ -51,7 +51,7 @@ export function NavSecondary({
   );
 }
 
-export function ThemeChangeMenu() {
+function ThemeChangeMenu() {
   const { setTheme } = useTheme();
 
   return (
