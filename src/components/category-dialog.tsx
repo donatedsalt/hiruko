@@ -59,13 +59,6 @@ export function CategoryDialog({
     initialValues.type || "expense"
   );
 
-  useEffect(() => {
-    if (!open) return;
-    setName(initialValues.name || "");
-    setIcon(initialValues.icon || "😀");
-    setType(initialValues.type || "expense");
-  }, [open, initialValues]);
-
   const handleSubmit = async () => {
     setIsSubmitting(true);
 
@@ -91,6 +84,9 @@ export function CategoryDialog({
         await createCategory(result.data);
         toast.success("Category added");
       }
+      setName(initialValues.name || "");
+      setIcon(initialValues.icon || "😀");
+      setType(initialValues.type || "expense");
       setOpen(false);
     } catch (err: any) {
       toast.error("Something went wrong!", {
