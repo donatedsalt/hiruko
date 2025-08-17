@@ -11,9 +11,11 @@ import {
   IconEdit,
 } from "@tabler/icons-react";
 
-import { CategoryId } from "@/types/convex";
+import { Category } from "@/types/convex";
 
 import { CategorySchema } from "@/validation/category";
+
+import { useCountdown } from "@/hooks/use-countdown";
 
 import {
   Dialog,
@@ -30,35 +32,32 @@ import { Button } from "@/components/ui/button";
 import EmojiPickerButton from "@/components/emoji-picker-button";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
-type CategoryFormValues = {
-  name: string;
-  icon: string;
-  type: "income" | "expense";
-};
-
 interface CategoryDialogProps {
   mode?: "add" | "edit";
-  initialValues?: Partial<CategoryFormValues> & { id?: CategoryId };
+  category?: Category;
   trigger?: React.ReactNode;
   disabled?: boolean;
 }
 
 export function CategoryDialog({
   mode = "add",
-  initialValues = {},
+  category,
   trigger,
   disabled = false,
 }: CategoryDialogProps) {
   const [open, setOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showConfirmDelete, setShowConfirmDelete] = useState(false);
+  const { count, done } = useCountdown(3, showConfirmDelete);
 
   const createCategory = useMutation(api.categories.mutations.create);
   const updateCategory = useMutation(api.categories.mutations.update);
+  const deleteCategory = useMutation(api.categories.mutations.remove);
 
-  const [name, setName] = useState(initialValues.name || "");
-  const [icon, setIcon] = useState(initialValues.icon || "😀");
+  const [name, setName] = useState(category?.name || "");
+  const [icon, setIcon] = useState(category?.icon || "😀");
   const [type, setType] = useState<"income" | "expense">(
-    initialValues.type || "expense"
+    category?.type || "expense"
   );
 
   const handleSubmit = async () => {
@@ -79,16 +78,32 @@ export function CategoryDialog({
     }
 
     try {
-      if (mode === "edit" && initialValues.id) {
-        await updateCategory({ id: initialValues.id, ...result.data });
+      if (mode === "edit" && category) {
+        await updateCategory({ id: category._id, ...result.data });
         toast.success("Category updated");
       } else {
         await createCategory(result.data);
         toast.success("Category added");
+        setName("");
+        setIcon("😀");
+        setType("expense");
       }
-      setName(initialValues.name || "");
-      setIcon(initialValues.icon || "😀");
-      setType(initialValues.type || "expense");
+      setOpen(false);
+    } catch (err: any) {
+      toast.error("Something went wrong!", {
+        description: err.message,
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    setIsSubmitting(true);
+
+    try {
+      await deleteCategory({ id: category!._id });
+      toast.success("Category deleted");
       setOpen(false);
     } catch (err: any) {
       toast.error("Something went wrong!", {
@@ -118,85 +133,139 @@ export function CategoryDialog({
       <DialogContent>
         <DialogHeader>
           <DialogTitle>
-            {mode === "edit" ? "Edit Category" : "Create Category"}
+            {mode === "edit"
+              ? showConfirmDelete
+                ? "Delete Category"
+                : "Edit Category"
+              : "Create Category"}
           </DialogTitle>
           <DialogDescription>
-            {mode === "edit"
-              ? "Update the selected transaction category."
-              : "Create a new transaction category."}
+            {mode === "edit" ? (
+              showConfirmDelete ? (
+                <>
+                  <span>
+                    Are you sure? This will delete the category and its
+                    transactions.
+                  </span>
+                  <br />
+                  <span className="text-destructive">
+                    {category?.transactionCount} Transactions will be deleted
+                  </span>
+                </>
+              ) : (
+                "Update the selected transaction category."
+              )
+            ) : (
+              "Create a new transaction category."
+            )}
           </DialogDescription>
         </DialogHeader>
 
-        <div className="grid gap-4">
-          <div className="grid gap-3 *:w-full">
-            <Label htmlFor="type">
-              Type<span className="text-destructive">*</span>
-            </Label>
-            <ToggleGroup
-              type="single"
-              value={type}
-              onValueChange={(val: "income" | "expense") => {
-                if (val) setType(val);
-              }}
-            >
-              <ToggleGroupItem
-                value="expense"
-                aria-label="Toggle expense"
-                className="border dark:bg-input/30 data-[state=on]:bg-destructive! text-destructive-foreground"
+        {!showConfirmDelete && (
+          <div className="grid gap-4">
+            <div className="grid gap-3 *:w-full">
+              <Label htmlFor="type">
+                Type<span className="text-destructive">*</span>
+              </Label>
+              <ToggleGroup
+                type="single"
+                value={type}
+                onValueChange={(val: "income" | "expense") => {
+                  if (val) setType(val);
+                }}
               >
-                <IconCaretDownFilled />
-                <span>Expense</span>
-              </ToggleGroupItem>
-              <ToggleGroupItem
-                value="income"
-                aria-label="Toggle income"
-                className="border dark:bg-input/30 data-[state=on]:bg-emerald-500! text-foreground"
+                <ToggleGroupItem
+                  value="expense"
+                  aria-label="Toggle expense"
+                  className="border dark:bg-input/30 data-[state=on]:bg-destructive! text-destructive-foreground"
+                >
+                  <IconCaretDownFilled />
+                  <span>Expense</span>
+                </ToggleGroupItem>
+                <ToggleGroupItem
+                  value="income"
+                  aria-label="Toggle income"
+                  className="border dark:bg-input/30 data-[state=on]:bg-emerald-500! text-foreground"
+                >
+                  <IconCaretUpFilled />
+                  <span>Income</span>
+                </ToggleGroupItem>
+              </ToggleGroup>
+            </div>
+
+            <div className="flex gap-4">
+              <div className="grid gap-3">
+                <Label htmlFor="icon">Icon</Label>
+                <EmojiPickerButton
+                  value={icon}
+                  onChange={(val) => setIcon(val)}
+                />
+              </div>
+              <div className="grid gap-3 grow">
+                <Label htmlFor="name">Name</Label>
+                <Input
+                  id="name"
+                  name="name"
+                  type="text"
+                  placeholder="Shopping"
+                  value={name}
+                  onChange={(val) => setName(val.target.value)}
+                  required
+                />
+              </div>
+            </div>
+          </div>
+        )}
+
+        <DialogFooter className="mt-4 justify-between!">
+          {!showConfirmDelete ? (
+            <>
+              <Button
+                type="button"
+                variant="destructive"
+                onClick={() => setShowConfirmDelete(true)}
+                disabled={isSubmitting}
               >
-                <IconCaretUpFilled />
-                <span>Income</span>
-              </ToggleGroupItem>
-            </ToggleGroup>
-          </div>
-
-          <div className="flex gap-4">
-            <div className="grid gap-3">
-              <Label htmlFor="icon">Icon</Label>
-              <EmojiPickerButton
-                value={icon}
-                onChange={(val) => setIcon(val)}
-              />
+                Delete
+              </Button>
+              <div className="flex flex-col-reverse gap-2 sm:flex-row">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setOpen(false)}
+                  disabled={isSubmitting}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="button"
+                  onClick={handleSubmit}
+                  disabled={isSubmitting || !name.trim()}
+                >
+                  {mode === "edit" ? "Save Changes" : "Confirm"}
+                </Button>
+              </div>
+            </>
+          ) : (
+            <div className="flex flex-col-reverse justify-end gap-2 grow sm:flex-row">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setShowConfirmDelete(false)}
+                disabled={isSubmitting}
+              >
+                Cancel
+              </Button>
+              <Button
+                type="button"
+                variant="destructive"
+                onClick={handleDelete}
+                disabled={isSubmitting || !done}
+              >
+                {done ? "Confirm Delete" : `Confirm in ${count}s`}
+              </Button>
             </div>
-            <div className="grid gap-3 grow">
-              <Label htmlFor="name">Name</Label>
-              <Input
-                id="name"
-                name="name"
-                type="text"
-                placeholder="Shopping"
-                value={name}
-                onChange={(val) => setName(val.target.value)}
-                required
-              />
-            </div>
-          </div>
-        </div>
-
-        <DialogFooter className="mt-4">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => setOpen(false)}
-            disabled={isSubmitting}
-          >
-            Cancel
-          </Button>
-          <Button
-            type="button"
-            onClick={handleSubmit}
-            disabled={isSubmitting || !name.trim()}
-          >
-            {mode === "edit" ? "Save Changes" : "Confirm"}
-          </Button>
+          )}
         </DialogFooter>
       </DialogContent>
     </Dialog>
