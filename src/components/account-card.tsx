@@ -71,7 +71,7 @@ export function AccountsCard({ account }: { account: Account }) {
         id: account._id,
         ...result.data,
       });
-      toast.success("Account added");
+      toast.success("Account updated");
       form.reset();
       setOpen(false);
     } catch (err: any) {
