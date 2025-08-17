@@ -52,7 +52,7 @@ const data = {
     },
     {
       title: "Statistics",
-      url: "#",
+      url: "/statistics",
       icon: IconChartPie,
     },
     {
