@@ -32,6 +32,10 @@ export const create = mutation({
       throw new Error("Invalid category");
     }
 
+    if (category.type !== args.type) {
+      throw new Error("Category type and transaction type must match");
+    }
+
     const transaction = await ctx.db.insert("transactions", {
       userId,
       categoryId: args.categoryId,
@@ -107,11 +111,15 @@ export const update = mutation({
       throw new Error("Target category not found");
     }
 
+    const newType = updates.type ?? transaction.type;
+    if (newCategory.type !== newType) {
+      throw new Error("Category type and transaction type must match");
+    }
+
     const oldAmount = transaction.amount;
     const newAmount = updates.amount ?? oldAmount;
 
     const oldType = transaction.type;
-    const newType = updates.type ?? oldType;
 
     const accountChanged = transaction.accountId !== newAccountId;
     const categoryChanged = transaction.categoryId !== newCategoryId;
