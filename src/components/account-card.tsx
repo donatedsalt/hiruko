@@ -153,6 +153,7 @@ export function AccountsCard({ account }: { account: Account }) {
               )}
             </DialogDescription>
           </DialogHeader>
+
           {!showConfirmDelete && (
             <div className="grid gap-4">
               <div className="grid gap-3">
@@ -179,7 +180,8 @@ export function AccountsCard({ account }: { account: Account }) {
               </div>
             </div>
           )}
-          <DialogFooter className="justify-between!">
+
+          <DialogFooter className="mt-4 justify-between!">
             {!showConfirmDelete ? (
               <>
                 <Button
@@ -324,7 +326,7 @@ export function AddAccountCard() {
               />
             </div>
           </div>
-          <DialogFooter>
+          <DialogFooter className="mt-4">
             <DialogClose asChild>
               <Button variant="outline" disabled={isSubmitting}>
                 Cancel
