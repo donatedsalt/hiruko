@@ -7,7 +7,10 @@ import {
   ChartAreaInteractive,
   ChartAreaInteractiveSkeleton,
 } from "@/components/chart-area-interactive";
-import { DataList, DataListSkeleton } from "@/components/data-list";
+import {
+  TransactionList,
+  DataListSkeleton,
+} from "@/components/transaction-list";
 import { AccountsCards } from "@/components/accounts-cards";
 import { ErrorMessage } from "@/components/error-message";
 import { SiteHeader } from "@/components/site-header";
@@ -32,7 +35,7 @@ export default function Page() {
           ) : transactions && categories ? (
             <>
               <ChartAreaInteractive data={transactions.all} />
-              <DataList
+              <TransactionList
                 allData={transactions.all}
                 incomeData={transactions.income}
                 expenseData={transactions.expense}

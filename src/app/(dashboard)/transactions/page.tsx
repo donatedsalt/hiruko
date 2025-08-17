@@ -5,7 +5,10 @@ import { api } from "@/convex/_generated/api";
 
 import { SiteHeader } from "@/components/site-header";
 import { ErrorMessage } from "@/components/error-message";
-import { DataList, DataListSkeleton } from "@/components/data-list";
+import {
+  TransactionList,
+  DataListSkeleton,
+} from "@/components/transaction-list";
 
 export default function Page() {
   const transactions = useQuery(api.transactions.queries.listAllVariants);
@@ -19,7 +22,7 @@ export default function Page() {
         {loading ? (
           <DataListSkeleton />
         ) : transactions && categories ? (
-          <DataList
+          <TransactionList
             allData={transactions.all}
             incomeData={transactions.income}
             expenseData={transactions.expense}

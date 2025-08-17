@@ -1,19 +1,12 @@
-import Link from "next/link";
-import {
-  IconCaretDownFilled,
-  IconCaretUpFilled,
-  IconCashBanknoteMinus,
-  IconCashBanknotePlus,
-} from "@tabler/icons-react";
+import { IconCaretDownFilled, IconCaretUpFilled } from "@tabler/icons-react";
 
 import type { Category, Transaction, TransactionGroups } from "@/types/convex";
 
 import { cn } from "@/lib/utils";
 
-import { Badge } from "@/components/ui/badge";
-import { Avatar } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ListItem, ListItemSkeleton } from "./list-item";
 
 // TODO: use the already defined groupByDay convex function
 function groupByDay(transactions: Transaction[]) {
@@ -75,7 +68,32 @@ function RenderGroupedList({
             {grouped[date].map((txn) => {
               const cat = categories.find((c) => c._id === txn.categoryId);
               if (!cat) return null;
-              return <ListItem key={txn._id.toString()} txn={txn} cat={cat} />;
+              return (
+                <ListItem
+                  key={txn._id.toString()}
+                  href={`/transactions/${txn._id.toString()}`}
+                  icon={cat.icon}
+                  title={txn.title || cat.name}
+                  badge={txn.title && cat.name}
+                  amount={
+                    <div
+                      className={cn(
+                        "flex items-center [&>svg]:size-4",
+                        txn.type === "income"
+                          ? "text-emerald-500"
+                          : "text-destructive"
+                      )}
+                    >
+                      {txn.type === "income" ? (
+                        <IconCaretUpFilled />
+                      ) : (
+                        <IconCaretDownFilled />
+                      )}
+                      {txn.amount}
+                    </div>
+                  }
+                />
+              );
             })}
           </ul>
         </div>
@@ -87,7 +105,7 @@ function RenderGroupedList({
   );
 }
 
-export function DataList({
+export function TransactionList({
   allData,
   incomeData,
   expenseData,
@@ -151,51 +169,6 @@ export function DataList({
   );
 }
 
-export function ListItem({ txn, cat }: { txn: Transaction; cat: Category }) {
-  return (
-    <li>
-      <Link
-        href={`/transactions/${txn._id.toString()}`}
-        className="flex items-center justify-between gap-2"
-      >
-        <div className="flex items-center gap-2">
-          <Avatar className="items-center justify-center border size-12">
-            {cat.icon || <ListItemIcon item={txn.type} />}
-          </Avatar>
-          <div>
-            <h3 className="font-semibold">{txn.title || cat.name}</h3>
-            {txn.title && <Badge variant={"outline"}>{cat.name}</Badge>}
-          </div>
-        </div>
-        <p
-          className={cn(
-            "flex items-center text-lg font-semibold [&>svg]:size-4",
-            txn.type === "income" ? "text-emerald-500" : "text-destructive"
-          )}
-        >
-          {txn.type === "income" ? (
-            <IconCaretUpFilled />
-          ) : (
-            <IconCaretDownFilled />
-          )}
-          {txn.amount}
-        </p>
-      </Link>
-    </li>
-  );
-}
-
-function ListItemIcon({ item }: { item: string }) {
-  switch (item) {
-    case "income":
-      return <IconCashBanknotePlus />;
-    case "expense":
-      return <IconCashBanknoteMinus />;
-    default:
-      return null;
-  }
-}
-
 function EmptyState({ text }: { text: string }) {
   return (
     <div className="grid border border-dashed rounded-lg place-items-center aspect-video">
@@ -219,20 +192,5 @@ export function DataListSkeleton() {
         </ul>
       </div>
     </div>
-  );
-}
-
-export function ListItemSkeleton() {
-  return (
-    <li className="flex items-center justify-between gap-2">
-      <div className="flex items-center gap-2">
-        <Skeleton className="rounded-full size-12" />
-        <div className="grid gap-2">
-          <Skeleton className="w-24 h-4" />
-          <Skeleton className="w-12 h-3" />
-        </div>
-      </div>
-      <Skeleton className="w-16 h-6" />
-    </li>
   );
 }
