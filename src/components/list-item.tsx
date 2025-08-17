@@ -8,7 +8,7 @@ interface ListItemProps {
   href?: string;
   icon: React.ReactNode | string;
   title: string;
-  badge?: string;
+  badge?: React.ReactNode | string;
   amount?: React.ReactNode | string;
 }
 
