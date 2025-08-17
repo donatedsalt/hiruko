@@ -1,35 +1,44 @@
+import { useEffect, useState } from "react";
+
 import type { Category } from "@/types/convex";
 
 import { cn } from "@/lib/utils";
 
 import { Skeleton } from "@/components/ui/skeleton";
+import { CategoryDialog } from "@/components/category-dialog";
+import { ListItem, ListItemSkeleton } from "@/components/list-item";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ListItem, ListItemSkeleton } from "./list-item";
-import { useEffect, useState } from "react";
 
-function RenderGroupedList({ categories }: { categories: Category[] }) {
+function RenderList({ categories }: { categories: Category[] }) {
   return (
     <ul className="grid gap-4">
-      {categories.map((cat) => {
-        if (!cat) return null;
+      {categories.map((category) => {
         return (
-          <ListItem
-            key={cat._id.toString()}
-            icon={cat.icon}
-            title={cat.name}
-            badge={
-              <div
-                className={cn(
-                  "flex items-center [&>svg]:size-4",
-                  cat.type === "income"
-                    ? "text-emerald-500"
-                    : "text-destructive"
-                )}
-              >
-                {cat.type}
+          <CategoryDialog
+            key={category._id.toString()}
+            mode="edit"
+            category={category}
+            trigger={
+              <div>
+                <ListItem
+                  icon={category.icon}
+                  title={category.name}
+                  badge={
+                    <div
+                      className={cn(
+                        "flex items-center [&>svg]:size-4",
+                        category.type === "income"
+                          ? "text-emerald-500"
+                          : "text-destructive"
+                      )}
+                    >
+                      {category.type}
+                    </div>
+                  }
+                  amount={category.transactionAmount}
+                />
               </div>
             }
-            amount={cat.transactionAmount}
           />
         );
       })}
@@ -75,7 +84,7 @@ export function CateogryList({
       {/* All */}
       <TabsContent value="all" className="flex flex-col px-4 lg:px-6">
         {Data.length ? (
-          <RenderGroupedList categories={Data} />
+          <RenderList categories={Data} />
         ) : (
           <EmptyState text="No categories found. 😲" />
         )}
@@ -84,7 +93,7 @@ export function CateogryList({
       {/* Income */}
       <TabsContent value="income" className="flex flex-col px-4 lg:px-6">
         {incomeData && incomeData.length ? (
-          <RenderGroupedList categories={incomeData} />
+          <RenderList categories={incomeData} />
         ) : (
           <EmptyState text="No income categories found. 😬" />
         )}
@@ -93,7 +102,7 @@ export function CateogryList({
       {/* Expense */}
       <TabsContent value="expense" className="flex flex-col px-4 lg:px-6">
         {expenseData && expenseData.length ? (
-          <RenderGroupedList categories={expenseData} />
+          <RenderList categories={expenseData} />
         ) : (
           <EmptyState text="No expense categories found. 🤯" />
         )}
