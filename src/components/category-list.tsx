@@ -35,7 +35,7 @@ function RenderList({ categories }: { categories: Category[] }) {
                       {category.type}
                     </div>
                   }
-                  amount={category.transactionAmount}
+                  amount={category.transactionAmount.toString()}
                 />
               </div>
             }
