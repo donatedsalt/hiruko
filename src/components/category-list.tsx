@@ -15,7 +15,6 @@ function RenderGroupedList({ categories }: { categories: Category[] }) {
         return (
           <ListItem
             key={cat._id.toString()}
-            href={`/transactions/${cat._id.toString()}`}
             icon={cat.icon}
             title={cat.name}
             badge={
