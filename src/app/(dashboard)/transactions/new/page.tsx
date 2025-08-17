@@ -79,6 +79,7 @@ export default function Page() {
 
       if (categories.length > 0 && txnCategory === "") {
         setTxnCategory(categories[0]?._id);
+        setTxnType(categories[0]?.type);
       }
     }
 
@@ -169,8 +170,10 @@ export default function Page() {
               <Select
                 name="categoryId"
                 value={txnCategory}
-                onValueChange={(value: CategoryId) => {
-                  setTxnCategory(value);
+                onValueChange={(catId: CategoryId) => {
+                  const cat = categories.find((cat) => cat._id === catId);
+                  setTxnCategory(catId);
+                  setTxnType(cat?.type || "expense");
                 }}
               >
                 <SelectTrigger className="w-full">
@@ -201,8 +204,10 @@ export default function Page() {
           <ToggleGroup
             type="single"
             value={txnType}
-            onValueChange={(val: "income" | "expense") => {
-              if (val) setTxnType(val);
+            onValueChange={(type: "income" | "expense") => {
+              const cat = categories?.find((cat) => cat.type === type);
+              setTxnType(type);
+              setTxnCategory(cat?._id || "");
             }}
           >
             <ToggleGroupItem
@@ -234,9 +239,7 @@ export default function Page() {
             <ToggleGroup
               type="single"
               value={txnAccount}
-              onValueChange={(val: AccountId) => {
-                if (val) setTxnAccount(val);
-              }}
+              onValueChange={(accId: AccountId) => setTxnAccount(accId)}
             >
               {accounts.map((account) => (
                 <ToggleGroupItem
