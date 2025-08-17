@@ -194,6 +194,7 @@ export default function Page() {
                   onValueChange={(value: CategoryId) => {
                     setTxnCategory(value);
                   }}
+                  disabled={!isEditing}
                 >
                   <SelectTrigger className="w-full">
                     <SelectValue placeholder="Select a category" />
@@ -212,7 +213,7 @@ export default function Page() {
                   className="min-h-36"
                 />
               )}
-              <CategoryDialog />
+              <CategoryDialog disabled={!isEditing} />
             </div>
           </div>
           <div className="grid **:disabled:opacity-75 gap-3 *:w-full">

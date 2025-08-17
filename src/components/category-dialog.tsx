@@ -1,7 +1,7 @@
 "use client";
 
 import { toast } from "sonner";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import {
@@ -40,12 +40,14 @@ interface CategoryDialogProps {
   mode?: "add" | "edit";
   initialValues?: Partial<CategoryFormValues> & { id?: CategoryId };
   trigger?: React.ReactNode;
+  disabled?: boolean;
 }
 
 export function CategoryDialog({
   mode = "add",
   initialValues = {},
   trigger,
+  disabled = false,
 }: CategoryDialogProps) {
   const [open, setOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -103,11 +105,11 @@ export function CategoryDialog({
         {trigger ? (
           trigger
         ) : mode === "add" ? (
-          <Button size="icon" variant="outline">
+          <Button size="icon" variant="outline" disabled={disabled}>
             <IconPlus />
           </Button>
         ) : (
-          <Button size="icon" variant="ghost">
+          <Button size="icon" variant="ghost" disabled={disabled}>
             <IconEdit />
           </Button>
         )}
