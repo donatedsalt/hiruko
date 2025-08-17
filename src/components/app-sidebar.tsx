@@ -4,6 +4,7 @@ import * as React from "react";
 import Link from "next/link";
 import {
   IconCash,
+  IconCategory2,
   IconChartCandle,
   IconChartPie,
   IconCoin,
@@ -43,6 +44,11 @@ const data = {
       title: "Transactions",
       url: "/transactions",
       icon: IconCash,
+    },
+    {
+      title: "Categories",
+      url: "/categories",
+      icon: IconCategory2,
     },
     {
       title: "Statistics",
