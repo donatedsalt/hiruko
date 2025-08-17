@@ -179,7 +179,10 @@ export default function Page() {
           <span>Loading...</span>
         </div>
       ) : transaction ? (
-        <form onSubmit={handleSubmit} className="grid gap-6 m-4 md:m-6 ">
+        <form
+          onSubmit={handleSubmit}
+          className="@container/main flex flex-col flex-1 gap-4 p-4 md:gap-6 md:p-6"
+        >
           <div className="grid **:disabled:opacity-75 gap-3 *:w-full">
             <Label htmlFor="categoryId">
               Category<span className="text-destructive">*</span>

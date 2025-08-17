@@ -23,29 +23,27 @@ export default function Page() {
   return (
     <>
       <SiteHeader title="Overview" />
-      <div className="@container/main flex flex-col flex-1 gap-2">
-        <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
-          <AccountsCards />
+      <div className="@container/main flex flex-col flex-1 gap-4 py-4 md:gap-6 md:py-6">
+        <AccountsCards />
 
-          {loading ? (
-            <>
-              <ChartAreaInteractiveSkeleton />
-              <DataListSkeleton />
-            </>
-          ) : transactions && categories ? (
-            <>
-              <ChartAreaInteractive data={transactions.all} />
-              <TransactionList
-                allData={transactions.all}
-                incomeData={transactions.income}
-                expenseData={transactions.expense}
-                categories={categories}
-              />
-            </>
-          ) : (
-            <ErrorMessage error="Failed to load transactions" />
-          )}
-        </div>
+        {loading ? (
+          <>
+            <ChartAreaInteractiveSkeleton />
+            <DataListSkeleton />
+          </>
+        ) : transactions && categories ? (
+          <>
+            <ChartAreaInteractive data={transactions.all} />
+            <TransactionList
+              allData={transactions.all}
+              incomeData={transactions.income}
+              expenseData={transactions.expense}
+              categories={categories}
+            />
+          </>
+        ) : (
+          <ErrorMessage error="Failed to load transactions" />
+        )}
       </div>
     </>
   );

@@ -18,7 +18,7 @@ export default function Page() {
   return (
     <>
       <SiteHeader title="Transactions" />
-      <div className="grid h-full my-4">
+      <div className="@container/main flex flex-col flex-1 gap-4 py-4 md:gap-6 md:py-6">
         {loading ? (
           <DataListSkeleton />
         ) : transactions && categories ? (
