@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { Pie, PieChart } from "recharts";
 
 import { Category } from "@/types/convex";
@@ -7,8 +8,6 @@ import { Category } from "@/types/convex";
 import {
   ChartConfig,
   ChartContainer,
-  ChartLegend,
-  ChartLegendContent,
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
@@ -20,7 +19,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Skeleton } from "./ui/skeleton";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const COLORS = [
   "var(--chart-1)",
@@ -39,6 +38,8 @@ export function ChartPie({
   description?: string;
   categories?: Category[];
 }) {
+  const [showPercent, setShowPercent] = useState(false);
+
   if (!categories) return <ChartPieSkeleton />;
 
   const total = categories.reduce((sum, cat) => sum + cat.transactionAmount, 0);
@@ -76,7 +77,10 @@ export function ChartPie({
           </PieChart>
         </ChartContainer>
       </CardContent>
-      <CardFooter className="flex-col gap-2">
+      <CardFooter
+        className="flex-col gap-2"
+        onClick={() => setShowPercent(!showPercent)}
+      >
         {categories.map((cat, idx) => {
           const percent = ((cat.transactionAmount / total) * 100).toFixed(1);
           return (
@@ -88,22 +92,33 @@ export function ChartPie({
                 />
                 <div>{cat.name}</div>
               </div>
-              <div>{percent}%</div>
+              {showPercent ? (
+                <div>{percent}%</div>
+              ) : (
+                <div>
+                  {cat.transactionAmount.toLocaleString("en-US", {
+                    style: "currency",
+                    currency: "USD",
+                  })}
+                </div>
+              )}
             </div>
           );
         })}
-        {/* <div className="flex justify-between w-full">
-          <div className="flex items-center gap-2">
-            <div className="rounded-xs size-4 bg-primary" />
-            <div>Total</div>
+        {!showPercent && (
+          <div className="flex justify-between w-full">
+            <div className="flex items-center gap-2">
+              <div className="rounded-xs size-4 bg-primary" />
+              <div>Total</div>
+            </div>
+            <div>
+              {total.toLocaleString("en-US", {
+                style: "currency",
+                currency: "USD",
+              })}
+            </div>
           </div>
-          <div>
-            {total.toLocaleString("en-US", {
-              style: "currency",
-              currency: "USD",
-            })}
-          </div>
-        </div> */}
+        )}
       </CardFooter>
     </Card>
   );
