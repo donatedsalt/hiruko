@@ -220,14 +220,18 @@ export function CategoryDialog({
         <DialogFooter className="mt-4 justify-between!">
           {!showConfirmDelete ? (
             <>
-              <Button
-                type="button"
-                variant="destructive"
-                onClick={() => setShowConfirmDelete(true)}
-                disabled={isSubmitting}
-              >
-                Delete
-              </Button>
+              {mode === "edit" ? (
+                <Button
+                  type="button"
+                  variant="destructive"
+                  onClick={() => setShowConfirmDelete(true)}
+                  disabled={isSubmitting}
+                >
+                  Delete
+                </Button>
+              ) : (
+                <div></div>
+              )}
               <div className="flex flex-col-reverse gap-2 sm:flex-row">
                 <Button
                   type="button"
