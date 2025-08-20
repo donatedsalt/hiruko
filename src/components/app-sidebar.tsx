@@ -72,7 +72,7 @@ const data = {
     },
     {
       title: "Consult",
-      url: "#",
+      url: "/consult",
       icon: IconMessageCircleQuestion,
     },
   ],

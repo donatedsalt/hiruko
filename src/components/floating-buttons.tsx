@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 // - /settings and all its nested routes
 const hiddenPatterns = [
   /^\/transactions\/.+$/, // Matches /transactions/anything (but not /transactions)
+  /^\/consult(\/.*)?/, // Matches /consult and any nested route
   /^\/settings(\/.*)?$/, // Matches /settings and any nested route
 ];
 
