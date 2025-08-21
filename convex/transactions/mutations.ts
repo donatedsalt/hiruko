@@ -182,6 +182,17 @@ export const remove = mutation({
       transactionCount: Math.max(account.transactionCount - 1, 0),
     });
 
+    const category = await ctx.db.get(transaction.categoryId);
+    if (category && category.userId === userId) {
+      await ctx.db.patch(transaction.categoryId, {
+        transactionCount: Math.max(category.transactionCount - 1, 0),
+        transactionAmount: Math.max(
+          category.transactionAmount - transaction.amount,
+          0
+        ),
+      });
+    }
+
     await ctx.db.delete(id);
 
     return id;
