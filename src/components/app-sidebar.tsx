@@ -65,11 +65,11 @@ const data = {
       url: "#",
       icon: IconPigMoney,
     },
-    {
-      title: "Trade",
-      url: "#",
-      icon: IconChartCandle,
-    },
+    // {
+    //   title: "Trade",
+    //   url: "#",
+    //   icon: IconChartCandle,
+    // },
     {
       title: "Consult",
       url: "/consult",
