@@ -178,6 +178,7 @@ export default function Page() {
                   setTxnCategory(catId);
                   setTxnType(cat?.type || "expense");
                 }}
+                required
               >
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="Select a category" />
@@ -203,7 +204,7 @@ export default function Page() {
           <Label htmlFor="type">
             Type<span className="text-destructive">*</span>
           </Label>
-          <input type="hidden" name="type" value={txnType} />
+          <input type="hidden" name="type" value={txnType} required />
           <ToggleGroup
             type="single"
             value={txnType}
@@ -235,7 +236,7 @@ export default function Page() {
           <Label htmlFor="accountId">
             Account<span className="text-destructive">*</span>
           </Label>
-          <input type="hidden" name="accountId" value={txnAccount} />
+          <input type="hidden" name="accountId" value={txnAccount} required />
           {accLoading ? (
             <Skeleton className="w-full h-9" />
           ) : accounts ? (

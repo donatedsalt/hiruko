@@ -200,6 +200,7 @@ export default function Page() {
                     setTxnType(cat?.type || "expense");
                   }}
                   disabled={!isEditing}
+                  required
                 >
                   <SelectTrigger className="w-full">
                     <SelectValue placeholder="Select a category" />
@@ -230,6 +231,7 @@ export default function Page() {
               name="type"
               value={txnType}
               disabled={!isEditing}
+              required
             />
             <ToggleGroup
               type="single"
@@ -268,6 +270,7 @@ export default function Page() {
               name="accountId"
               value={txnAccount}
               disabled={!isEditing}
+              required
             />
             {accLoading ? (
               <Skeleton className="w-full h-9" />
