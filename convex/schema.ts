@@ -21,6 +21,7 @@ export default defineSchema({
     .index("by_userId_name", ["userId", "name"]),
   transactions: defineTable({
     userId: v.string(),
+    budgetId: v.optional(v.id("budgets")),
     categoryId: v.id("categories"),
     accountId: v.id("accounts"),
     amount: v.number(),
@@ -34,4 +35,10 @@ export default defineSchema({
     .index("by_account", ["accountId"])
     .index("by_category", ["categoryId"])
     .index("by_transactionTime", ["transactionTime"]),
+  budgets: defineTable({
+    userId: v.string(),
+    name: v.string(),
+    amount: v.number(),
+    spent: v.number(),
+  }).index("by_userId", ["userId"]),
 });

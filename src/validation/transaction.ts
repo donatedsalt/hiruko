@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { AccountId, CategoryId } from "@/types/convex";
+import { AccountId, BudgetId, CategoryId } from "@/types/convex";
 
 export const TransactionSchema = z
   .object({
@@ -13,13 +13,17 @@ export const TransactionSchema = z
       .string()
       .min(1, "Category is required.")
       .transform((val) => val as CategoryId),
+    budgetId: z
+      .string()
+      .transform((val) => val as BudgetId)
+      .optional(),
     title: z
       .string()
       .max(100, "Title must be less than 100 characters.")
       .optional()
       .default(""),
     note: z.string().optional().default(""),
-    type: z.enum(["income", "expense"], "Type must be income or expense."),
+    type: z.enum(["income", "expense"]),
     amount: z.number().positive("Amount must be a positive number."),
     transactionTime: z.number(),
     updatedAt: z.number().optional(),

@@ -9,3 +9,6 @@ export type CategoryId = Id<"categories">;
 
 export type Account = Doc<"accounts">;
 export type AccountId = Id<"accounts">;
+
+export type Budget = Doc<"budgets">;
+export type BudgetId = Id<"budgets">;

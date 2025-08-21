@@ -13,6 +13,7 @@ import {
 
 import {
   AccountId,
+  BudgetId,
   CategoryId,
   Transaction,
   TransactionId,
@@ -59,9 +60,12 @@ export default function Page() {
   const accLoading = accounts === undefined;
   const categories = useQuery(api.categories.queries.list);
   const catLoading = categories === undefined;
+  const budgets = useQuery(api.budgets.queries.list);
+  const budLoading = budgets === undefined;
 
   const updateTransaction = useMutation(api.transactions.mutations.update);
   const deleteTransaction = useMutation(api.transactions.mutations.remove);
+  const [txnBudget, setTxnBudget] = useState<BudgetId | "">("");
 
   const [txnType, setTxnType] = useState<"income" | "expense">("expense");
   const [txnAccount, setTxnAccount] = useState<AccountId | "">("");
@@ -81,6 +85,8 @@ export default function Page() {
       setTxnType(transaction.type);
 
       setTxnCategory(transaction.categoryId);
+
+      setTxnBudget(transaction.budgetId ?? "");
 
       const date = new Date(transaction.transactionTime)
         .toISOString()
@@ -117,6 +123,7 @@ export default function Page() {
 
     const accountId = formData.get("accountId") as AccountId;
     const categoryId = formData.get("categoryId") as CategoryId;
+    const budgetId = formData.get("budgetId") as BudgetId;
     const amount = parseFloat(formData.get("amount") as string);
     const type = formData.get("type") as "income" | "expense";
     const title = formData.get("title") as string;
@@ -129,6 +136,7 @@ export default function Page() {
     const payload = {
       accountId,
       categoryId,
+      budgetId,
       amount,
       type,
       title: title || undefined,
@@ -295,6 +303,36 @@ export default function Page() {
               <ErrorMessage
                 error={"Failed to load accounts"}
                 className="min-h-36"
+              />
+            )}
+          </div>
+          <div className="grid **:disabled:opacity-75 gap-3 *:w-full">
+            <Label htmlFor="budgetId">
+              Budget<span className="text-destructive">*</span>
+            </Label>
+            <input type="hidden" name="budgetId" value={txnBudget} required />
+            {budLoading ? (
+              <Skeleton className="w-full h-9" />
+            ) : budgets ? (
+              <ToggleGroup
+                type="single"
+                value={txnBudget}
+                onValueChange={(accId: BudgetId) => setTxnBudget(accId)}
+              >
+                {budgets.map((budget) => (
+                  <ToggleGroupItem
+                    key={budget._id}
+                    value={budget._id}
+                    className="border dark:bg-input/30 dark:data-[state=on]:bg-input"
+                  >
+                    {budget.name}
+                  </ToggleGroupItem>
+                ))}
+              </ToggleGroup>
+            ) : (
+              <ErrorMessage
+                error={"Failed to load budgets"}
+                className="min-h-9"
               />
             )}
           </div>
