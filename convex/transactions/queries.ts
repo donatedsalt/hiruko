@@ -53,7 +53,7 @@ export const getById = query({
 
     const transaction = await ctx.db.get(args.id);
     if (!transaction || transaction.userId !== userId) {
-      throw new Error("Not found");
+      return null;
     }
 
     return transaction;
