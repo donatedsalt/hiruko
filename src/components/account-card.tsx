@@ -113,7 +113,7 @@ export function AccountCard({ account }: { account: Account }) {
       <DialogTrigger asChild>
         <Card className="justify-center gap-3 p-6 shadow-xs cursor-pointer select-none min-h-36 shrink-0 from-primary/5 to-card dark:bg-card bg-gradient-to-t">
           <CardHeader className="@container-normal">
-            <CardTitle className="font-semibold text-1xl text-muted-foreground">
+            <CardTitle className="text-xl font-semibold text-muted-foreground">
               {account.name}
             </CardTitle>
             <CardDescription className="text-2xl font-semibold text-foreground tabular-nums">
