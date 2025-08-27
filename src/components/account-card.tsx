@@ -35,7 +35,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 
-export function AccountsCard({ account }: { account: Account }) {
+export function AccountCard({ account }: { account: Account }) {
   const [open, setOpen] = useState(false);
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
   const { count, done } = useCountdown(3, showConfirmDelete);
@@ -234,7 +234,7 @@ export function AccountsCard({ account }: { account: Account }) {
   );
 }
 
-export function AccountsCardSkeleton() {
+export function AccountCardSkeleton() {
   return <Skeleton className="min-h-36 aspect-3/2" />;
 }
 
@@ -285,7 +285,7 @@ export function AddAccountCard() {
       <DialogTrigger asChild>
         <Card className="flex flex-col items-center justify-center gap-0 p-0 bg-transparent border-dashed shadow-xs cursor-pointer select-none min-h-36 shrink-0">
           <CardHeader className="@container-normal">
-            <CardTitle className="flex flex-col items-center text-2xl font-semibold text-muted-foreground">
+            <CardTitle className="flex flex-col items-center gap-1 text-2xl font-semibold text-muted-foreground">
               <IconCirclePlusFilled />
               <span>Add Account</span>
             </CardTitle>

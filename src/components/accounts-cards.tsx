@@ -2,8 +2,8 @@
 
 import { ErrorMessage } from "@/components/error-message";
 import {
-  AccountsCardSkeleton,
-  AccountsCard,
+  AccountCardSkeleton,
+  AccountCard,
   AddAccountCard,
 } from "@/components/account-card";
 import { useQuery } from "convex/react";
@@ -15,7 +15,7 @@ export function AccountsCards() {
   if (accounts === undefined) {
     return (
       <div className="flex gap-4 px-4 overflow-auto lg:px-6 scrollbar-none">
-        <AccountsCardSkeleton />
+        <AccountCardSkeleton />
         <AddAccountCard />
       </div>
     );
@@ -28,7 +28,7 @@ export function AccountsCards() {
   return (
     <div className="flex gap-4 px-4 overflow-auto lg:px-6 scrollbar-none">
       {accounts.map((account) => (
-        <AccountsCard key={account._id} account={account} />
+        <AccountCard key={account._id} account={account} />
       ))}
 
       <AddAccountCard />
