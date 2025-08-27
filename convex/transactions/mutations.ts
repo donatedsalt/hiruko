@@ -62,11 +62,11 @@ export const create = mutation({
       transactionAmount: category.transactionAmount + args.amount,
     });
 
-    // update budget if linked + expense
     if (args.budgetId && args.type === "expense") {
       const budget = await ctx.db.get(args.budgetId);
       if (budget && budget.userId === userId) {
         await ctx.db.patch(args.budgetId, {
+          transactionCount: budget.transactionCount + 1,
           spent: (budget.spent ?? 0) + args.amount,
         });
       }
@@ -240,6 +240,7 @@ export const remove = mutation({
       const budget = await ctx.db.get(transaction.budgetId);
       if (budget && budget.userId === userId) {
         await ctx.db.patch(transaction.budgetId, {
+          transactionCount: budget.transactionCount - 1,
           spent: Math.max((budget.spent ?? 0) - transaction.amount, 0),
         });
       }

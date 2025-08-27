@@ -31,8 +31,9 @@ export default function BudgetsPage() {
               <BudgetCard key={budget._id} budget={budget} />
             ))
           )}
+          {!loading && budgets?.length % 2 ? <AddBudgetCard /> : null}
         </div>
-        <AddBudgetCard />
+        {loading || !(budgets?.length % 2) ? <AddBudgetCard /> : null}
       </div>
     </>
   );

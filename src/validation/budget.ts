@@ -6,6 +6,7 @@ export const BudgetSchema = z
     name: z.string().min(1, "Name is required").max(100),
     amount: z.number().positive().default(0),
     spent: z.number().positive().default(0),
+    transactionCount: z.number().nonnegative().default(0),
   })
   .strict();
 
