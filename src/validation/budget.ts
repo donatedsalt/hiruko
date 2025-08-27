@@ -5,6 +5,7 @@ export const BudgetSchema = z
     userId: z.string().min(1, "User ID is required."),
     name: z.string().min(1, "Name is required").max(100),
     amount: z.number().positive().default(0),
+    spent: z.number().positive().default(0),
   })
   .strict();
 
