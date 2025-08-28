@@ -62,7 +62,7 @@ const data = {
     },
     {
       title: "Goals",
-      url: "#",
+      url: "/goals",
       icon: IconPigMoney,
     },
     // {

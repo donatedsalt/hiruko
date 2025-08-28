@@ -12,3 +12,6 @@ export type AccountId = Id<"accounts">;
 
 export type Budget = Doc<"budgets">;
 export type BudgetId = Id<"budgets">;
+
+export type Goal = Doc<"goals">;
+export type GoalId = Id<"goals">;

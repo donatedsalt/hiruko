@@ -13,6 +13,7 @@ export const create = mutation({
     categoryId: v.id("categories"),
     accountId: v.id("accounts"),
     budgetId: v.optional(v.id("budgets")),
+    goalId: v.optional(v.id("goals")),
     type: v.union(v.literal("income"), v.literal("expense")),
     amount: v.number(),
     title: v.optional(v.string()),
@@ -42,6 +43,7 @@ export const create = mutation({
       categoryId: args.categoryId,
       accountId: args.accountId,
       budgetId: args.budgetId ?? undefined,
+      goalId: args.goalId ?? undefined,
       type: args.type,
       amount: args.amount,
       title: args.title,
@@ -72,6 +74,16 @@ export const create = mutation({
       }
     }
 
+    if (args.goalId && args.type === "expense") {
+      const goal = await ctx.db.get(args.goalId);
+      if (goal && goal.userId === userId) {
+        await ctx.db.patch(args.goalId, {
+          transactionCount: goal.transactionCount + 1,
+          saved: (goal.saved ?? 0) + args.amount,
+        });
+      }
+    }
+
     return transaction;
   },
 });
@@ -86,6 +98,7 @@ export const update = mutation({
       categoryId: v.optional(v.id("categories")),
       accountId: v.optional(v.id("accounts")),
       budgetId: v.optional(v.id("budgets")),
+      goalId: v.optional(v.id("goals")),
       amount: v.optional(v.number()),
       type: v.optional(v.union(v.literal("income"), v.literal("expense"))),
       title: v.optional(v.string()),
@@ -142,6 +155,9 @@ export const update = mutation({
     const oldBudgetId = transaction.budgetId;
     const newBudgetId = updates.budgetId ?? transaction.budgetId;
 
+    const oldGoalId = transaction.goalId;
+    const newGoalId = updates.goalId ?? transaction.goalId;
+
     if (accountChanged || amountChanged || typeChanged) {
       await adjustAccount(ctx, originalAccount, oldAmount, oldType, -1);
       await adjustAccount(ctx, newAccount, newAmount, newType, 1);
@@ -186,11 +202,38 @@ export const update = mutation({
       }
     }
 
+    if (
+      (amountChanged || typeChanged || oldGoalId !== newGoalId) &&
+      oldGoalId &&
+      oldType === "expense"
+    ) {
+      const oldGoal = await ctx.db.get(oldGoalId);
+      if (oldGoal && oldGoal.userId === userId) {
+        await ctx.db.patch(oldGoalId, {
+          saved: Math.max((oldGoal.saved ?? 0) - oldAmount, 0),
+        });
+      }
+    }
+
+    if (
+      (amountChanged || typeChanged || oldGoalId !== newGoalId) &&
+      newGoalId &&
+      newType === "expense"
+    ) {
+      const newGoal = await ctx.db.get(newGoalId);
+      if (newGoal && newGoal.userId === userId) {
+        await ctx.db.patch(newGoalId, {
+          saved: (newGoal.saved ?? 0) + newAmount,
+        });
+      }
+    }
+
     await ctx.db.patch(id, {
       ...updates,
       accountId: newAccountId,
       categoryId: newCategoryId,
       budgetId: newBudgetId,
+      goalId: newGoalId,
       updatedAt: Date.now(),
     });
 
@@ -242,6 +285,16 @@ export const remove = mutation({
         await ctx.db.patch(transaction.budgetId, {
           transactionCount: budget.transactionCount - 1,
           spent: Math.max((budget.spent ?? 0) - transaction.amount, 0),
+        });
+      }
+    }
+
+    if (transaction.goalId && transaction.type === "expense") {
+      const goal = await ctx.db.get(transaction.goalId);
+      if (goal && goal.userId === userId) {
+        await ctx.db.patch(transaction.goalId, {
+          transactionCount: goal.transactionCount - 1,
+          saved: Math.max((goal.saved ?? 0) - transaction.amount, 0),
         });
       }
     }

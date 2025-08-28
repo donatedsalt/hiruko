@@ -6,7 +6,7 @@ import { useMutation, useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { IconCaretDownFilled, IconCaretUpFilled } from "@tabler/icons-react";
 
-import { AccountId, BudgetId, CategoryId } from "@/types/convex";
+import { AccountId, CategoryId, BudgetId, GoalId } from "@/types/convex";
 
 import { TransactionSchema } from "@/validation/transaction";
 
@@ -38,11 +38,14 @@ export default function Page() {
   const catLoading = categories === undefined;
   const budgets = useQuery(api.budgets.queries.list);
   const budLoading = budgets === undefined;
+  const goals = useQuery(api.goals.queries.list);
+  const goalLoading = budgets === undefined;
 
   const [txnType, setTxnType] = useState<"income" | "expense">("expense");
   const [txnAccount, setTxnAccount] = useState<AccountId | "">("");
   const [txnCategory, setTxnCategory] = useState<CategoryId | "">("");
   const [txnBudget, setTxnBudget] = useState<BudgetId | "">("");
+  const [txnGoal, setTxnGoal] = useState<GoalId | "">("");
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const createTransaction = useMutation(api.transactions.mutations.create);
@@ -106,6 +109,7 @@ export default function Page() {
     const accountId = formData.get("accountId") as AccountId;
     const categoryId = formData.get("categoryId") as CategoryId;
     const budgetId = formData.get("budgetId") as BudgetId;
+    const goalId = formData.get("goalId") as GoalId;
     const amount = parseFloat(formData.get("amount") as string);
     const type = formData.get("type") as "income" | "expense";
     const title = formData.get("title") as string;
@@ -119,6 +123,7 @@ export default function Page() {
       accountId,
       categoryId,
       budgetId,
+      goalId,
       amount,
       type,
       title: title || undefined,
@@ -267,36 +272,70 @@ export default function Page() {
             />
           )}
         </div>
-        <div className="grid gap-3 *:w-full">
-          <Label htmlFor="budgetId">
-            Budget<span className="text-destructive">*</span>
-          </Label>
-          <input type="hidden" name="budgetId" value={txnBudget} required />
-          {budLoading ? (
-            <Skeleton className="w-full h-9" />
-          ) : budgets ? (
-            <ToggleGroup
-              type="single"
-              value={txnBudget}
-              onValueChange={(accId: BudgetId) => setTxnBudget(accId)}
-            >
-              {budgets.map((budget) => (
-                <ToggleGroupItem
-                  key={budget._id}
-                  value={budget._id}
-                  className="border dark:bg-input/30 dark:data-[state=on]:bg-input"
-                >
-                  {budget.name}
-                </ToggleGroupItem>
-              ))}
-            </ToggleGroup>
-          ) : (
-            <ErrorMessage
-              error={"Failed to load budgets"}
-              className="min-h-9"
-            />
-          )}
-        </div>
+        {(budLoading || (budgets && budgets.length > 0)) && (
+          <div className="grid gap-3 *:w-full">
+            <Label htmlFor="budgetId">
+              Budget<span className="text-destructive">*</span>
+            </Label>
+            <input type="hidden" name="budgetId" value={txnBudget} required />
+            {budLoading ? (
+              <Skeleton className="w-full h-9" />
+            ) : budgets ? (
+              <ToggleGroup
+                type="single"
+                value={txnBudget}
+                onValueChange={(accId: BudgetId) => setTxnBudget(accId)}
+              >
+                {budgets.map((budget) => (
+                  <ToggleGroupItem
+                    key={budget._id}
+                    value={budget._id}
+                    className="border dark:bg-input/30 dark:data-[state=on]:bg-input"
+                  >
+                    {budget.name}
+                  </ToggleGroupItem>
+                ))}
+              </ToggleGroup>
+            ) : (
+              <ErrorMessage
+                error={"Failed to load budgets"}
+                className="min-h-9"
+              />
+            )}
+          </div>
+        )}
+        {(goalLoading || (goals && goals.length > 0)) && (
+          <div className="grid gap-3 *:w-full">
+            <Label htmlFor="goalId">
+              Goal<span className="text-destructive">*</span>
+            </Label>
+            <input type="hidden" name="goalId" value={txnGoal} required />
+            {goalLoading ? (
+              <Skeleton className="w-full h-9" />
+            ) : goals ? (
+              <ToggleGroup
+                type="single"
+                value={txnGoal}
+                onValueChange={(accId: GoalId) => setTxnGoal(accId)}
+              >
+                {goals.map((goal) => (
+                  <ToggleGroupItem
+                    key={goal._id}
+                    value={goal._id}
+                    className="border dark:bg-input/30 dark:data-[state=on]:bg-input"
+                  >
+                    {goal.name}
+                  </ToggleGroupItem>
+                ))}
+              </ToggleGroup>
+            ) : (
+              <ErrorMessage
+                error={"Failed to load goals"}
+                className="min-h-9"
+              />
+            )}
+          </div>
+        )}
         <div className="grid gap-3 *:w-full">
           <Label htmlFor="amount">
             Amount<span className="text-destructive">*</span>
