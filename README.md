@@ -18,15 +18,11 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 ### Todo
 
-- [ ] budget
-- [ ] goal
-- [ ] conuslt chatbot
 - [ ] market tracking
 - [ ] change lucide icons to tabler icons
 - [ ] checkbox to disable conformation and enable it in settings
 - [ ] [simple icons](https://simpleicons.org/) for using brand icons
 - [ ] take image of reciepts to automatically add transactions
-- [ ] migrate to nextjs server component and fetch api
 
 ### Done
 
@@ -39,3 +35,6 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 - [x] account delete
 - [x] disable buttons when action is being performed (submit button when form is being submitted)
 - [x] migrate from mongodb to convex
+- [x] conuslt chatbot
+- [x] budget
+- [x] goal
