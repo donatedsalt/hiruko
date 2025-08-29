@@ -41,6 +41,11 @@ export default function Page() {
   const goals = useQuery(api.goals.queries.list);
   const goalLoading = budgets === undefined;
 
+  const createTransaction = useMutation(api.transactions.mutations.create);
+  const createDefaults = useMutation(
+    api.categories.mutations.createDefaultCategories
+  );
+
   const [txnType, setTxnType] = useState<"income" | "expense">("expense");
   const [txnAccount, setTxnAccount] = useState<AccountId | "">("");
   const [txnCategory, setTxnCategory] = useState<CategoryId | "">("");
@@ -48,10 +53,6 @@ export default function Page() {
   const [txnGoal, setTxnGoal] = useState<GoalId | "">("");
 
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const createTransaction = useMutation(api.transactions.mutations.create);
-  const createDefaults = useMutation(
-    api.categories.mutations.createDefaultCategories
-  );
 
   const toastShown = useRef(false);
 
