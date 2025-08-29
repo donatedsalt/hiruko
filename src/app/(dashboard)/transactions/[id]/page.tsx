@@ -13,6 +13,7 @@ import {
 
 import {
   AccountId,
+  Category,
   CategoryId,
   BudgetId,
   GoalId,
@@ -83,6 +84,8 @@ export default function Page() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
 
+  const [oldCategory, setOldCategory] = useState<Category>();
+
   useEffect(() => {
     if (transaction) {
       setTxnAccount(transaction.accountId);
@@ -90,6 +93,10 @@ export default function Page() {
       setTxnCategory(transaction.categoryId);
       setTxnBudget(transaction.budgetId ?? "");
       setTxnGoal(transaction.goalId ?? "");
+
+      setOldCategory(
+        categories?.find((cat) => cat._id === transaction.categoryId)
+      );
 
       const date = new Date(transaction.transactionTime)
         .toISOString()
@@ -214,7 +221,13 @@ export default function Page() {
                   required
                 >
                   <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Select a category" />
+                    <SelectValue
+                      placeholder={
+                        oldCategory
+                          ? `${oldCategory.icon} ${oldCategory.name}`
+                          : "Select category"
+                      }
+                    />
                   </SelectTrigger>
                   <SelectContent>
                     {categories.map((cat) => (
