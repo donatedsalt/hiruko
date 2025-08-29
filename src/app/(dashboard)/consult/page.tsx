@@ -27,7 +27,13 @@ export default function Page() {
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState<IMessage[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [prompts, _setPrompts] = useState(["how do i reduce my expenses?"]);
+  const [prompts, _setPrompts] = useState([
+    "How do i reduce my expenses?",
+    "How do i increase my income?",
+    "How do i save for retirement?",
+    "What are some good budgeting tips?",
+    "What are the best investment strategies?",
+  ]);
 
   const handleSubmit = async (e?: React.FormEvent<HTMLFormElement>) => {
     e?.preventDefault();
