@@ -13,8 +13,9 @@ import {
 
 import {
   AccountId,
-  BudgetId,
   CategoryId,
+  BudgetId,
+  GoalId,
   Transaction,
   TransactionId,
 } from "@/types/convex";
@@ -52,6 +53,7 @@ import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 export default function Page() {
   const { id } = useParams();
   const smartRouter = useSmartRouter();
+
   const transaction = useQuery(api.transactions.queries.getById, {
     id: id as TransactionId,
   });
@@ -67,11 +69,12 @@ export default function Page() {
 
   const updateTransaction = useMutation(api.transactions.mutations.update);
   const deleteTransaction = useMutation(api.transactions.mutations.remove);
-  const [txnBudget, setTxnBudget] = useState<BudgetId | "">("");
 
   const [txnType, setTxnType] = useState<"income" | "expense">("expense");
   const [txnAccount, setTxnAccount] = useState<AccountId | "">("");
   const [txnCategory, setTxnCategory] = useState<CategoryId | "">("");
+  const [txnBudget, setTxnBudget] = useState<BudgetId | "">("");
+  const [txnGoal, setTxnGoal] = useState<GoalId | "">("");
   const [txnTime, setTxnTime] = useState({
     date: "",
     time: "",
@@ -83,12 +86,10 @@ export default function Page() {
   useEffect(() => {
     if (transaction) {
       setTxnAccount(transaction.accountId);
-
       setTxnType(transaction.type);
-
       setTxnCategory(transaction.categoryId);
-
       setTxnBudget(transaction.budgetId ?? "");
+      setTxnGoal(transaction.goalId ?? "");
 
       const date = new Date(transaction.transactionTime)
         .toISOString()
@@ -313,7 +314,13 @@ export default function Page() {
               <Label htmlFor="budgetId">
                 Budget<span className="text-destructive">*</span>
               </Label>
-              <input type="hidden" name="budgetId" value={txnBudget} required />
+              <input
+                type="hidden"
+                name="budgetId"
+                value={txnBudget}
+                disabled={!isEditing}
+                required
+              />
               {budLoading ? (
                 <Skeleton className="w-full h-9" />
               ) : budgets ? (
@@ -321,6 +328,7 @@ export default function Page() {
                   type="single"
                   value={txnBudget}
                   onValueChange={(accId: BudgetId) => setTxnBudget(accId)}
+                  disabled={!isEditing}
                 >
                   {budgets.map((budget) => (
                     <ToggleGroupItem
@@ -342,37 +350,43 @@ export default function Page() {
           )}
           {(goalLoading || (goals && goals.length > 0)) && (
             <div className="grid **:disabled:opacity-75 gap-3 *:w-full">
-              <Label htmlFor="budgetId">
-                Budget<span className="text-destructive">*</span>
+              <Label htmlFor="goalId">
+                Goal<span className="text-destructive">*</span>
               </Label>
-              <input type="hidden" name="budgetId" value={txnBudget} required />
+              <input
+                type="hidden"
+                name="goalId"
+                value={txnGoal}
+                disabled={!isEditing}
+                required
+              />
               {budLoading ? (
                 <Skeleton className="w-full h-9" />
-              ) : budgets ? (
+              ) : goals ? (
                 <ToggleGroup
                   type="single"
-                  value={txnBudget}
-                  onValueChange={(accId: BudgetId) => setTxnBudget(accId)}
+                  value={txnGoal}
+                  onValueChange={(accId: GoalId) => setTxnGoal(accId)}
+                  disabled={!isEditing}
                 >
-                  {budgets.map((budget) => (
+                  {goals.map((goal) => (
                     <ToggleGroupItem
-                      key={budget._id}
-                      value={budget._id}
+                      key={goal._id}
+                      value={goal._id}
                       className="border dark:bg-input/30 dark:data-[state=on]:bg-input"
                     >
-                      {budget.name}
+                      {goal.name}
                     </ToggleGroupItem>
                   ))}
                 </ToggleGroup>
               ) : (
                 <ErrorMessage
-                  error={"Failed to load budgets"}
+                  error={"Failed to load goals"}
                   className="min-h-9"
                 />
               )}
             </div>
           )}
-
           <div className="grid **:disabled:opacity-75 gap-3 *:w-full">
             <Label htmlFor="amount">
               Amount<span className="text-destructive">*</span>
@@ -383,10 +397,10 @@ export default function Page() {
               type="number"
               placeholder="99.99"
               defaultValue={transaction?.amount}
-              required
               min="0.01"
               step="0.01"
               disabled={!isEditing}
+              required
             />
           </div>
           <div className="grid **:disabled:opacity-75 gap-3 *:w-full">
@@ -433,8 +447,8 @@ export default function Page() {
                 name="time"
                 type="time"
                 defaultValue={txnTime.time}
-                required
                 disabled={!isEditing}
+                required
               />
             </div>
           </div>
