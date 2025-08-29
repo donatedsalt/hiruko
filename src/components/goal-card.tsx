@@ -252,14 +252,44 @@ export function AddGoalCard() {
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
   const [amount, setAmount] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!name || !amount) return;
-    await createGoal({ name, amount: Number(amount) });
-    setName("");
-    setAmount("");
-    setOpen(false);
+    setIsSubmitting(true);
+
+    const form = e.currentTarget;
+    const formData = new FormData(form);
+    const name = formData.get("name") as string;
+    const amount = parseFloat(formData.get("amount") as string);
+
+    const payload = { name, balance: amount };
+
+    const result = GoalSchema.omit({
+      userId: true,
+      saved: true,
+      transactionCount: true,
+    }).safeParse(payload);
+
+    if (!result.success) {
+      toast.warning("Validation error", {
+        description: result.error.issues[0].message,
+      });
+      return;
+    }
+
+    try {
+      await createGoal(result.data);
+      toast.success("Goal added");
+      form.reset();
+      setOpen(false);
+    } catch (err: any) {
+      toast.error("Something went wrong!", {
+        description: err.message,
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -288,7 +318,9 @@ export function AddGoalCard() {
               id="name"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="e.g. Groceries"
+              placeholder="e.g. New Car"
+              disabled={isSubmitting}
+              required
             />
           </div>
           <div>
@@ -299,6 +331,8 @@ export function AddGoalCard() {
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
               placeholder="500"
+              disabled={isSubmitting}
+              required
             />
           </div>
           <Button type="submit" className="w-full">

@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { AccountId, BudgetId, CategoryId } from "@/types/convex";
+import { AccountId, BudgetId, CategoryId, GoalId } from "@/types/convex";
 
 export const TransactionSchema = z
   .object({
@@ -16,6 +16,10 @@ export const TransactionSchema = z
     budgetId: z
       .string()
       .transform((val) => (val === "" ? undefined : (val as BudgetId)))
+      .optional(),
+    goalId: z
+      .string()
+      .transform((val) => (val === "" ? undefined : (val as GoalId)))
       .optional(),
     title: z
       .string()

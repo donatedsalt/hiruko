@@ -62,6 +62,8 @@ export default function Page() {
   const catLoading = categories === undefined;
   const budgets = useQuery(api.budgets.queries.list);
   const budLoading = budgets === undefined;
+  const goals = useQuery(api.goals.queries.list);
+  const goalLoading = budgets === undefined;
 
   const updateTransaction = useMutation(api.transactions.mutations.update);
   const deleteTransaction = useMutation(api.transactions.mutations.remove);
@@ -306,7 +308,7 @@ export default function Page() {
               />
             )}
           </div>
-          {!budLoading && budgets.length > 0 && (
+          {(budLoading || (budgets && budgets.length > 0)) && (
             <div className="grid **:disabled:opacity-75 gap-3 *:w-full">
               <Label htmlFor="budgetId">
                 Budget<span className="text-destructive">*</span>
@@ -338,6 +340,39 @@ export default function Page() {
               )}
             </div>
           )}
+          {(goalLoading || (goals && goals.length > 0)) && (
+            <div className="grid **:disabled:opacity-75 gap-3 *:w-full">
+              <Label htmlFor="budgetId">
+                Budget<span className="text-destructive">*</span>
+              </Label>
+              <input type="hidden" name="budgetId" value={txnBudget} required />
+              {budLoading ? (
+                <Skeleton className="w-full h-9" />
+              ) : budgets ? (
+                <ToggleGroup
+                  type="single"
+                  value={txnBudget}
+                  onValueChange={(accId: BudgetId) => setTxnBudget(accId)}
+                >
+                  {budgets.map((budget) => (
+                    <ToggleGroupItem
+                      key={budget._id}
+                      value={budget._id}
+                      className="border dark:bg-input/30 dark:data-[state=on]:bg-input"
+                    >
+                      {budget.name}
+                    </ToggleGroupItem>
+                  ))}
+                </ToggleGroup>
+              ) : (
+                <ErrorMessage
+                  error={"Failed to load budgets"}
+                  className="min-h-9"
+                />
+              )}
+            </div>
+          )}
+
           <div className="grid **:disabled:opacity-75 gap-3 *:w-full">
             <Label htmlFor="amount">
               Amount<span className="text-destructive">*</span>
