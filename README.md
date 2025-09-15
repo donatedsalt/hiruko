@@ -23,6 +23,9 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 - [ ] checkbox to disable conformation and enable it in settings
 - [ ] [simple icons](https://simpleicons.org/) for using brand icons
 - [ ] take image of reciepts to automatically add transactions
+- [ ] premium features like family budgets and goals tracking
+- [ ] fix invalid date error
+- [ ] use sorted data from convex in dalist
 
 ### Done
 
@@ -38,3 +41,4 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 - [x] conuslt chatbot
 - [x] budget
 - [x] goal
+- [x] add custom brand theme

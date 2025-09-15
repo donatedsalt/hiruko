@@ -10,12 +10,13 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
+import { SidebarMenuButton } from "@/components/ui/sidebar";
 
 export function ThemeChangeButton({
-  showLabel = false,
+  isSidebarItem = false,
   className,
 }: {
-  showLabel?: boolean;
+  isSidebarItem?: boolean;
   className?: string;
 }) {
   const { setTheme } = useTheme();
@@ -23,11 +24,18 @@ export function ThemeChangeButton({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger className={className} asChild>
-        <Button variant={"outline"} size={!showLabel ? "icon" : "default"}>
-          <IconSun className="h-[1.2rem] w-[1.2rem] scale-100 rotate-0 transition-all dark:scale-0 dark:-rotate-90" />
-          <IconMoon className="absolute h-[1.2rem] w-[1.2rem] scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0" />
-          {showLabel && <span>Change theme</span>}
-        </Button>
+        {isSidebarItem ? (
+          <SidebarMenuButton>
+            <IconSun className="icon-sun h-[1.2rem] w-[1.2rem] dark:hidden" />
+            <IconMoon className="icon-moon hidden h-[1.2rem] w-[1.2rem] dark:block" />
+            <span>Change theme</span>
+          </SidebarMenuButton>
+        ) : (
+          <Button variant={"outline"} size={"icon"}>
+            <IconSun className="icon-sun h-[1.2rem] w-[1.2rem] dark:hidden" />
+            <IconMoon className="icon-moon hidden h-[1.2rem] w-[1.2rem] dark:block" />
+          </Button>
+        )}
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         <DropdownMenuItem onClick={() => setTheme("light")}>
@@ -35,6 +43,12 @@ export function ThemeChangeButton({
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => setTheme("dark")}>
           Dark
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => setTheme("brand-light")}>
+          Brand Light
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => setTheme("brand-dark")}>
+          Brand Dark
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => setTheme("system")}>
           System

@@ -118,7 +118,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               asChild
             >
               <Link href="/">
-                <HirukoIcon className="!size-5 fill-foreground" />
+                <HirukoIcon className="!size-5" />
                 <span className="text-base font-semibold">Hiruko</span>
               </Link>
             </SidebarMenuButton>
