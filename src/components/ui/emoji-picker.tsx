@@ -6,7 +6,7 @@ import {
   type EmojiPickerListRowProps,
   EmojiPicker as EmojiPickerPrimitive,
 } from "frimousse";
-import { LoaderIcon, SearchIcon } from "lucide-react";
+import { IconLoader, IconSearch } from "@tabler/icons-react";
 import type * as React from "react";
 
 import { cn } from "@/lib/utils";
@@ -19,7 +19,7 @@ function EmojiPicker({
     <EmojiPickerPrimitive.Root
       className={cn(
         "bg-popover text-popover-foreground isolate flex h-full w-fit flex-col overflow-hidden rounded-md",
-        className
+        className,
       )}
       data-slot="emoji-picker"
       {...props}
@@ -36,7 +36,7 @@ function EmojiPickerSearch({
       className={cn("flex h-9 items-center gap-2 border-b px-3", className)}
       data-slot="emoji-picker-search-wrapper"
     >
-      <SearchIcon className="size-4 shrink-0 opacity-50" />
+      <IconSearch className="size-4 shrink-0 opacity-50" />
       <EmojiPickerPrimitive.Search
         className="outline-hidden placeholder:text-muted-foreground flex h-10 w-full rounded-md bg-transparent py-3 text-sm disabled:cursor-not-allowed disabled:opacity-50"
         data-slot="emoji-picker-search"
@@ -64,7 +64,7 @@ function EmojiPickerEmoji({
       {...props}
       className={cn(
         "data-[active]:bg-accent flex size-7 items-center justify-center rounded-sm text-base",
-        className
+        className,
       )}
       data-slot="emoji-picker-emoji"
     >
@@ -102,7 +102,7 @@ function EmojiPickerContent({
         className="absolute inset-0 flex items-center justify-center text-muted-foreground"
         data-slot="emoji-picker-loading"
       >
-        <LoaderIcon className="size-4 animate-spin" />
+        <IconLoader className="size-4 animate-spin" />
       </EmojiPickerPrimitive.Loading>
       <EmojiPickerPrimitive.Empty
         className="absolute inset-0 flex items-center justify-center text-muted-foreground text-sm"
@@ -131,7 +131,7 @@ function EmojiPickerFooter({
     <div
       className={cn(
         "max-w-(--frimousse-viewport-width) flex w-full min-w-0 items-center gap-1 border-t p-2",
-        className
+        className,
       )}
       data-slot="emoji-picker-footer"
       {...props}

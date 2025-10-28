@@ -19,7 +19,6 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 ### Todo
 
 - [ ] market tracking
-- [ ] change lucide icons to tabler icons
 - [ ] checkbox to disable conformation and enable it in settings
 - [ ] [simple icons](https://simpleicons.org/) for using brand icons
 - [ ] take image of reciepts to automatically add transactions
@@ -42,3 +41,4 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 - [x] budget
 - [x] goal
 - [x] add custom brand theme
+- [x] change lucide icons to tabler icons

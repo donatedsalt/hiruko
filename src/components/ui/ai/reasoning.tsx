@@ -7,7 +7,7 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { cn } from "@/lib/utils";
-import { BrainIcon, ChevronDownIcon } from "lucide-react";
+import { IconBrain, IconChevronDown } from "@tabler/icons-react";
 import type { ComponentProps } from "react";
 import { createContext, memo, useContext, useEffect, useState } from "react";
 import { Response } from "./response";
@@ -107,7 +107,7 @@ export const Reasoning = memo(
         </Collapsible>
       </ReasoningContext.Provider>
     );
-  }
+  },
 );
 
 export type ReasoningTriggerProps = ComponentProps<
@@ -129,29 +129,29 @@ export const ReasoningTrigger = memo(
       <CollapsibleTrigger
         className={cn(
           "flex items-center gap-2 text-muted-foreground text-sm",
-          className
+          className,
         )}
         {...props}
       >
         {children ?? (
           <>
-            <BrainIcon className="size-4" />
+            <IconBrain className="size-4" />
             {isStreaming || duration === 0 ? (
               <p>Thinking...</p>
             ) : (
               <p>Thought for {duration} seconds</p>
             )}
-            <ChevronDownIcon
+            <IconChevronDown
               className={cn(
                 "size-4 text-muted-foreground transition-transform",
-                isOpen ? "rotate-180" : "rotate-0"
+                isOpen ? "rotate-180" : "rotate-0",
               )}
             />
           </>
         )}
       </CollapsibleTrigger>
     );
-  }
+  },
 );
 
 export type ReasoningContentProps = ComponentProps<
@@ -166,13 +166,13 @@ export const ReasoningContent = memo(
       className={cn(
         "mt-4 text-sm",
         "data-[state=closed]:fade-out-0 data-[state=closed]:slide-out-to-top-2 data-[state=open]:slide-in-from-top-2 text-popover-foreground outline-none data-[state=closed]:animate-out data-[state=open]:animate-in",
-        className
+        className,
       )}
       {...props}
     >
       <Response className="grid gap-2">{children}</Response>
     </CollapsibleContent>
-  )
+  ),
 );
 
 Reasoning.displayName = "Reasoning";

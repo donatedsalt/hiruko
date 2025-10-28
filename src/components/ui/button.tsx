@@ -32,7 +32,7 @@ const buttonVariants = cva(
       variant: "default",
       size: "default",
     },
-  }
+  },
 );
 
 function Button({
@@ -55,7 +55,7 @@ function Button({
       className={cn(
         buttonVariants({ variant, size, className }),
         floating &&
-          "size-14 hover:rounded-[50%] active:rounded-[50%] focus-visible:rounded-[50%]"
+          "size-14 hover:rounded-[50%] active:rounded-[50%] focus-visible:rounded-[50%]",
       )}
       {...props}
     />

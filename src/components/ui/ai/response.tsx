@@ -288,7 +288,7 @@ const components: Options["components"] = {
     <blockquote
       className={cn(
         "my-4 border-muted-foreground/30 border-l-4 pl-4 text-muted-foreground italic",
-        className
+        className,
       )}
       {...props}
     >
@@ -306,7 +306,7 @@ const components: Options["components"] = {
       <code
         className={cn(
           "rounded bg-muted px-1.5 py-0.5 font-mono text-sm",
-          className
+          className,
         )}
         {...props}
       />
@@ -367,7 +367,7 @@ export const Response = memo(
       <div
         className={cn(
           "size-full [&>*:first-child]:mt-0 [&>*:last-child]:mb-0",
-          className
+          className,
         )}
         {...props}
       >
@@ -385,7 +385,7 @@ export const Response = memo(
       </div>
     );
   },
-  (prevProps, nextProps) => prevProps.children === nextProps.children
+  (prevProps, nextProps) => prevProps.children === nextProps.children,
 );
 
 Response.displayName = "Response";

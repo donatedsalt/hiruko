@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { ChevronDownIcon } from "lucide-react";
+import { IconChevronDown } from "@tabler/icons-react";
 
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
@@ -24,7 +24,7 @@ function DatePicker({
 }) {
   const [open, setOpen] = React.useState(false);
   const [date, setDate] = React.useState<Date | undefined>(
-    defaultValue ? new Date(defaultValue) : new Date()
+    defaultValue ? new Date(defaultValue) : new Date(),
   );
 
   return (
@@ -38,7 +38,7 @@ function DatePicker({
             disabled={disabled}
           >
             {date ? date.toLocaleDateString() : "Select date"}
-            <ChevronDownIcon />
+            <IconChevronDown />
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-auto overflow-hidden p-0" align="start">

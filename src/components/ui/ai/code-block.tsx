@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { CheckIcon, CopyIcon } from "lucide-react";
+import { IconCheck, IconCopy } from "@tabler/icons-react";
 import type { ComponentProps, HTMLAttributes, ReactNode } from "react";
 import { createContext, useContext, useState } from "react";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
@@ -38,7 +38,7 @@ export const CodeBlock = ({
     <div
       className={cn(
         "relative w-full overflow-hidden rounded-md border bg-background text-foreground",
-        className
+        className,
       )}
       {...props}
     >
@@ -132,7 +132,7 @@ export const CodeBlockCopyButton = ({
     }
   };
 
-  const Icon = isCopied ? CheckIcon : CopyIcon;
+  const Icon = isCopied ? IconCheck : IconCopy;
 
   return (
     <Button
