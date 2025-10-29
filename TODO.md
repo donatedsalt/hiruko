@@ -5,6 +5,7 @@ list of todos
 ## Todo
 
 - [ ] fix invalid date error
+- [ ] give the AI access to user data (e.g., income, expenses, balance) after asking permission to improve AI response
 - [ ] market tracking (e.g., crypto, stocks, gold, currencies)
 - [ ] settings page
 - [ ] checkbox to disable or enable deletion conformation in settings
