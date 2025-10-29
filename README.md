@@ -1,6 +1,6 @@
 # Hiruko
 
-The Finance Tracking App For You And Your Businesses
+AI Powered Finance Tracking App For You And Your Businesses
 
 ## Getting Started
 
@@ -18,12 +18,12 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 ### Todo
 
-- [ ] market tracking
-- [ ] checkbox to disable conformation and enable it in settings
-- [ ] [simple icons](https://simpleicons.org/) for using brand icons
+- [ ] fix invalid date error
+- [ ] market tracking (e.g., crypto, stocks, gold, currencies)
+- [ ] settings page
+- [ ] checkbox to disable or enable deletion conformation in settings
 - [ ] take image of reciepts to automatically add transactions
 - [ ] premium features like family budgets and goals tracking
-- [ ] fix invalid date error
 - [ ] use sorted data from convex in dalist
 
 ### Done
@@ -42,3 +42,4 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 - [x] goal
 - [x] add custom brand theme
 - [x] change lucide icons to tabler icons
+- [x] ~~[simple icons](https://simpleicons.org/) for using brand icons~~ use tabler brand icons instead
