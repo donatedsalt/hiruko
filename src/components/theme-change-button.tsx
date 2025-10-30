@@ -44,11 +44,11 @@ export function ThemeChangeButton({
         <DropdownMenuItem onClick={() => setTheme("dark")}>
           Dark
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme("brand-light")}>
-          Brand Light
+        <DropdownMenuItem onClick={() => setTheme("hiruko-light")}>
+          Hiruko Light
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme("brand-dark")}>
-          Brand Dark
+        <DropdownMenuItem onClick={() => setTheme("hiruko-dark")}>
+          Hiruko Dark
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => setTheme("system")}>
           System

@@ -10,7 +10,7 @@ export function ThemeProvider({
   return (
     <NextThemesProvider
       attribute={"class"}
-      themes={["light", "dark", "brand-light", "brand-dark"]}
+      themes={["light", "dark", "hiruko-light", "hiruko-dark"]}
       {...props}
     >
       {children}

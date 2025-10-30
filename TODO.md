@@ -27,6 +27,6 @@ list of todos
 - [x] consult chat-bot
 - [x] budget
 - [x] goal
-- [x] add custom brand theme
+- [x] add custom ~~brand~~ hiruko theme
 - [x] change lucide icons to tabler icons
 - [x] ~~[simple icons](https://simpleicons.org/) for using brand icons~~ use tabler brand icons instead

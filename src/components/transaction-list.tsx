@@ -54,7 +54,7 @@ function RenderGroupedList({
 }) {
   const grouped = groupByDay(transactions);
   const dates = Object.keys(grouped).sort(
-    (a, b) => new Date(b).getTime() - new Date(a).getTime()
+    (a, b) => new Date(b).getTime() - new Date(a).getTime(),
   );
 
   return (
@@ -81,7 +81,7 @@ function RenderGroupedList({
                         "flex items-center [&>svg]:size-4",
                         txn.type === "income"
                           ? "text-emerald-500"
-                          : "text-destructive"
+                          : "text-destructive",
                       )}
                     >
                       {txn.type === "income" ? (
