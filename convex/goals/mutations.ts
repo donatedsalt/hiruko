@@ -4,6 +4,9 @@ import { mutation } from "@/convex/_generated/server";
 
 import { getUserId } from "@/convex/utils/auth";
 
+/**
+ * Create a goal.
+ */
 export const createGoal = mutation({
   args: {
     name: v.string(),
@@ -24,7 +27,7 @@ export const createGoal = mutation({
 });
 
 /**
- * Update an goal.
+ * Update a goal.
  */
 export const update = mutation({
   args: {
@@ -51,7 +54,7 @@ export const update = mutation({
 });
 
 /**
- * Delete an goal and remove goalId from all associated transactions.
+ * Delete a goal and remove goalId from all associated transactions.
  */
 export const remove = mutation({
   args: { id: v.id("goals") },

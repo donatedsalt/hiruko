@@ -4,6 +4,9 @@ import { mutation } from "@/convex/_generated/server";
 
 import { getUserId } from "@/convex/utils/auth";
 
+/**
+ * Create a budget.
+ */
 export const createBudget = mutation({
   args: {
     name: v.string(),
@@ -24,7 +27,7 @@ export const createBudget = mutation({
 });
 
 /**
- * Update an budget.
+ * Update a budget.
  */
 export const update = mutation({
   args: {
@@ -51,7 +54,7 @@ export const update = mutation({
 });
 
 /**
- * Delete an budget and remove budgetId from all associated transactions.
+ * Delete a budget and remove budgetId from all associated transactions.
  */
 export const remove = mutation({
   args: { id: v.id("budgets") },
