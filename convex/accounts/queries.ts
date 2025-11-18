@@ -2,14 +2,13 @@ import { v } from "convex/values";
 
 import { query } from "@/convex/_generated/server";
 
-import { getUserId } from "@/convex/utils/auth";
+import { requireUserId } from "@/convex/utils/auth";
 
 /**
  * Get all accounts for the authenticated user.
  */
 export const list = query(async (ctx) => {
-  const userId = await getUserId(ctx);
-  if (!userId) return [];
+  const userId = await requireUserId(ctx);
 
   return await ctx.db
     .query("accounts")
@@ -23,8 +22,7 @@ export const list = query(async (ctx) => {
 export const getById = query({
   args: { id: v.id("accounts") },
   handler: async (ctx, args) => {
-    const userId = await getUserId(ctx);
-    if (!userId) return [];
+    const userId = await requireUserId(ctx);
 
     const account = await ctx.db.get(args.id);
 

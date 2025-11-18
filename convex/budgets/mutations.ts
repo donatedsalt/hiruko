@@ -2,7 +2,7 @@ import { v } from "convex/values";
 
 import { mutation } from "@/convex/_generated/server";
 
-import { getUserId } from "@/convex/utils/auth";
+import { requireUserId } from "@/convex/utils/auth";
 
 /**
  * Create a budget.
@@ -13,8 +13,7 @@ export const createBudget = mutation({
     amount: v.number(),
   },
   handler: async (ctx, { name, amount }) => {
-    const userId = await getUserId(ctx);
-    if (!userId) return [];
+    const userId = await requireUserId(ctx);
 
     return await ctx.db.insert("budgets", {
       userId,
@@ -36,8 +35,7 @@ export const update = mutation({
     amount: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
-    const userId = await getUserId(ctx);
-    if (!userId) return [];
+    const userId = await requireUserId(ctx);
 
     const budget = await ctx.db.get(args.id);
     if (!budget || budget.userId !== userId) {
@@ -59,8 +57,7 @@ export const update = mutation({
 export const remove = mutation({
   args: { id: v.id("budgets") },
   handler: async (ctx, args) => {
-    const userId = await getUserId(ctx);
-    if (!userId) return { success: false, reason: "unauthorized" };
+    const userId = await requireUserId(ctx);
 
     const budget = await ctx.db.get(args.id);
     if (!budget || budget.userId !== userId) {

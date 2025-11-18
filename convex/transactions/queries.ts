@@ -4,7 +4,7 @@ import { query } from "@/convex/_generated/server";
 
 import { TransactionGroups } from "@/types/convex";
 
-import { getUserId } from "@/convex/utils/auth";
+import { requireUserId } from "@/convex/utils/auth";
 
 /**
  * Get all transactions for the authenticated user.
@@ -14,8 +14,7 @@ export const list = query({
     type: v.optional(v.union(v.literal("income"), v.literal("expense"))),
   },
   handler: async (ctx, args) => {
-    const userId = await getUserId(ctx);
-    if (!userId) return [];
+    const userId = await requireUserId(ctx);
 
     let transactions;
 
@@ -47,8 +46,7 @@ export const list = query({
 export const listAllVariants = query({
   args: {},
   handler: async (ctx) => {
-    const userId = await getUserId(ctx);
-    if (!userId) return [];
+    const userId = await requireUserId(ctx);
 
     return {
       all: await ctx.db
@@ -80,8 +78,7 @@ export const listAllVariants = query({
 export const getById = query({
   args: { id: v.id("transactions") },
   handler: async (ctx, args) => {
-    const userId = await getUserId(ctx);
-    if (!userId) return null;
+    const userId = await requireUserId(ctx);
 
     const transaction = await ctx.db.get(args.id);
     if (!transaction || transaction.userId !== userId) {
@@ -98,8 +95,7 @@ export const getById = query({
 export const groupByDate = query({
   args: {},
   handler: async (ctx) => {
-    const userId = await getUserId(ctx);
-    if (!userId) return [];
+    const userId = await requireUserId(ctx);
 
     const transactions = await ctx.db
       .query("transactions")
@@ -126,8 +122,7 @@ export const groupByDate = query({
 export const groupByMonth = query({
   args: {},
   handler: async (ctx) => {
-    const userId = await getUserId(ctx);
-    if (!userId) return [];
+    const userId = await requireUserId(ctx);
 
     const transactions = await ctx.db
       .query("transactions")
@@ -153,8 +148,7 @@ export const groupByMonth = query({
 export const groupByCategory = query({
   args: {},
   handler: async (ctx) => {
-    const userId = await getUserId(ctx);
-    if (!userId) return [];
+    const userId = await requireUserId(ctx);
 
     const transactions = await ctx.db
       .query("transactions")
