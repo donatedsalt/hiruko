@@ -34,7 +34,7 @@ export const create = mutation({
       const category = await ctx.db
         .query("categories")
         .withIndex("by_userId_name", (q) =>
-          q.eq("userId", userId).eq("name", categoryName)
+          q.eq("userId", userId).eq("name", categoryName),
         )
         .unique();
 
@@ -124,7 +124,7 @@ export const update = mutation({
       const category = await ctx.db
         .query("categories")
         .withIndex("by_userId_name", (q) =>
-          q.eq("userId", userId).eq("name", categoryName)
+          q.eq("userId", userId).eq("name", categoryName),
         )
         .unique();
 
