@@ -5,7 +5,6 @@ import { query } from "@/convex/_generated/server";
 import { TransactionGroups } from "@/types/convex";
 
 import { getUserId } from "@/convex/utils/auth";
-import { getUserTransactions } from "@/convex/utils/db/transactions";
 
 /**
  * Get all transactions for the authenticated user.
@@ -48,12 +47,29 @@ export const list = query({
 export const listAllVariants = query({
   args: {},
   handler: async (ctx) => {
-    const transactions = await getUserTransactions(ctx);
+    const userId = await getUserId(ctx);
+    if (!userId) return [];
 
     return {
-      all: transactions,
-      income: transactions.filter((t) => t.type === "income"),
-      expense: transactions.filter((t) => t.type === "expense"),
+      all: await ctx.db
+        .query("transactions")
+        .withIndex("by_userId", (q) => q.eq("userId", userId))
+        .order("desc")
+        .collect(),
+      income: await ctx.db
+        .query("transactions")
+        .withIndex("by_userId_type", (q) =>
+          q.eq("userId", userId).eq("type", "income"),
+        )
+        .order("desc")
+        .collect(),
+      expense: await ctx.db
+        .query("transactions")
+        .withIndex("by_userId_type", (q) =>
+          q.eq("userId", userId).eq("type", "expense"),
+        )
+        .order("desc")
+        .collect(),
     };
   },
 });
@@ -82,7 +98,14 @@ export const getById = query({
 export const groupByDate = query({
   args: {},
   handler: async (ctx) => {
-    const transactions = await getUserTransactions(ctx);
+    const userId = await getUserId(ctx);
+    if (!userId) return [];
+
+    const transactions = await ctx.db
+      .query("transactions")
+      .withIndex("by_userId", (q) => q.eq("userId", userId))
+      .order("desc")
+      .collect();
 
     transactions.sort((a, b) => b.transactionTime - a.transactionTime);
 
@@ -103,7 +126,14 @@ export const groupByDate = query({
 export const groupByMonth = query({
   args: {},
   handler: async (ctx) => {
-    const transactions = await getUserTransactions(ctx);
+    const userId = await getUserId(ctx);
+    if (!userId) return [];
+
+    const transactions = await ctx.db
+      .query("transactions")
+      .withIndex("by_userId", (q) => q.eq("userId", userId))
+      .order("desc")
+      .collect();
 
     const grouped = transactions.reduce((acc, txn) => {
       const date = new Date(txn.transactionTime);
@@ -123,7 +153,14 @@ export const groupByMonth = query({
 export const groupByCategory = query({
   args: {},
   handler: async (ctx) => {
-    const transactions = await getUserTransactions(ctx);
+    const userId = await getUserId(ctx);
+    if (!userId) return [];
+
+    const transactions = await ctx.db
+      .query("transactions")
+      .withIndex("by_userId", (q) => q.eq("userId", userId))
+      .order("desc")
+      .collect();
 
     transactions.sort((a, b) => b.transactionTime - a.transactionTime);
 
