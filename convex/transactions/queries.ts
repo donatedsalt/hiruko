@@ -15,13 +15,29 @@ export const list = query({
     type: v.optional(v.union(v.literal("income"), v.literal("expense"))),
   },
   handler: async (ctx, args) => {
-    let transactions = await getUserTransactions(ctx);
+    const userId = await getUserId(ctx);
+    if (!userId) return [];
+
+    let transactions;
 
     if (args.type) {
-      transactions = transactions.filter((t) => t.type === args.type);
+      transactions = await ctx.db
+        .query("transactions")
+        .withIndex("by_userId_type", (q) =>
+          q.eq("userId", userId).eq("type", args.type!),
+        )
+        .order("desc")
+        .collect();
+    } else {
+      transactions = await ctx.db
+        .query("transactions")
+        .withIndex("by_userId", (q) => q.eq("userId", userId))
+        .order("desc")
+        .collect();
     }
 
-    return transactions.sort((a, b) => b.transactionTime - a.transactionTime);
+    // return transactions.sort((a, b) => b.transactionTime - a.transactionTime);
+    return transactions;
   },
 });
 
