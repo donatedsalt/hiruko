@@ -2,6 +2,8 @@
 
 AI Powered Finance Tracking App For You And Your Businesses
 
+**THIS PROJECT WAS MADE FOR APTECH VISION 2025**
+
 ## Getting Started
 
 First, run the development server:
