@@ -2,7 +2,7 @@ import { v } from "convex/values";
 
 import { mutation } from "@/convex/_generated/server";
 
-import { getUserId } from "@/convex/utils/auth";
+import { requireUserId } from "@/convex/utils/auth";
 
 /**
  * Create a new category.
@@ -14,8 +14,7 @@ export const create = mutation({
     type: v.union(v.literal("income"), v.literal("expense")),
   },
   handler: async (ctx, args) => {
-    const userId = await getUserId(ctx);
-    if (!userId) return [];
+    const userId = await requireUserId(ctx);
 
     return await ctx.db.insert("categories", {
       userId,
@@ -35,8 +34,7 @@ export const create = mutation({
 export const createDefaultCategories = mutation({
   args: {},
   handler: async (ctx) => {
-    const userId = await getUserId(ctx);
-    if (!userId) throw new Error("Unauthorized");
+    const userId = await requireUserId(ctx);
 
     const existingCategories = await ctx.db
       .query("categories")
@@ -46,7 +44,7 @@ export const createDefaultCategories = mutation({
     const hasOnlyBalanceCorrection =
       existingCategories.length <= 2 &&
       existingCategories.every((cat) =>
-        cat.name.trim().toLowerCase().startsWith("balance correction")
+        cat.name.trim().toLowerCase().startsWith("balance correction"),
       );
 
     if (existingCategories.length > 0 && !hasOnlyBalanceCorrection) {
@@ -83,8 +81,7 @@ export const update = mutation({
     type: v.union(v.literal("income"), v.literal("expense")),
   },
   handler: async (ctx, args) => {
-    const userId = await getUserId(ctx);
-    if (!userId) return [];
+    const userId = await requireUserId(ctx);
 
     const category = await ctx.db.get(args.id);
     if (!category || category.userId !== userId) {
@@ -108,8 +105,7 @@ export const update = mutation({
 export const remove = mutation({
   args: { id: v.id("categories") },
   handler: async (ctx, args) => {
-    const userId = await getUserId(ctx);
-    if (!userId) return [];
+    const userId = await requireUserId(ctx);
 
     const category = await ctx.db.get(args.id);
     if (!category || category.userId !== userId) {

@@ -4,8 +4,7 @@ import { query } from "@/convex/_generated/server";
 
 import { TransactionGroups } from "@/types/convex";
 
-import { getUserId } from "@/convex/utils/auth";
-import { getUserTransactions } from "@/convex/utils/db/transactions";
+import { requireUserId } from "@/convex/utils/auth";
 
 /**
  * Get all transactions for the authenticated user.
@@ -15,13 +14,28 @@ export const list = query({
     type: v.optional(v.union(v.literal("income"), v.literal("expense"))),
   },
   handler: async (ctx, args) => {
-    let transactions = await getUserTransactions(ctx);
+    const userId = await requireUserId(ctx);
+
+    let transactions;
 
     if (args.type) {
-      transactions = transactions.filter((t) => t.type === args.type);
+      transactions = await ctx.db
+        .query("transactions")
+        .withIndex("by_userId_type", (q) =>
+          q.eq("userId", userId).eq("type", args.type!),
+        )
+        .order("desc")
+        .collect();
+    } else {
+      transactions = await ctx.db
+        .query("transactions")
+        .withIndex("by_userId", (q) => q.eq("userId", userId))
+        .order("desc")
+        .collect();
     }
 
-    return transactions.sort((a, b) => b.transactionTime - a.transactionTime);
+    // return transactions.sort((a, b) => b.transactionTime - a.transactionTime);
+    return transactions;
   },
 });
 
@@ -32,12 +46,28 @@ export const list = query({
 export const listAllVariants = query({
   args: {},
   handler: async (ctx) => {
-    const transactions = await getUserTransactions(ctx);
+    const userId = await requireUserId(ctx);
 
     return {
-      all: transactions,
-      income: transactions.filter((t) => t.type === "income"),
-      expense: transactions.filter((t) => t.type === "expense"),
+      all: await ctx.db
+        .query("transactions")
+        .withIndex("by_userId", (q) => q.eq("userId", userId))
+        .order("desc")
+        .collect(),
+      income: await ctx.db
+        .query("transactions")
+        .withIndex("by_userId_type", (q) =>
+          q.eq("userId", userId).eq("type", "income"),
+        )
+        .order("desc")
+        .collect(),
+      expense: await ctx.db
+        .query("transactions")
+        .withIndex("by_userId_type", (q) =>
+          q.eq("userId", userId).eq("type", "expense"),
+        )
+        .order("desc")
+        .collect(),
     };
   },
 });
@@ -48,8 +78,7 @@ export const listAllVariants = query({
 export const getById = query({
   args: { id: v.id("transactions") },
   handler: async (ctx, args) => {
-    const userId = await getUserId(ctx);
-    if (!userId) return null;
+    const userId = await requireUserId(ctx);
 
     const transaction = await ctx.db.get(args.id);
     if (!transaction || transaction.userId !== userId) {
@@ -66,7 +95,13 @@ export const getById = query({
 export const groupByDate = query({
   args: {},
   handler: async (ctx) => {
-    const transactions = await getUserTransactions(ctx);
+    const userId = await requireUserId(ctx);
+
+    const transactions = await ctx.db
+      .query("transactions")
+      .withIndex("by_userId", (q) => q.eq("userId", userId))
+      .order("desc")
+      .collect();
 
     transactions.sort((a, b) => b.transactionTime - a.transactionTime);
 
@@ -87,7 +122,13 @@ export const groupByDate = query({
 export const groupByMonth = query({
   args: {},
   handler: async (ctx) => {
-    const transactions = await getUserTransactions(ctx);
+    const userId = await requireUserId(ctx);
+
+    const transactions = await ctx.db
+      .query("transactions")
+      .withIndex("by_userId", (q) => q.eq("userId", userId))
+      .order("desc")
+      .collect();
 
     const grouped = transactions.reduce((acc, txn) => {
       const date = new Date(txn.transactionTime);
@@ -107,7 +148,13 @@ export const groupByMonth = query({
 export const groupByCategory = query({
   args: {},
   handler: async (ctx) => {
-    const transactions = await getUserTransactions(ctx);
+    const userId = await requireUserId(ctx);
+
+    const transactions = await ctx.db
+      .query("transactions")
+      .withIndex("by_userId", (q) => q.eq("userId", userId))
+      .order("desc")
+      .collect();
 
     transactions.sort((a, b) => b.transactionTime - a.transactionTime);
 

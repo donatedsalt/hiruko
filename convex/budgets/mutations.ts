@@ -2,16 +2,18 @@ import { v } from "convex/values";
 
 import { mutation } from "@/convex/_generated/server";
 
-import { getUserId } from "@/convex/utils/auth";
+import { requireUserId } from "@/convex/utils/auth";
 
+/**
+ * Create a budget.
+ */
 export const createBudget = mutation({
   args: {
     name: v.string(),
     amount: v.number(),
   },
   handler: async (ctx, { name, amount }) => {
-    const userId = await getUserId(ctx);
-    if (!userId) return [];
+    const userId = await requireUserId(ctx);
 
     return await ctx.db.insert("budgets", {
       userId,
@@ -24,7 +26,7 @@ export const createBudget = mutation({
 });
 
 /**
- * Update an budget.
+ * Update a budget.
  */
 export const update = mutation({
   args: {
@@ -33,8 +35,7 @@ export const update = mutation({
     amount: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
-    const userId = await getUserId(ctx);
-    if (!userId) return [];
+    const userId = await requireUserId(ctx);
 
     const budget = await ctx.db.get(args.id);
     if (!budget || budget.userId !== userId) {
@@ -51,13 +52,12 @@ export const update = mutation({
 });
 
 /**
- * Delete an budget and remove budgetId from all associated transactions.
+ * Delete a budget and remove budgetId from all associated transactions.
  */
 export const remove = mutation({
   args: { id: v.id("budgets") },
   handler: async (ctx, args) => {
-    const userId = await getUserId(ctx);
-    if (!userId) return { success: false, reason: "unauthorized" };
+    const userId = await requireUserId(ctx);
 
     const budget = await ctx.db.get(args.id);
     if (!budget || budget.userId !== userId) {

@@ -4,7 +4,7 @@ import { mutation } from "@/convex/_generated/server";
 
 import { CategoryId } from "@/types/convex";
 
-import { getUserId } from "@/convex/utils/auth";
+import { requireUserId } from "@/convex/utils/auth";
 
 /**
  * Create a new account.
@@ -15,8 +15,7 @@ export const create = mutation({
     balance: v.number(),
   },
   handler: async (ctx, args) => {
-    const userId = await getUserId(ctx);
-    if (!userId) return [];
+    const userId = await requireUserId(ctx);
 
     const now = Date.now();
 
@@ -34,7 +33,7 @@ export const create = mutation({
       const category = await ctx.db
         .query("categories")
         .withIndex("by_userId_name", (q) =>
-          q.eq("userId", userId).eq("name", categoryName)
+          q.eq("userId", userId).eq("name", categoryName),
         )
         .unique();
 
@@ -95,8 +94,7 @@ export const update = mutation({
     balance: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
-    const userId = await getUserId(ctx);
-    if (!userId) return [];
+    const userId = await requireUserId(ctx);
 
     const account = await ctx.db.get(args.id);
     if (!account || account.userId !== userId) {
@@ -124,7 +122,7 @@ export const update = mutation({
       const category = await ctx.db
         .query("categories")
         .withIndex("by_userId_name", (q) =>
-          q.eq("userId", userId).eq("name", categoryName)
+          q.eq("userId", userId).eq("name", categoryName),
         )
         .unique();
 
@@ -172,8 +170,7 @@ export const update = mutation({
 export const remove = mutation({
   args: { id: v.id("accounts") },
   handler: async (ctx, args) => {
-    const userId = await getUserId(ctx);
-    if (!userId) return [];
+    const userId = await requireUserId(ctx);
 
     const account = await ctx.db.get(args.id);
     if (!account || account.userId !== userId) {

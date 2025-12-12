@@ -5,13 +5,13 @@ list of todos
 ## Todo
 
 - [ ] fix invalid date error
+- [ ] use sorted data from convex in data list
 - [ ] give the AI access to user data (e.g., income, expenses, balance) after asking permission to improve AI response
 - [ ] market tracking (e.g., crypto, stocks, gold, currencies)
 - [ ] settings page
 - [ ] checkbox to disable or enable deletion conformation in settings
-- [ ] take image of receipts to automatically add transactions
 - [ ] premium features like family budgets and goals tracking
-- [ ] use sorted data from convex in data list
+- [ ] take image of receipts to automatically add transactions
 
 ## Done
 

@@ -2,7 +2,7 @@ import { v } from "convex/values";
 
 import { mutation } from "@/convex/_generated/server";
 
-import { getUserId } from "@/convex/utils/auth";
+import { requireUserId } from "@/convex/utils/auth";
 import { adjustAccount } from "@/convex/utils/db/accounts";
 
 /**
@@ -21,8 +21,7 @@ export const create = mutation({
     transactionTime: v.number(),
   },
   handler: async (ctx, args) => {
-    const userId = await getUserId(ctx);
-    if (!userId) return [];
+    const userId = await requireUserId(ctx);
 
     const account = await ctx.db.get(args.accountId);
     if (!account || account.userId !== userId) {
@@ -107,8 +106,7 @@ export const update = mutation({
     }),
   },
   handler: async (ctx, { id, updates }) => {
-    const userId = await getUserId(ctx);
-    if (!userId) return [];
+    const userId = await requireUserId(ctx);
 
     const transaction = await ctx.db.get(id);
     if (!transaction || transaction.userId !== userId) {
@@ -247,8 +245,7 @@ export const update = mutation({
 export const remove = mutation({
   args: { id: v.id("transactions") },
   handler: async (ctx, { id }) => {
-    const userId = await getUserId(ctx);
-    if (!userId) return [];
+    const userId = await requireUserId(ctx);
 
     const transaction = await ctx.db.get(id);
     if (!transaction || transaction.userId !== userId) {
@@ -274,7 +271,7 @@ export const remove = mutation({
         transactionCount: Math.max(category.transactionCount - 1, 0),
         transactionAmount: Math.max(
           category.transactionAmount - transaction.amount,
-          0
+          0,
         ),
       });
     }

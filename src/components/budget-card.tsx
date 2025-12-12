@@ -115,7 +115,7 @@ export function BudgetCard({ budget }: { budget: Budget }) {
       <DialogTrigger asChild>
         <Card
           key={budget._id}
-          className="justify-center gap-3 p-6 shadow-xs cursor-pointer select-none min-h-36 shrink-0 from-primary/5 to-card dark:bg-card bg-gradient-to-t"
+          className="justify-center gap-3 p-6 shadow-xs cursor-pointer select-none min-h-36 shrink-0 from-primary/5 to-card dark:bg-card bg-linear-to-t"
         >
           <CardHeader className="@container-normal">
             <CardTitle className="text-xl font-semibold text-muted-foreground">

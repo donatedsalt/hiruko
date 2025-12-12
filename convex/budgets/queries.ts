@@ -1,12 +1,11 @@
 import { query } from "@/convex/_generated/server";
-import { getUserId } from "@/convex/utils/auth";
+import { requireUserId } from "@/convex/utils/auth";
 
 /**
  * Get all budgets for the authenticated user.
  */
 export const list = query(async (ctx) => {
-  const userId = await getUserId(ctx);
-  if (!userId) return [];
+  const userId = await requireUserId(ctx);
 
   return await ctx.db
     .query("budgets")
