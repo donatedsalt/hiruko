@@ -39,7 +39,7 @@ export default function Page() {
   const budgets = useQuery(api.budgets.queries.list);
   const budLoading = budgets === undefined;
   const goals = useQuery(api.goals.queries.list);
-  const goalLoading = budgets === undefined;
+  const goalLoading = goals === undefined;
 
   const createTransaction = useMutation(api.transactions.mutations.create);
   const createDefaults = useMutation(
