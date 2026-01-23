@@ -76,9 +76,9 @@ export function BudgetCard({ budget }: { budget: Budget }) {
       toast.success("Budget updated");
       form.reset();
       setOpen(false);
-    } catch (err: any) {
+    } catch (err) {
       toast.error("Something went wrong!", {
-        description: err.message,
+        description: err instanceof Error ? err.message : "Unknown error",
       });
     } finally {
       setIsSubmitting(false);
@@ -92,9 +92,9 @@ export function BudgetCard({ budget }: { budget: Budget }) {
       await deleteBudget({ id: budget._id });
       toast.success("Budget deleted");
       setOpen(false);
-    } catch (err: any) {
+    } catch (err) {
       toast.error("Something went wrong!", {
-        description: err.message,
+        description: err instanceof Error ? err.message : "Unknown error",
       });
     } finally {
       setIsSubmitting(false);
@@ -263,11 +263,11 @@ export function AddBudgetCard() {
     const name = formData.get("name") as string;
     const amount = parseFloat(formData.get("amount") as string);
 
-    const payload = { name, balance: amount };
+    const payload = { name, amount };
 
     const result = BudgetSchema.omit({
       userId: true,
-      saved: true,
+      spent: true,
       transactionCount: true,
     }).safeParse(payload);
 
@@ -283,9 +283,9 @@ export function AddBudgetCard() {
       toast.success("Budget added");
       form.reset();
       setOpen(false);
-    } catch (err: any) {
+    } catch (err) {
       toast.error("Something went wrong!", {
-        description: err.message,
+        description: err instanceof Error ? err.message : "Unknown error",
       });
     } finally {
       setIsSubmitting(false);
