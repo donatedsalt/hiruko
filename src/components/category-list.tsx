@@ -73,7 +73,7 @@ export function CategoryList({
       defaultValue="all"
       className="flex-col justify-start w-full gap-4 md:gap-6"
     >
-      <div className="px-4 lg:px-6">
+      <div>
         <TabsList>
           <TabsTrigger value="all">All</TabsTrigger>
           <TabsTrigger value="income">Income</TabsTrigger>
@@ -82,7 +82,7 @@ export function CategoryList({
       </div>
 
       {/* All */}
-      <TabsContent value="all" className="flex flex-col px-4 lg:px-6">
+      <TabsContent value="all" className="flex flex-col">
         {Data.length ? (
           <RenderList categories={Data} />
         ) : (
@@ -91,7 +91,7 @@ export function CategoryList({
       </TabsContent>
 
       {/* Income */}
-      <TabsContent value="income" className="flex flex-col px-4 lg:px-6">
+      <TabsContent value="income" className="flex flex-col">
         {incomeData && incomeData.length ? (
           <RenderList categories={incomeData} />
         ) : (
@@ -100,7 +100,7 @@ export function CategoryList({
       </TabsContent>
 
       {/* Expense */}
-      <TabsContent value="expense" className="flex flex-col px-4 lg:px-6">
+      <TabsContent value="expense" className="flex flex-col">
         {expenseData && expenseData.length ? (
           <RenderList categories={expenseData} />
         ) : (
@@ -114,10 +114,10 @@ export function CategoryList({
 export function CategoryListSkeleton() {
   return (
     <div className="flex flex-col justify-start w-full gap-4 md:gap-6">
-      <div className="px-4 lg:px-6">
+      <div>
         <Skeleton className="h-8 w-42" />
       </div>
-      <div className="px-4 lg:px-6">
+      <div>
         <ul className="grid gap-4">
           {[...Array(4)].map((_, i) => (
             <ListItemSkeleton key={i} />

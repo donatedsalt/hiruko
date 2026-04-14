@@ -29,9 +29,8 @@ export default function GoalsPage() {
           ) : (
             goals.map((goal: Goal) => <GoalCard key={goal._id} goal={goal} />)
           )}
-          {!loading && goals?.length % 2 ? <AddGoalCard /> : null}
+          {!loading && <AddGoalCard />}
         </div>
-        {loading || !(goals?.length % 2) ? <AddGoalCard /> : null}
       </div>
     </>
   );

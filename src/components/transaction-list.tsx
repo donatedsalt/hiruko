@@ -125,7 +125,7 @@ export function TransactionList({
       defaultValue="all"
       className="flex-col justify-start w-full gap-4 md:gap-6"
     >
-      <div className="px-4 lg:px-6">
+      <div>
         <TabsList>
           <TabsTrigger value="all">All</TabsTrigger>
           <TabsTrigger value="income">Income</TabsTrigger>
@@ -134,7 +134,7 @@ export function TransactionList({
       </div>
 
       {/* All */}
-      <TabsContent value="all" className="flex flex-col px-4 lg:px-6">
+      <TabsContent value="all" className="flex flex-col">
         {allData.length ? (
           <RenderGroupedList transactions={allData} categories={categories} />
         ) : (
@@ -143,7 +143,7 @@ export function TransactionList({
       </TabsContent>
 
       {/* Income */}
-      <TabsContent value="income" className="flex flex-col px-4 lg:px-6">
+      <TabsContent value="income" className="flex flex-col">
         {incomeData.length ? (
           <RenderGroupedList
             transactions={incomeData}
@@ -155,7 +155,7 @@ export function TransactionList({
       </TabsContent>
 
       {/* Expense */}
-      <TabsContent value="expense" className="flex flex-col px-4 lg:px-6">
+      <TabsContent value="expense" className="flex flex-col">
         {expenseData.length ? (
           <RenderGroupedList
             transactions={expenseData}
@@ -172,10 +172,10 @@ export function TransactionList({
 export function TransactionListSkeleton() {
   return (
     <div className="flex flex-col justify-start w-full gap-4 md:gap-6">
-      <div className="px-4 lg:px-6">
+      <div>
         <Skeleton className="h-8 w-42" />
       </div>
-      <div className="flex flex-col px-4 lg:px-6">
+      <div className="flex flex-col">
         <Skeleton className="w-32 h-4 my-3" />
         <ul className="grid gap-4">
           {[...Array(4)].map((_, i) => (

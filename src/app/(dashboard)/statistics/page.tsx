@@ -25,11 +25,11 @@ export default function Page() {
   return (
     <>
       <SiteHeader title="Statistics" />
-      <div className="@container/main flex flex-col flex-1 gap-4 py-4 md:gap-6 md:py-6">
+      <div className="@container/main flex flex-col flex-1 gap-4 p-4 md:gap-6 md:p-6">
         {loading ? (
           <ChartPieSkeleton />
         ) : categories ? (
-          <div className="grid grid-cols-1 gap-4 px-4 md:gap-6 lg:grid-cols-2 lg:px-6">
+          <div className="grid grid-cols-1 gap-4 md:gap-6 lg:grid-cols-2">
             <ChartPie title={"Income by Category"} categories={incCats} />
             <ChartPie title={"Expense by Category"} categories={expCats} />
           </div>
