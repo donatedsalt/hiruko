@@ -24,7 +24,7 @@ export function FloatingButtons() {
   return (
     <div className="fixed z-50 flex flex-col items-end gap-4 bottom-4 md:bottom-6 right-4 md:right-6">
       <Button floating asChild>
-        <Link href="/transactions/new">
+        <Link href="/transactions/new" aria-label="Add transaction">
           <IconCirclePlusFilled className="!size-6" />
         </Link>
       </Button>

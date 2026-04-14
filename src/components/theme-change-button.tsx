@@ -31,7 +31,7 @@ export function ThemeChangeButton({
             <span>Change theme</span>
           </SidebarMenuButton>
         ) : (
-          <Button variant={"outline"} size={"icon"}>
+          <Button variant={"outline"} size={"icon"} aria-label="Change theme">
             <IconSun className="icon-sun h-[1.2rem] w-[1.2rem] dark:hidden" />
             <IconMoon className="icon-moon hidden h-[1.2rem] w-[1.2rem] dark:block" />
           </Button>

@@ -47,7 +47,6 @@ list of todos
 - [ ] page padding inconsistent: `py-4 md:py-6` vs `p-4 md:p-6`; tabs add their own `px-4 lg:px-6` — consolidate at page wrapper
 - [ ] add-card jumps between in-grid and full-width based on count parity — `src/app/(dashboard)/{budgets,goals}/page.tsx`
 - [ ] income uses raw `text-emerald-500` (not a token) and color is the only signal in some places — promote to `--color-success`/`text-success` — `transaction-list.tsx`, `category-list.tsx`, `category-dialog.tsx:188`
-- [ ] floating "+" and `ThemeChangeButton` icon-only — add `aria-label` — `src/components/{floating-buttons,theme-change-button}.tsx`
 - [ ] edit page "Cancel" reads the same in view + edit modes; doesn't discard dirty state — `src/app/(dashboard)/transactions/[id]/page.tsx:502-528`
 - [ ] `ListItem` div branch (category-list) has no hover/focus/cursor styling despite being clickable — `src/components/{list-item,category-list}.tsx`
 - [ ] `chart-area-interactive.tsx:147-229` hard-codes hex fallbacks (`#22c55e`/`#ef4444`/`#000`) — drop fallbacks
@@ -77,3 +76,4 @@ list of todos
 - [x] clamp budget/goal Progress with `Math.min(100, ...)`
 - [x] fix `AddGoalCard` payload using wrong field (`balance` → `amount`)
 - [x] sidebar active-route highlighting + nav-main `asChild` link wiring
+- [x] add `aria-label` to icon-only floating add button and theme toggle
