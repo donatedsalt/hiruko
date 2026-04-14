@@ -12,40 +12,41 @@ interface ListItemProps {
   amount?: React.ReactNode | string;
 }
 
+const itemRowClass =
+  "flex items-center justify-between gap-2 -mx-2 px-2 py-1 rounded-md cursor-pointer transition-colors hover:bg-accent focus-visible:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring";
+
+function ItemBody({ icon, title, badge, amount }: Omit<ListItemProps, "href">) {
+  return (
+    <>
+      <div className="flex items-center gap-2">
+        <Avatar className="items-center justify-center border size-12">
+          {icon}
+        </Avatar>
+        <div>
+          <h3 className="font-semibold">{title}</h3>
+          {badge && <Badge variant={"outline"}>{badge}</Badge>}
+        </div>
+      </div>
+      {amount && <div className="text-lg font-semibold">{amount}</div>}
+    </>
+  );
+}
+
 export function ListItem({ href, icon, title, badge, amount }: ListItemProps) {
   if (href) {
     return (
       <li>
-        <Link href={href} className="flex items-center justify-between gap-2">
-          <div className="flex items-center gap-2">
-            <Avatar className="items-center justify-center border size-12">
-              {icon}
-            </Avatar>
-            <div>
-              <h3 className="font-semibold">{title}</h3>
-              {badge && <Badge variant={"outline"}>{badge}</Badge>}
-            </div>
-          </div>
-          {amount && <div className="text-lg font-semibold">{amount}</div>}
+        <Link href={href} className={itemRowClass}>
+          <ItemBody icon={icon} title={title} badge={badge} amount={amount} />
         </Link>
       </li>
     );
-  } else {
-    return (
-      <li className="flex items-center justify-between gap-2">
-        <div className="flex items-center gap-2">
-          <Avatar className="items-center justify-center border size-12">
-            {icon}
-          </Avatar>
-          <div>
-            <h3 className="font-semibold">{title}</h3>
-            {badge && <Badge variant={"outline"}>{badge}</Badge>}
-          </div>
-        </div>
-        {amount && <div className="text-lg font-semibold">{amount}</div>}
-      </li>
-    );
   }
+  return (
+    <li className={itemRowClass} tabIndex={0}>
+      <ItemBody icon={icon} title={title} badge={badge} amount={amount} />
+    </li>
+  );
 }
 
 export function EmptyState({ text }: { text: string }) {

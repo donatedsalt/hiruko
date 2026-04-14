@@ -41,8 +41,6 @@ list of todos
 
 ## UI / Design
 
-- [ ] edit page "Cancel" reads the same in view + edit modes; doesn't discard dirty state — `src/app/(dashboard)/transactions/[id]/page.tsx:502-528`
-- [ ] `ListItem` div branch (category-list) has no hover/focus/cursor styling despite being clickable — `src/components/{list-item,category-list}.tsx`
 
 ## Done
 
@@ -76,3 +74,5 @@ list of todos
 - [x] add `--success` token; replace raw `text-emerald-500`/`bg-emerald-500` with `text-success`/`bg-success`
 - [x] AddBudget/AddGoal dialog form parity (DialogFooter, Cancel, asterisks, name attrs, missing isSubmitting reset)
 - [x] consult page: flex-1 conversation height, real animation-delay on dots, isLoading reset only after stream completes
+- [x] transactions edit: button reads "Discard" while editing; drop the `Button asChild` wrapping a button
+- [x] `ListItem` rows have hover background, cursor, and focus-visible ring

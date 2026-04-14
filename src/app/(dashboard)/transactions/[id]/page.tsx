@@ -512,18 +512,15 @@ export default function Page() {
                 }}
                 disabled={isSubmitting}
               >
-                Cancel
+                {isEditing ? "Discard" : "Cancel"}
               </Button>
               {isEditing ? (
                 <Button type="submit" disabled={isSubmitting}>
                   Save changes
                 </Button>
               ) : (
-                // idk whats wrong with this but it doesnt work normally
-                <Button asChild>
-                  <button type="button" onClick={() => setIsEditing(true)}>
-                    Enable Editing
-                  </button>
+                <Button type="button" onClick={() => setIsEditing(true)}>
+                  Enable Editing
                 </Button>
               )}
             </div>
