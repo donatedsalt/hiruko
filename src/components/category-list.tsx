@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 
 import { Skeleton } from "@/components/ui/skeleton";
 import { CategoryDialog } from "@/components/category-dialog";
-import { ListItem, ListItemSkeleton } from "@/components/list-item";
+import { EmptyState, ListItem, ListItemSkeleton } from "@/components/list-item";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 function RenderList({ categories }: { categories: Category[] }) {
@@ -66,7 +66,7 @@ export function CategoryList({
     setExpenseData(expenseCat);
   }, [Data, loading]);
 
-  if (loading) return <DataListSkeleton />;
+  if (loading) return <CategoryListSkeleton />;
 
   return (
     <Tabs
@@ -111,15 +111,7 @@ export function CategoryList({
   );
 }
 
-function EmptyState({ text }: { text: string }) {
-  return (
-    <div className="grid border border-dashed rounded-lg place-items-center aspect-video">
-      <p className="text-xl font-semibold">{text}</p>
-    </div>
-  );
-}
-
-export function DataListSkeleton() {
+export function CategoryListSkeleton() {
   return (
     <div className="flex flex-col justify-start w-full gap-4 md:gap-6">
       <div className="px-4 lg:px-6">

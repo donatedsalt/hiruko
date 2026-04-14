@@ -42,14 +42,12 @@ list of todos
 ## UI / Design
 
 - [ ] consult page: fixed `height: 500px`; loading-dot `delay-75/150` are *transition* delays not animation; `setIsLoading(false)` runs in per-token finally — `src/app/(dashboard)/consult/page.tsx:98,114-118,82`
-- [ ] two `DataListSkeleton` exports with same name — `src/components/{transaction,category}-list.tsx`
 - [ ] add-budget/goal dialog forms diverge from edit forms (no Cancel, no required asterisks, different spacing) — `src/components/{budget,goal}-card.tsx:298-345`
 - [ ] page padding inconsistent: `py-4 md:py-6` vs `p-4 md:p-6`; tabs add their own `px-4 lg:px-6` — consolidate at page wrapper
 - [ ] add-card jumps between in-grid and full-width based on count parity — `src/app/(dashboard)/{budgets,goals}/page.tsx`
 - [ ] income uses raw `text-emerald-500` (not a token) and color is the only signal in some places — promote to `--color-success`/`text-success` — `transaction-list.tsx`, `category-list.tsx`, `category-dialog.tsx:188`
 - [ ] edit page "Cancel" reads the same in view + edit modes; doesn't discard dirty state — `src/app/(dashboard)/transactions/[id]/page.tsx:502-528`
 - [ ] `ListItem` div branch (category-list) has no hover/focus/cursor styling despite being clickable — `src/components/{list-item,category-list}.tsx`
-- [ ] duplicate `EmptyState` between transaction-list and category-list — extract
 
 ## Done
 
@@ -77,3 +75,4 @@ list of todos
 - [x] rename `CateogryList` → `CategoryList`
 - [x] drop hex fallbacks on chart CSS vars
 - [x] `ErrorMessage` shows the actual error message as the heading
+- [x] extract shared `EmptyState`; rename duplicate `DataListSkeleton` → `TransactionListSkeleton`/`CategoryListSkeleton`

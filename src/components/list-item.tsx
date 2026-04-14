@@ -48,6 +48,14 @@ export function ListItem({ href, icon, title, badge, amount }: ListItemProps) {
   }
 }
 
+export function EmptyState({ text }: { text: string }) {
+  return (
+    <div className="grid border border-dashed rounded-lg place-items-center aspect-video">
+      <p className="text-xl font-semibold">{text}</p>
+    </div>
+  );
+}
+
 export function ListItemSkeleton() {
   return (
     <li className="flex items-center justify-between gap-2">

@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ListItem, ListItemSkeleton } from "./list-item";
+import { EmptyState, ListItem, ListItemSkeleton } from "./list-item";
 
 // TODO: use the already defined groupByDay convex function
 function groupByDay(transactions: Transaction[]) {
@@ -118,7 +118,7 @@ export function TransactionList({
   categories: Category[];
   loading?: boolean;
 }) {
-  if (loading) return <DataListSkeleton />;
+  if (loading) return <TransactionListSkeleton />;
 
   return (
     <Tabs
@@ -169,15 +169,7 @@ export function TransactionList({
   );
 }
 
-function EmptyState({ text }: { text: string }) {
-  return (
-    <div className="grid border border-dashed rounded-lg place-items-center aspect-video">
-      <p className="text-xl font-semibold">{text}</p>
-    </div>
-  );
-}
-
-export function DataListSkeleton() {
+export function TransactionListSkeleton() {
   return (
     <div className="flex flex-col justify-start w-full gap-4 md:gap-6">
       <div className="px-4 lg:px-6">

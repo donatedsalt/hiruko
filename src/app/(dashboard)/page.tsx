@@ -9,7 +9,7 @@ import {
 } from "@/components/chart-area-interactive";
 import {
   TransactionList,
-  DataListSkeleton,
+  TransactionListSkeleton,
 } from "@/components/transaction-list";
 import { AccountsCards } from "@/components/accounts-cards";
 import { ErrorMessage } from "@/components/error-message";
@@ -29,7 +29,7 @@ export default function Page() {
         {loading ? (
           <>
             <ChartAreaInteractiveSkeleton />
-            <DataListSkeleton />
+            <TransactionListSkeleton />
           </>
         ) : transactions && categories ? (
           <>

@@ -7,7 +7,7 @@ import { SiteHeader } from "@/components/site-header";
 import { ErrorMessage } from "@/components/error-message";
 import {
   TransactionList,
-  DataListSkeleton,
+  TransactionListSkeleton,
 } from "@/components/transaction-list";
 
 export default function Page() {
@@ -20,7 +20,7 @@ export default function Page() {
       <SiteHeader title="Transactions" />
       <div className="@container/main flex flex-col flex-1 gap-4 py-4 md:gap-6 md:py-6">
         {loading ? (
-          <DataListSkeleton />
+          <TransactionListSkeleton />
         ) : transactions && categories ? (
           <TransactionList
             allData={transactions.all}
