@@ -28,7 +28,7 @@ function RenderList({ categories }: { categories: Category[] }) {
                       className={cn(
                         "flex items-center [&>svg]:size-4",
                         category.type === "income"
-                          ? "text-emerald-500"
+                          ? "text-success"
                           : "text-destructive"
                       )}
                     >

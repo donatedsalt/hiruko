@@ -185,7 +185,7 @@ export function CategoryDialog({
                 <ToggleGroupItem
                   value="income"
                   aria-label="Toggle income"
-                  className="border dark:bg-input/30 data-[state=on]:bg-emerald-500! text-foreground"
+                  className="border dark:bg-input/30 data-[state=on]:bg-success! text-foreground"
                 >
                   <IconCaretUpFilled />
                   <span>Income</span>
