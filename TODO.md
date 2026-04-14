@@ -39,6 +39,27 @@ list of todos
 
 - [ ] middleware treats `/manifest.webmanifest` and icon paths as protected — breaks PWA install previews — `src/middleware.ts:3`
 
+## UI / Design
+
+- [ ] budget/goal cards render `${value}` raw — no thousands/decimals; AccountCard uses Intl. Inconsistent display — `src/components/{budget,goal}-card.tsx:126-138`
+- [ ] `Math.min((spent / amount) * 100)` is a no-op; Progress overflows past 100% — `src/components/{budget,goal}-card.tsx:131`
+- [ ] `AddGoalCard` sends `{ name, balance: amount }` — schema expects `amount`. Goal create silently broken — `src/components/goal-card.tsx:266`
+- [ ] consult page: fixed `height: 500px`; loading-dot `delay-75/150` are *transition* delays not animation; `setIsLoading(false)` runs in per-token finally — `src/app/(dashboard)/consult/page.tsx:98,114-118,82`
+- [ ] two `DataListSkeleton` exports with same name — `src/components/{transaction,category}-list.tsx`
+- [ ] add-budget/goal dialog forms diverge from edit forms (no Cancel, no required asterisks, different spacing) — `src/components/{budget,goal}-card.tsx:298-345`
+- [ ] page padding inconsistent: `py-4 md:py-6` vs `p-4 md:p-6`; tabs add their own `px-4 lg:px-6` — consolidate at page wrapper
+- [ ] add-card jumps between in-grid and full-width based on count parity — `src/app/(dashboard)/{budgets,goals}/page.tsx`
+- [ ] income uses raw `text-emerald-500` (not a token) and color is the only signal in some places — promote to `--color-success`/`text-success` — `transaction-list.tsx`, `category-list.tsx`, `category-dialog.tsx:188`
+- [ ] floating "+" and `ThemeChangeButton` icon-only — add `aria-label` — `src/components/{floating-buttons,theme-change-button}.tsx`
+- [ ] `nav-main.tsx` wraps `SidebarMenuButton` in `<Link>` (nested `<a><button>`); use `asChild` like `nav-secondary` — `src/components/nav-main.tsx:42-49`
+- [ ] sidebar has no active-route highlight — pass `isActive={pathname === item.url}` to `SidebarMenuButton` — `src/components/{nav-main,nav-secondary}.tsx`
+- [ ] edit page "Cancel" reads the same in view + edit modes; doesn't discard dirty state — `src/app/(dashboard)/transactions/[id]/page.tsx:502-528`
+- [ ] `ListItem` div branch (category-list) has no hover/focus/cursor styling despite being clickable — `src/components/{list-item,category-list}.tsx`
+- [ ] `chart-area-interactive.tsx:147-229` hard-codes hex fallbacks (`#22c55e`/`#ef4444`/`#000`) — drop fallbacks
+- [ ] typo `CateogryList` — `src/components/category-list.tsx:49`
+- [ ] duplicate `EmptyState` between transaction-list and category-list — extract
+- [ ] `ErrorMessage` shows generic "Something went wrong" even when error string is specific — promote `error` to heading — `src/components/error-message.tsx:15-17`
+
 ## Done
 
 - [x] transaction view
