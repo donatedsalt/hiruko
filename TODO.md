@@ -12,6 +12,33 @@ list of todos
 - [ ] premium features like family budgets and goals tracking
 - [ ] take image of receipts to automatically add transactions
 
+## Bugs
+
+- [ ] edit form drops `goalId` (never read from FormData) and type-flip income↔expense can double-count budget — `convex/transactions/mutations.ts`, `src/app/(dashboard)/transactions/[id]/page.tsx`
+- [ ] budget/goal `transactionCount` not adjusted on transaction `update`; budget/goal `remove` doesn't reverse counters — `convex/{transactions,budgets,goals}/mutations.ts`
+- [ ] `accounts.remove` and `categories.remove` cascade-delete transactions without reversing budget/goal/category counters — `convex/{accounts,categories}/mutations.ts`
+- [ ] `accounts.update` balance-correction bypasses `adjustAccount` and overwrites balance non-atomically — `convex/accounts/mutations.ts:107-160`
+- [ ] typo: `goalLoading = budgets === undefined` (and `budLoading` swap) — `src/app/(dashboard)/transactions/[id]/page.tsx:69,376`
+- [ ] `groupByDate` keys by UTC day → non-UTC users see transactions in wrong bucket — `convex/transactions/queries.ts:106`
+- [ ] `validation/budget.ts` uses `.positive()` on `spent` — rejects legal value `0`
+- [ ] `useSmartRouter` returns unbound `router.back/forward` — can throw — `src/hooks/use-smart-router.ts:23-31`
+
+## Latent / perf
+
+- [ ] race on denormalized counters: handlers read account/category/budget/goal early then patch after many awaits — re-fetch right before patch
+- [ ] `listAllVariants` + `groupBy*` `.collect()` entire tables on every dashboard mount — paginate or aggregate
+- [ ] `createDefaultCategories` called from a form `useEffect` with no uniqueness guard → can create duplicates — `convex/categories/mutations.ts`, `src/app/(dashboard)/transactions/new/page.tsx:81-85`
+
+## Security
+
+- [ ] `/api/chat` has no auth, rate limit, or input validation — anyone can drain Gemini key — `src/app/api/chat/route.ts`
+- [ ] `next.config.ts` is empty — add CSP / security headers, `poweredByHeader: false`
+- [ ] `HistoryTracker` localStorage key not namespaced per user — paths leak between accounts after sign-out — `src/components/history-tracker.tsx`
+
+## UX
+
+- [ ] middleware treats `/manifest.webmanifest` and icon paths as protected — breaks PWA install previews — `src/middleware.ts:3`
+
 ## Done
 
 - [x] transaction view
