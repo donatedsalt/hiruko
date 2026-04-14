@@ -49,10 +49,7 @@ list of todos
 - [ ] income uses raw `text-emerald-500` (not a token) and color is the only signal in some places — promote to `--color-success`/`text-success` — `transaction-list.tsx`, `category-list.tsx`, `category-dialog.tsx:188`
 - [ ] edit page "Cancel" reads the same in view + edit modes; doesn't discard dirty state — `src/app/(dashboard)/transactions/[id]/page.tsx:502-528`
 - [ ] `ListItem` div branch (category-list) has no hover/focus/cursor styling despite being clickable — `src/components/{list-item,category-list}.tsx`
-- [ ] `chart-area-interactive.tsx:147-229` hard-codes hex fallbacks (`#22c55e`/`#ef4444`/`#000`) — drop fallbacks
-- [ ] typo `CateogryList` — `src/components/category-list.tsx:49`
 - [ ] duplicate `EmptyState` between transaction-list and category-list — extract
-- [ ] `ErrorMessage` shows generic "Something went wrong" even when error string is specific — promote `error` to heading — `src/components/error-message.tsx:15-17`
 
 ## Done
 
@@ -77,3 +74,6 @@ list of todos
 - [x] fix `AddGoalCard` payload using wrong field (`balance` → `amount`)
 - [x] sidebar active-route highlighting + nav-main `asChild` link wiring
 - [x] add `aria-label` to icon-only floating add button and theme toggle
+- [x] rename `CateogryList` → `CategoryList`
+- [x] drop hex fallbacks on chart CSS vars
+- [x] `ErrorMessage` shows the actual error message as the heading

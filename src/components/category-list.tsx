@@ -46,7 +46,7 @@ function RenderList({ categories }: { categories: Category[] }) {
   );
 }
 
-export function CateogryList({
+export function CategoryList({
   Data,
   loading,
 }: {

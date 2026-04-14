@@ -168,12 +168,12 @@ export function ChartAreaInteractive({ data }: { data: Transaction[] }) {
                 <linearGradient id="fillBalance" x1="0" y1="0" x2="0" y2="1">
                   <stop
                     offset="5%"
-                    stopColor="var(--color-primary, #000)"
+                    stopColor="var(--color-primary)"
                     stopOpacity={0.7}
                   />
                   <stop
                     offset="95%"
-                    stopColor="var(--color-primary, #000)"
+                    stopColor="var(--color-primary)"
                     stopOpacity={0.1}
                   />
                 </linearGradient>
@@ -226,7 +226,7 @@ export function ChartAreaInteractive({ data }: { data: Transaction[] }) {
                 dataKey="balance"
                 type="monotone"
                 fill="url(#fillBalance)"
-                stroke="var(--color-primary, #000)"
+                stroke="var(--color-primary)"
                 dot={false}
                 strokeWidth={2}
               />

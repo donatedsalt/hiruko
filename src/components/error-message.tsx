@@ -12,8 +12,12 @@ export const ErrorMessage: React.FC<ErrorMessageProps> = ({
 }) => {
   return (
     <div className={cn("text-center content-center min-h-64", className)}>
-      <p className="text-xl font-semibold">Something went wrong. 😞</p>
-      {error && <p className="text-sm text-destructive">{error}</p>}
+      <p className="text-xl font-semibold">
+        {error ?? "Something went wrong. 😞"}
+      </p>
+      {error && (
+        <p className="text-sm text-muted-foreground">Please try again.</p>
+      )}
     </div>
   );
 };

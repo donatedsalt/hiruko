@@ -5,7 +5,7 @@ import { api } from "@/convex/_generated/api";
 
 import { SiteHeader } from "@/components/site-header";
 import { ErrorMessage } from "@/components/error-message";
-import { CateogryList, DataListSkeleton } from "@/components/category-list";
+import { CategoryList, DataListSkeleton } from "@/components/category-list";
 
 export default function Page() {
   const categories = useQuery(api.categories.queries.list);
@@ -18,7 +18,7 @@ export default function Page() {
         {loading ? (
           <DataListSkeleton />
         ) : categories ? (
-          <CateogryList Data={categories} />
+          <CategoryList Data={categories} />
         ) : (
           <ErrorMessage error={"Failed to load categories"} />
         )}
