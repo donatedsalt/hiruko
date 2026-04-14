@@ -5,7 +5,6 @@ list of todos
 ## Todo
 
 - [ ] fix invalid date error
-- [ ] use sorted data from convex in data list
 - [ ] give the AI access to user data (e.g., income, expenses, balance) after asking permission to improve AI response
 - [ ] market tracking (e.g., crypto, stocks, gold, currencies)
 - [ ] settings page
@@ -30,3 +29,4 @@ list of todos
 - [x] add custom ~~brand~~ hiruko theme
 - [x] change lucide icons to tabler icons
 - [x] ~~[simple icons](https://simpleicons.org/) for using brand icons~~ use tabler brand icons instead
+- [x] use sorted data from convex in data list
