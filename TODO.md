@@ -41,7 +41,6 @@ list of todos
 
 ## UI / Design
 
-- [ ] consult page: fixed `height: 500px`; loading-dot `delay-75/150` are *transition* delays not animation; `setIsLoading(false)` runs in per-token finally — `src/app/(dashboard)/consult/page.tsx:98,114-118,82`
 - [ ] edit page "Cancel" reads the same in view + edit modes; doesn't discard dirty state — `src/app/(dashboard)/transactions/[id]/page.tsx:502-528`
 - [ ] `ListItem` div branch (category-list) has no hover/focus/cursor styling despite being clickable — `src/components/{list-item,category-list}.tsx`
 
@@ -76,3 +75,4 @@ list of todos
 - [x] always render Add card as last grid child (drop parity hack)
 - [x] add `--success` token; replace raw `text-emerald-500`/`bg-emerald-500` with `text-success`/`bg-success`
 - [x] AddBudget/AddGoal dialog form parity (DialogFooter, Cancel, asterisks, name attrs, missing isSubmitting reset)
+- [x] consult page: flex-1 conversation height, real animation-delay on dots, isLoading reset only after stream completes

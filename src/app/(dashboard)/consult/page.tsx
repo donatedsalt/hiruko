@@ -53,7 +53,10 @@ export default function Page() {
       body: JSON.stringify({ prompt: currentInput }),
     });
 
-    if (!res.body) return;
+    if (!res.body) {
+      setIsLoading(false);
+      return;
+    }
 
     const reader = res.body.getReader();
     const decoder = new TextDecoder();
@@ -61,27 +64,28 @@ export default function Page() {
     const assistantMessage = { from: "assistant" as const, content: "" };
     setMessages((prev) => [...prev, assistantMessage]);
 
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
+    try {
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
 
-      const chunk = decoder.decode(value, { stream: true });
-      const lines = chunk.split("\n").filter((l) => l.trim());
+        const chunk = decoder.decode(value, { stream: true });
+        const lines = chunk.split("\n").filter((l) => l.trim());
 
-      for (const line of lines) {
-        try {
-          const { token } = JSON.parse(line);
-          assistantMessage.content += token;
-          setMessages((prev) => {
-            const updated = [...prev];
-            updated[updated.length - 1] = { ...assistantMessage };
-            return updated;
-          });
-        } catch {
-        } finally {
-          setIsLoading(false);
+        for (const line of lines) {
+          try {
+            const { token } = JSON.parse(line);
+            assistantMessage.content += token;
+            setMessages((prev) => {
+              const updated = [...prev];
+              updated[updated.length - 1] = { ...assistantMessage };
+              return updated;
+            });
+          } catch {}
         }
       }
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -95,7 +99,7 @@ export default function Page() {
       <SiteHeader title="Consult" />
 
       <div className="@container/main flex flex-col flex-1 gap-4 p-4 md:gap-6 md:p-6">
-        <Conversation className="relative w-full" style={{ height: "500px" }}>
+        <Conversation className="relative w-full flex-1 min-h-0">
           <ConversationContent className="px-0">
             {messages.map((message, idx) => (
               <Message key={idx} from={message.from}>
@@ -113,8 +117,8 @@ export default function Page() {
                 <MessageContent>
                   <div className="flex space-x-1">
                     <span className="animate-bounce">.</span>
-                    <span className="animate-bounce delay-75">.</span>
-                    <span className="animate-bounce delay-150">.</span>
+                    <span className="animate-bounce [animation-delay:150ms]">.</span>
+                    <span className="animate-bounce [animation-delay:300ms]">.</span>
                   </div>
                 </MessageContent>
               </Message>
