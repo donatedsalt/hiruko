@@ -42,9 +42,6 @@ export default function Page() {
   const goalLoading = goals === undefined;
 
   const createTransaction = useMutation(api.transactions.mutations.create);
-  const createDefaults = useMutation(
-    api.categories.mutations.createDefaultCategories
-  );
 
   const [txnType, setTxnType] = useState<"income" | "expense">("expense");
   const [txnAccount, setTxnAccount] = useState<AccountId | "">("");
@@ -71,19 +68,6 @@ export default function Page() {
         setTxnAccount(accounts[0]?._id);
       }
 
-      const onlyBalanceCorrection =
-        categories.length > 0 &&
-        categories.length <= 2 &&
-        categories.every((cat) =>
-          cat.name.trim().toLowerCase().startsWith("balance correction")
-        );
-
-      if (categories.length === 0 || onlyBalanceCorrection) {
-        toast.info("No categories found. Creating defaults...");
-        createDefaults();
-        toastTriggered = true;
-      }
-
       if (categories.length > 0 && txnCategory === "") {
         setTxnCategory(categories[0]?._id);
         setTxnType(categories[0]?.type);
@@ -91,14 +75,7 @@ export default function Page() {
     }
 
     if (toastTriggered) toastShown.current = true;
-  }, [
-    accounts,
-    categories,
-    createDefaults,
-    smartRouter,
-    txnAccount,
-    txnCategory,
-  ]);
+  }, [accounts, categories, smartRouter, txnAccount, txnCategory]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
