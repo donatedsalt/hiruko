@@ -48,8 +48,6 @@ list of todos
 - [ ] add-card jumps between in-grid and full-width based on count parity — `src/app/(dashboard)/{budgets,goals}/page.tsx`
 - [ ] income uses raw `text-emerald-500` (not a token) and color is the only signal in some places — promote to `--color-success`/`text-success` — `transaction-list.tsx`, `category-list.tsx`, `category-dialog.tsx:188`
 - [ ] floating "+" and `ThemeChangeButton` icon-only — add `aria-label` — `src/components/{floating-buttons,theme-change-button}.tsx`
-- [ ] `nav-main.tsx` wraps `SidebarMenuButton` in `<Link>` (nested `<a><button>`); use `asChild` like `nav-secondary` — `src/components/nav-main.tsx:42-49`
-- [ ] sidebar has no active-route highlight — pass `isActive={pathname === item.url}` to `SidebarMenuButton` — `src/components/{nav-main,nav-secondary}.tsx`
 - [ ] edit page "Cancel" reads the same in view + edit modes; doesn't discard dirty state — `src/app/(dashboard)/transactions/[id]/page.tsx:502-528`
 - [ ] `ListItem` div branch (category-list) has no hover/focus/cursor styling despite being clickable — `src/components/{list-item,category-list}.tsx`
 - [ ] `chart-area-interactive.tsx:147-229` hard-codes hex fallbacks (`#22c55e`/`#ef4444`/`#000`) — drop fallbacks
@@ -78,3 +76,4 @@ list of todos
 - [x] format budget/goal card amounts via shared `formatCurrency` helper
 - [x] clamp budget/goal Progress with `Math.min(100, ...)`
 - [x] fix `AddGoalCard` payload using wrong field (`balance` → `amount`)
+- [x] sidebar active-route highlighting + nav-main `asChild` link wiring
