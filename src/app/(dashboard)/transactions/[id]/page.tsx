@@ -115,9 +115,10 @@ export default function Page() {
       toast.success("Transaction deleted");
       setOpen(false);
       smartRouter.replaceWithBack();
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Unknown error occurred";
       toast.error("Something went wrong!", {
-        description: err.message,
+        description: message,
       });
     } finally {
       setIsSubmitting(false);
@@ -178,9 +179,10 @@ export default function Page() {
       toast.success("Transaction updated");
       form.reset();
       smartRouter.back();
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Unknown error occurred";
       toast.error("Something went wrong!", {
-        description: err.message,
+        description: message,
       });
     } finally {
       setIsSubmitting(false);

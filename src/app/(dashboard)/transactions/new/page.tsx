@@ -131,9 +131,10 @@ export default function Page() {
       toast.success("Transaction added");
       form.reset();
       smartRouter.back();
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Unknown error occurred";
       toast.error("Something went wrong!", {
-        description: err.message,
+        description: message,
       });
     } finally {
       setIsSubmitting(false);

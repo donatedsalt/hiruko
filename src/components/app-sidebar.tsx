@@ -5,20 +5,16 @@ import Link from "next/link";
 import {
   IconCash,
   IconCategory2,
-  IconChartCandle,
   IconChartPie,
   IconCoin,
-  IconHelp,
   IconMessageCircleQuestion,
   IconMoneybag,
   IconPigMoney,
   IconReport,
   // IconSearch,
-  IconSettings,
 } from "@tabler/icons-react";
 
 import { NavMain } from "@/components/nav-main";
-import { NavBusinesses } from "@/components/nav-businesses";
 import { NavSecondary } from "@/components/nav-secondary";
 import { NavUser } from "@/components/nav-user";
 import {

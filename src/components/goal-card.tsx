@@ -77,9 +77,10 @@ export function GoalCard({ goal }: { goal: Goal }) {
       toast.success("Goal updated");
       form.reset();
       setOpen(false);
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Unknown error occurred";
       toast.error("Something went wrong!", {
-        description: err.message,
+        description: message,
       });
     } finally {
       setIsSubmitting(false);
@@ -93,9 +94,10 @@ export function GoalCard({ goal }: { goal: Goal }) {
       await deleteGoal({ id: goal._id });
       toast.success("Goal deleted");
       setOpen(false);
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Unknown error occurred";
       toast.error("Something went wrong!", {
-        description: err.message,
+        description: message,
       });
     } finally {
       setIsSubmitting(false);

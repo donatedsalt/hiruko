@@ -74,9 +74,10 @@ export function AccountCard({ account }: { account: Account }) {
       toast.success("Account updated");
       form.reset();
       setOpen(false);
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Unknown error occurred";
       toast.error("Something went wrong!", {
-        description: err.message,
+        description: message,
       });
     } finally {
       setIsSubmitting(false);
@@ -90,9 +91,10 @@ export function AccountCard({ account }: { account: Account }) {
       await deleteAccount({ id: account._id });
       toast.success("Account deleted");
       setOpen(false);
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Unknown error occurred";
       toast.error("Something went wrong!", {
-        description: err.message,
+        description: message,
       });
     } finally {
       setIsSubmitting(false);
@@ -271,9 +273,10 @@ export function AddAccountCard() {
       toast.success("Account added");
       form.reset();
       setOpen(false);
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Unknown error occurred";
       toast.error("Something went wrong!", {
-        description: err.message,
+        description: message,
       });
     } finally {
       setIsSubmitting(false);

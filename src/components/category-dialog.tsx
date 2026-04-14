@@ -89,9 +89,10 @@ export function CategoryDialog({
         setType("expense");
       }
       setOpen(false);
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Unknown error occurred";
       toast.error("Something went wrong!", {
-        description: err.message,
+        description: message,
       });
     } finally {
       setIsSubmitting(false);
@@ -105,9 +106,10 @@ export function CategoryDialog({
       await deleteCategory({ id: category!._id });
       toast.success("Category deleted");
       setOpen(false);
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Unknown error occurred";
       toast.error("Something went wrong!", {
-        description: err.message,
+        description: message,
       });
     } finally {
       setIsSubmitting(false);
