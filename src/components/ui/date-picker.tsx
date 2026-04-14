@@ -11,6 +11,22 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 
+function parseDate(value: string | undefined): Date | undefined {
+  if (!value) return new Date();
+  const ymd = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
+  const parsed = ymd
+    ? new Date(Number(ymd[1]), Number(ymd[2]) - 1, Number(ymd[3]))
+    : new Date(value);
+  return Number.isNaN(parsed.getTime()) ? new Date() : parsed;
+}
+
+function toDateInputValue(date: Date): string {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
+}
+
 function DatePicker({
   id,
   name,
@@ -23,9 +39,14 @@ function DatePicker({
   disabled?: boolean;
 }) {
   const [open, setOpen] = React.useState(false);
-  const [date, setDate] = React.useState<Date | undefined>(
-    defaultValue ? new Date(defaultValue) : new Date(),
+  const [date, setDate] = React.useState<Date | undefined>(() =>
+    parseDate(defaultValue),
   );
+
+  React.useEffect(() => {
+    const next = parseDate(defaultValue);
+    if (next) setDate(next);
+  }, [defaultValue]);
 
   return (
     <>
@@ -59,7 +80,7 @@ function DatePicker({
         <input
           type="hidden"
           name={name}
-          value={date.toISOString().split("T")[0]}
+          value={toDateInputValue(date)}
           disabled={disabled}
         />
       )}
