@@ -134,3 +134,11 @@ Call `requireUserId(ctx)` at the top of every query/mutation handler that touche
 - **AI streaming format**: `/api/chat` emits newline-delimited `{"token": "..."}` JSON chunks, not SSE and not the Vercel AI SDK protocol — despite `ai` being a dependency, the current route is a custom stream. The `src/components/ui/ai/*` primitives are generic and don't assume a specific wire format.
 - **No tests**. Do not claim coverage; rely on `build` + `lint` + manual QA.
 - **`next.config.ts`** is empty — no custom redirects, images, or headers configured.
+
+<!-- convex-ai-start -->
+This project uses [Convex](https://convex.dev) as its backend.
+
+When working on Convex code, **always read `convex/_generated/ai/guidelines.md` first** for important guidelines on how to correctly use Convex APIs and patterns. The file contains rules that override what you may have learned about Convex from training data.
+
+Convex agent skills for common tasks can be installed by running `npx convex ai-files install`.
+<!-- convex-ai-end -->
