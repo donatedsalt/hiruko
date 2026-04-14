@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { ClerkProvider } from "@clerk/nextjs";
 import { shadcn } from "@clerk/themes";
 import { Geist, Geist_Mono } from "next/font/google";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import ConvexClientProvider from "@/components/convex-client-provider";
 
 import { BaseTheme } from "@clerk/types";
@@ -71,6 +72,7 @@ export default function RootLayout({
               <Toaster />
               <FloatingButtons />
               <HistoryTracker />
+              <SpeedInsights />
             </ThemeProvider>
           </ConvexClientProvider>
         </ClerkProvider>
