@@ -253,8 +253,6 @@ export function GoalCardSkeleton() {
 export function AddGoalCard() {
   const createGoal = useMutation(api.goals.mutations.createGoal);
   const [open, setOpen] = useState(false);
-  const [name, setName] = useState("");
-  const [amount, setAmount] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -278,6 +276,7 @@ export function AddGoalCard() {
       toast.warning("Validation error", {
         description: result.error.issues[0].message,
       });
+      setIsSubmitting(false);
       return;
     }
 
@@ -286,9 +285,9 @@ export function AddGoalCard() {
       toast.success("Goal added");
       form.reset();
       setOpen(false);
-    } catch (err: any) {
+    } catch (err) {
       toast.error("Something went wrong!", {
-        description: err.message,
+        description: err instanceof Error ? err.message : "Unknown error",
       });
     } finally {
       setIsSubmitting(false);
@@ -311,36 +310,54 @@ export function AddGoalCard() {
         </Card>
       </DialogTrigger>
       <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Create New Goal</DialogTitle>
-        </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <Label htmlFor="name">Name</Label>
-            <Input
-              id="name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="e.g. New Car"
-              disabled={isSubmitting}
-              required
-            />
+        <form onSubmit={handleSubmit} className="grid gap-4">
+          <DialogHeader>
+            <DialogTitle>Create New Goal</DialogTitle>
+            <DialogDescription>
+              Set a target you can save toward over time.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="grid gap-4">
+            <div className="grid gap-3">
+              <Label htmlFor="name">
+                Name<span className="text-destructive">*</span>
+              </Label>
+              <Input
+                id="name"
+                name="name"
+                type="text"
+                placeholder="e.g. New Car"
+                disabled={isSubmitting}
+                required
+              />
+            </div>
+            <div className="grid gap-3">
+              <Label htmlFor="amount">
+                Amount<span className="text-destructive">*</span>
+              </Label>
+              <Input
+                id="amount"
+                name="amount"
+                type="number"
+                placeholder="500"
+                step="0.01"
+                disabled={isSubmitting}
+                required
+              />
+            </div>
           </div>
-          <div>
-            <Label htmlFor="amount">Amount</Label>
-            <Input
-              id="amount"
-              type="number"
-              value={amount}
-              onChange={(e) => setAmount(e.target.value)}
-              placeholder="500"
-              disabled={isSubmitting}
-              required
-            />
-          </div>
-          <Button type="submit" className="w-full">
-            Save
-          </Button>
+
+          <DialogFooter className="mt-4">
+            <DialogClose asChild>
+              <Button type="button" variant="outline" disabled={isSubmitting}>
+                Cancel
+              </Button>
+            </DialogClose>
+            <Button type="submit" disabled={isSubmitting}>
+              Save
+            </Button>
+          </DialogFooter>
         </form>
       </DialogContent>
     </Dialog>
