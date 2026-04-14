@@ -38,7 +38,7 @@ export default defineSchema({
     .index("by_budget", ["budgetId"])
     .index("by_goal", ["goalId"])
     .index("by_userId_type", ["userId", "type", "transactionTime"])
-    .index("by_transactionTime", ["transactionTime"]),
+    .index("by_userId_transactionTime", ["userId", "transactionTime"]),
   budgets: defineTable({
     userId: v.string(),
     name: v.string(),

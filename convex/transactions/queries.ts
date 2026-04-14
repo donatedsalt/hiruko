@@ -29,12 +29,11 @@ export const list = query({
     } else {
       transactions = await ctx.db
         .query("transactions")
-        .withIndex("by_userId", (q) => q.eq("userId", userId))
+        .withIndex("by_userId_transactionTime", (q) => q.eq("userId", userId))
         .order("desc")
         .collect();
     }
 
-    // return transactions.sort((a, b) => b.transactionTime - a.transactionTime);
     return transactions;
   },
 });
@@ -51,7 +50,7 @@ export const listAllVariants = query({
     return {
       all: await ctx.db
         .query("transactions")
-        .withIndex("by_userId", (q) => q.eq("userId", userId))
+        .withIndex("by_userId_transactionTime", (q) => q.eq("userId", userId))
         .order("desc")
         .collect(),
       income: await ctx.db
@@ -99,11 +98,9 @@ export const groupByDate = query({
 
     const transactions = await ctx.db
       .query("transactions")
-      .withIndex("by_userId", (q) => q.eq("userId", userId))
+      .withIndex("by_userId_transactionTime", (q) => q.eq("userId", userId))
       .order("desc")
       .collect();
-
-    transactions.sort((a, b) => b.transactionTime - a.transactionTime);
 
     const grouped = transactions.reduce((acc, txn) => {
       const dateKey = new Date(txn.transactionTime).toISOString().split("T")[0];
@@ -126,7 +123,7 @@ export const groupByMonth = query({
 
     const transactions = await ctx.db
       .query("transactions")
-      .withIndex("by_userId", (q) => q.eq("userId", userId))
+      .withIndex("by_userId_transactionTime", (q) => q.eq("userId", userId))
       .order("desc")
       .collect();
 
@@ -152,11 +149,9 @@ export const groupByCategory = query({
 
     const transactions = await ctx.db
       .query("transactions")
-      .withIndex("by_userId", (q) => q.eq("userId", userId))
+      .withIndex("by_userId_transactionTime", (q) => q.eq("userId", userId))
       .order("desc")
       .collect();
-
-    transactions.sort((a, b) => b.transactionTime - a.transactionTime);
 
     const grouped = transactions.reduce((acc, txn) => {
       const key = txn.categoryId;
