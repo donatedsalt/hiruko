@@ -7,6 +7,7 @@ import { api } from "@/convex/_generated/api";
 import { IconCirclePlusFilled } from "@tabler/icons-react";
 
 import { Goal } from "@/types/convex";
+import { formatCurrency } from "@/lib/utils";
 
 import { GoalSchema } from "@/validation/goal";
 
@@ -123,18 +124,20 @@ export function GoalCard({ goal }: { goal: Goal }) {
             </CardTitle>
             <CardDescription className="text-2xl font-semibold text-foreground tabular-nums">
               <p>
-                ${goal.saved} / ${goal.amount} used
+                {formatCurrency(goal.saved)} / {formatCurrency(goal.amount)} used
               </p>
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <Progress value={Math.min((goal.saved / goal.amount) * 100)} />
+            <Progress
+              value={Math.min(100, (goal.saved / goal.amount) * 100)}
+            />
           </CardContent>
           <CardFooter>
             <p className="text-base font-semibold text-muted-foreground tabular-nums">
               {goal.amount - goal.saved >= 0
-                ? `$${goal.amount - goal.saved} left`
-                : `Over goal by $${Math.abs(goal.amount - goal.saved)}`}
+                ? `${formatCurrency(goal.amount - goal.saved)} left`
+                : `Over goal by ${formatCurrency(Math.abs(goal.amount - goal.saved))}`}
             </p>
           </CardFooter>
         </Card>
@@ -263,7 +266,7 @@ export function AddGoalCard() {
     const name = formData.get("name") as string;
     const amount = parseFloat(formData.get("amount") as string);
 
-    const payload = { name, balance: amount };
+    const payload = { name, amount };
 
     const result = GoalSchema.omit({
       userId: true,

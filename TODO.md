@@ -41,9 +41,6 @@ list of todos
 
 ## UI / Design
 
-- [ ] budget/goal cards render `${value}` raw — no thousands/decimals; AccountCard uses Intl. Inconsistent display — `src/components/{budget,goal}-card.tsx:126-138`
-- [ ] `Math.min((spent / amount) * 100)` is a no-op; Progress overflows past 100% — `src/components/{budget,goal}-card.tsx:131`
-- [ ] `AddGoalCard` sends `{ name, balance: amount }` — schema expects `amount`. Goal create silently broken — `src/components/goal-card.tsx:266`
 - [ ] consult page: fixed `height: 500px`; loading-dot `delay-75/150` are *transition* delays not animation; `setIsLoading(false)` runs in per-token finally — `src/app/(dashboard)/consult/page.tsx:98,114-118,82`
 - [ ] two `DataListSkeleton` exports with same name — `src/components/{transaction,category}-list.tsx`
 - [ ] add-budget/goal dialog forms diverge from edit forms (no Cancel, no required asterisks, different spacing) — `src/components/{budget,goal}-card.tsx:298-345`
@@ -78,3 +75,6 @@ list of todos
 - [x] change lucide icons to tabler icons
 - [x] ~~[simple icons](https://simpleicons.org/) for using brand icons~~ use tabler brand icons instead
 - [x] use sorted data from convex in data list
+- [x] format budget/goal card amounts via shared `formatCurrency` helper
+- [x] clamp budget/goal Progress with `Math.min(100, ...)`
+- [x] fix `AddGoalCard` payload using wrong field (`balance` → `amount`)

@@ -7,6 +7,7 @@ import { api } from "@/convex/_generated/api";
 import { IconCirclePlusFilled } from "@tabler/icons-react";
 
 import { Budget } from "@/types/convex";
+import { formatCurrency } from "@/lib/utils";
 
 import { BudgetSchema } from "@/validation/budget";
 
@@ -123,18 +124,20 @@ export function BudgetCard({ budget }: { budget: Budget }) {
             </CardTitle>
             <CardDescription className="text-2xl font-semibold text-foreground tabular-nums">
               <p>
-                ${budget.spent} / ${budget.amount} used
+                {formatCurrency(budget.spent)} / {formatCurrency(budget.amount)} used
               </p>
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <Progress value={Math.min((budget.spent / budget.amount) * 100)} />
+            <Progress
+              value={Math.min(100, (budget.spent / budget.amount) * 100)}
+            />
           </CardContent>
           <CardFooter>
             <p className="text-base font-semibold text-muted-foreground tabular-nums">
               {budget.amount - budget.spent >= 0
-                ? `$${budget.amount - budget.spent} left`
-                : `Over budget by $${Math.abs(budget.amount - budget.spent)}`}
+                ? `${formatCurrency(budget.amount - budget.spent)} left`
+                : `Over budget by ${formatCurrency(Math.abs(budget.amount - budget.spent))}`}
             </p>
           </CardFooter>
         </Card>
