@@ -6,11 +6,11 @@ Hiruko is a personal finance tracker built with **Next.js 15 (App Router, Turbop
 
 - **Package manager**: `bun` (committed `bun.lock`). `package.json` is source of truth.
 - **Scripts**:
-  - `bun run dev` — Next dev server with Turbopack.
+  - `bun run dev` — runs Next (Turbopack) **and** `convex dev` together via `concurrently`.
+  - `bun run dev:next` / `bun run dev:convex` — run them individually.
   - `bun run build` — production build (also type-checks).
   - `bun run start` — run production build.
   - `bun run lint` — `next lint` (ESLint flat config).
-- **Convex dev**: not wired into `package.json` scripts. Run `bunx convex dev` manually when working on `convex/`.
 - **Required env**: `CLERK_FRONTEND_API_URL` (used by `convex/auth.config.ts`), the standard Clerk `NEXT_PUBLIC_CLERK_*` keys, `NEXT_PUBLIC_CONVEX_URL`, and `GEMINI_API_KEY` (used by `/api/chat`).
 
 ### Testing & Verification
