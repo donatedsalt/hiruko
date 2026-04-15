@@ -23,10 +23,6 @@ list of todos
 - [ ] `validation/budget.ts` uses `.positive()` on `spent` — rejects legal value `0`
 - [ ] `useSmartRouter` returns unbound `router.back/forward` — can throw — `src/hooks/use-smart-router.ts:23-31`
 
-## Latent / perf
-
-- [ ] race on denormalized counters: handlers read account/category/budget/goal early then patch after many awaits — re-fetch right before patch
-
 ## Security
 
 - [ ] `/api/chat` has no auth, rate limit, or input validation — anyone can drain Gemini key — `src/app/api/chat/route.ts`
