@@ -23,12 +23,14 @@ export const create = mutation({
   handler: async (ctx, args) => {
     const userId = await requireUserId(ctx);
 
-    const account = await ctx.db.get(args.accountId);
+    const [account, category] = await Promise.all([
+      ctx.db.get(args.accountId),
+      ctx.db.get(args.categoryId),
+    ]);
     if (!account || account.userId !== userId) {
       throw new Error("Invalid account");
     }
 
-    const category = await ctx.db.get(args.categoryId);
     if (!category || category.userId !== userId) {
       throw new Error("Invalid category");
     }
@@ -53,35 +55,45 @@ export const create = mutation({
 
     const balanceDelta = args.type === "income" ? args.amount : -args.amount;
 
-    await ctx.db.patch(args.accountId, {
-      balance: account.balance + balanceDelta,
-      transactionCount: account.transactionCount + 1,
-    });
+    const [budget, goal] = await Promise.all([
+      args.budgetId && args.type === "expense"
+        ? ctx.db.get(args.budgetId)
+        : Promise.resolve(null),
+      args.goalId && args.type === "expense"
+        ? ctx.db.get(args.goalId)
+        : Promise.resolve(null),
+    ]);
 
-    await ctx.db.patch(args.categoryId, {
-      transactionCount: category.transactionCount + 1,
-      transactionAmount: category.transactionAmount + args.amount,
-    });
+    const patches: Promise<unknown>[] = [
+      ctx.db.patch(args.accountId, {
+        balance: account.balance + balanceDelta,
+        transactionCount: account.transactionCount + 1,
+      }),
+      ctx.db.patch(args.categoryId, {
+        transactionCount: category.transactionCount + 1,
+        transactionAmount: category.transactionAmount + args.amount,
+      }),
+    ];
 
-    if (args.budgetId && args.type === "expense") {
-      const budget = await ctx.db.get(args.budgetId);
-      if (budget && budget.userId === userId) {
-        await ctx.db.patch(args.budgetId, {
+    if (args.budgetId && budget && budget.userId === userId) {
+      patches.push(
+        ctx.db.patch(args.budgetId, {
           transactionCount: budget.transactionCount + 1,
           spent: (budget.spent ?? 0) + args.amount,
-        });
-      }
+        }),
+      );
     }
 
-    if (args.goalId && args.type === "expense") {
-      const goal = await ctx.db.get(args.goalId);
-      if (goal && goal.userId === userId) {
-        await ctx.db.patch(args.goalId, {
+    if (args.goalId && goal && goal.userId === userId) {
+      patches.push(
+        ctx.db.patch(args.goalId, {
           transactionCount: goal.transactionCount + 1,
           saved: (goal.saved ?? 0) + args.amount,
-        });
-      }
+        }),
+      );
     }
+
+    await Promise.all(patches);
 
     return transaction;
   },
@@ -113,30 +125,41 @@ export const update = mutation({
       throw new Error("Transaction not found");
     }
 
-    const originalAccount = await ctx.db.get(transaction.accountId);
+    const newAccountId = updates.accountId ?? transaction.accountId;
+    const newCategoryId = updates.categoryId ?? transaction.categoryId;
+
+    const [originalAccount, originalCategory, newAccount, newCategory] =
+      await Promise.all([
+        ctx.db.get(transaction.accountId),
+        ctx.db.get(transaction.categoryId),
+        newAccountId === transaction.accountId
+          ? Promise.resolve(null)
+          : ctx.db.get(newAccountId),
+        newCategoryId === transaction.categoryId
+          ? Promise.resolve(null)
+          : ctx.db.get(newCategoryId),
+      ]);
+
     if (!originalAccount || originalAccount.userId !== userId) {
       throw new Error("Original account not found");
     }
 
-    const originalCategory = await ctx.db.get(transaction.categoryId);
     if (!originalCategory || originalCategory.userId !== userId) {
       throw new Error("Original category not found");
     }
 
-    const newAccountId = updates.accountId ?? transaction.accountId;
-    const newAccount = await ctx.db.get(newAccountId);
-    if (!newAccount || newAccount.userId !== userId) {
+    const resolvedNewAccount = newAccount ?? originalAccount;
+    if (!resolvedNewAccount || resolvedNewAccount.userId !== userId) {
       throw new Error("Target account not found");
     }
 
-    const newCategoryId = updates.categoryId ?? transaction.categoryId;
-    const newCategory = await ctx.db.get(newCategoryId);
-    if (!newCategory || newCategory.userId !== userId) {
+    const resolvedNewCategory = newCategory ?? originalCategory;
+    if (!resolvedNewCategory || resolvedNewCategory.userId !== userId) {
       throw new Error("Target category not found");
     }
 
     const newType = updates.type ?? transaction.type;
-    if (newCategory.type !== newType) {
+    if (resolvedNewCategory.type !== newType) {
       throw new Error("Category type and transaction type must match");
     }
 
@@ -158,73 +181,153 @@ export const update = mutation({
 
     if (accountChanged || amountChanged || typeChanged) {
       await adjustAccount(ctx, originalAccount, oldAmount, oldType, -1);
-      await adjustAccount(ctx, newAccount, newAmount, newType, 1);
+      await adjustAccount(ctx, resolvedNewAccount, newAmount, newType, 1);
     }
+
+    const oldBudgetTouched =
+      (amountChanged || typeChanged || oldBudgetId !== newBudgetId) &&
+      !!oldBudgetId &&
+      oldType === "expense";
+    const newBudgetTouched =
+      (amountChanged || typeChanged || oldBudgetId !== newBudgetId) &&
+      !!newBudgetId &&
+      newType === "expense";
+    const oldGoalTouched =
+      (amountChanged || typeChanged || oldGoalId !== newGoalId) &&
+      !!oldGoalId &&
+      oldType === "expense";
+    const newGoalTouched =
+      (amountChanged || typeChanged || oldGoalId !== newGoalId) &&
+      !!newGoalId &&
+      newType === "expense";
+
+    const [oldBudget, newBudget, oldGoal, newGoal] = await Promise.all([
+      oldBudgetTouched && oldBudgetId
+        ? ctx.db.get(oldBudgetId)
+        : Promise.resolve(null),
+      newBudgetTouched && newBudgetId
+        ? ctx.db.get(newBudgetId)
+        : Promise.resolve(null),
+      oldGoalTouched && oldGoalId
+        ? ctx.db.get(oldGoalId)
+        : Promise.resolve(null),
+      newGoalTouched && newGoalId
+        ? ctx.db.get(newGoalId)
+        : Promise.resolve(null),
+    ]);
+
+    const finalPatches: Promise<unknown>[] = [];
 
     if (categoryChanged || amountChanged || typeChanged) {
-      await ctx.db.patch(originalCategory._id, {
-        transactionCount: originalCategory.transactionCount - 1,
-        transactionAmount:
-          originalCategory.transactionAmount - transaction.amount,
-      });
+      if (categoryChanged) {
+        finalPatches.push(
+          ctx.db.patch(originalCategory._id, {
+            transactionCount: originalCategory.transactionCount - 1,
+            transactionAmount:
+              originalCategory.transactionAmount - transaction.amount,
+          }),
+        );
 
-      await ctx.db.patch(newCategory._id, {
-        transactionCount: newCategory.transactionCount + 1,
-        transactionAmount: newCategory.transactionAmount + newAmount,
-      });
-    }
-
-    if (
-      (amountChanged || typeChanged || oldBudgetId !== newBudgetId) &&
-      oldBudgetId &&
-      oldType === "expense"
-    ) {
-      const oldBudget = await ctx.db.get(oldBudgetId);
-      if (oldBudget && oldBudget.userId === userId) {
-        await ctx.db.patch(oldBudgetId, {
-          spent: Math.max((oldBudget.spent ?? 0) - oldAmount, 0),
-        });
+        finalPatches.push(
+          ctx.db.patch(resolvedNewCategory._id, {
+            transactionCount: resolvedNewCategory.transactionCount + 1,
+            transactionAmount:
+              resolvedNewCategory.transactionAmount + newAmount,
+          }),
+        );
+      } else {
+        finalPatches.push(
+          ctx.db.patch(originalCategory._id, {
+            transactionCount: originalCategory.transactionCount,
+            transactionAmount:
+              originalCategory.transactionAmount -
+              transaction.amount +
+              newAmount,
+          }),
+        );
       }
     }
 
-    if (
-      (amountChanged || typeChanged || oldBudgetId !== newBudgetId) &&
-      newBudgetId &&
-      newType === "expense"
-    ) {
-      const newBudget = await ctx.db.get(newBudgetId);
-      if (newBudget && newBudget.userId === userId) {
-        await ctx.db.patch(newBudgetId, {
-          spent: (newBudget.spent ?? 0) + newAmount,
-        });
+    const sameBudget =
+      oldBudgetTouched &&
+      newBudgetTouched &&
+      oldBudgetId === newBudgetId;
+
+    if (sameBudget && oldBudgetId && oldBudget && oldBudget.userId === userId) {
+      // Preserve original behavior: subtract then add against the mutated value.
+      const afterSubtract = Math.max((oldBudget.spent ?? 0) - oldAmount, 0);
+      finalPatches.push(
+        ctx.db.patch(oldBudgetId, {
+          spent: afterSubtract + newAmount,
+        }),
+      );
+    } else {
+      if (
+        oldBudgetTouched &&
+        oldBudgetId &&
+        oldBudget &&
+        oldBudget.userId === userId
+      ) {
+        finalPatches.push(
+          ctx.db.patch(oldBudgetId, {
+            spent: Math.max((oldBudget.spent ?? 0) - oldAmount, 0),
+          }),
+        );
+      }
+
+      if (
+        newBudgetTouched &&
+        newBudgetId &&
+        newBudget &&
+        newBudget.userId === userId
+      ) {
+        finalPatches.push(
+          ctx.db.patch(newBudgetId, {
+            spent: (newBudget.spent ?? 0) + newAmount,
+          }),
+        );
       }
     }
 
-    if (
-      (amountChanged || typeChanged || oldGoalId !== newGoalId) &&
-      oldGoalId &&
-      oldType === "expense"
-    ) {
-      const oldGoal = await ctx.db.get(oldGoalId);
-      if (oldGoal && oldGoal.userId === userId) {
-        await ctx.db.patch(oldGoalId, {
-          saved: Math.max((oldGoal.saved ?? 0) - oldAmount, 0),
-        });
+    const sameGoal =
+      oldGoalTouched && newGoalTouched && oldGoalId === newGoalId;
+
+    if (sameGoal && oldGoalId && oldGoal && oldGoal.userId === userId) {
+      const afterSubtract = Math.max((oldGoal.saved ?? 0) - oldAmount, 0);
+      finalPatches.push(
+        ctx.db.patch(oldGoalId, {
+          saved: afterSubtract + newAmount,
+        }),
+      );
+    } else {
+      if (
+        oldGoalTouched &&
+        oldGoalId &&
+        oldGoal &&
+        oldGoal.userId === userId
+      ) {
+        finalPatches.push(
+          ctx.db.patch(oldGoalId, {
+            saved: Math.max((oldGoal.saved ?? 0) - oldAmount, 0),
+          }),
+        );
+      }
+
+      if (
+        newGoalTouched &&
+        newGoalId &&
+        newGoal &&
+        newGoal.userId === userId
+      ) {
+        finalPatches.push(
+          ctx.db.patch(newGoalId, {
+            saved: (newGoal.saved ?? 0) + newAmount,
+          }),
+        );
       }
     }
 
-    if (
-      (amountChanged || typeChanged || oldGoalId !== newGoalId) &&
-      newGoalId &&
-      newType === "expense"
-    ) {
-      const newGoal = await ctx.db.get(newGoalId);
-      if (newGoal && newGoal.userId === userId) {
-        await ctx.db.patch(newGoalId, {
-          saved: (newGoal.saved ?? 0) + newAmount,
-        });
-      }
-    }
+    await Promise.all(finalPatches);
 
     await ctx.db.patch(id, {
       ...updates,

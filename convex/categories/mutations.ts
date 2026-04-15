@@ -57,14 +57,16 @@ export const createDefaultCategories = mutation({
       { name: "Shopping", icon: "🛒", type: "expense" as const },
     ];
 
-    for (const category of defaultCategories) {
-      await ctx.db.insert("categories", {
-        userId,
-        ...category,
-        transactionCount: 0,
-        transactionAmount: 0,
-      });
-    }
+    await Promise.all(
+      defaultCategories.map((category) =>
+        ctx.db.insert("categories", {
+          userId,
+          ...category,
+          transactionCount: 0,
+          transactionAmount: 0,
+        }),
+      ),
+    );
 
     return { success: true };
   },
@@ -117,9 +119,7 @@ export const remove = mutation({
       .withIndex("by_category", (q) => q.eq("categoryId", args.id))
       .collect();
 
-    for (const txn of txns) {
-      await ctx.db.delete(txn._id);
-    }
+    await Promise.all(txns.map((txn) => ctx.db.delete(txn._id)));
 
     await ctx.db.delete(args.id);
 

@@ -69,9 +69,9 @@ export const remove = mutation({
       .withIndex("by_budget", (q) => q.eq("budgetId", args.id))
       .collect();
 
-    for (const txn of txns) {
-      await ctx.db.patch(txn._id, { budgetId: undefined });
-    }
+    await Promise.all(
+      txns.map((txn) => ctx.db.patch(txn._id, { budgetId: undefined })),
+    );
 
     await ctx.db.delete(args.id);
 

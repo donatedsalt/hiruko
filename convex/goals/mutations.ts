@@ -69,9 +69,9 @@ export const remove = mutation({
       .withIndex("by_goal", (q) => q.eq("goalId", args.id))
       .collect();
 
-    for (const txn of txns) {
-      await ctx.db.patch(txn._id, { goalId: undefined });
-    }
+    await Promise.all(
+      txns.map((txn) => ctx.db.patch(txn._id, { goalId: undefined })),
+    );
 
     await ctx.db.delete(args.id);
 

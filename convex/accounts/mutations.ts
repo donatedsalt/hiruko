@@ -182,9 +182,7 @@ export const remove = mutation({
       .withIndex("by_account", (q) => q.eq("accountId", args.id))
       .collect();
 
-    for (const txn of txns) {
-      await ctx.db.delete(txn._id);
-    }
+    await Promise.all(txns.map((txn) => ctx.db.delete(txn._id)));
 
     await ctx.db.delete(args.id);
 
