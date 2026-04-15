@@ -45,7 +45,7 @@ function formatDisplayDate(dateStr: string) {
   return `${weekday}, ${monthDay}`;
 }
 
-function RenderGroupedList({
+export function RenderGroupedList({
   transactions,
   categories,
   showEndMarker = true,
