@@ -142,7 +142,8 @@ Call `requireUserId(ctx)` at the top of every query/mutation handler that touche
 
 ### Planning
 
-- `TODO.md` is the live backlog/progress file (there is no `PLAN.md`). Update it when completing or discovering work.
+- `TODO.md` is the live backlog (Todo / Bugs / Security / UX / UI sections). Update it when discovering work.
+- `CHANGELOG.md` holds completed work under an `Unreleased` heading. When a `TODO.md` item ships, move it to `CHANGELOG.md` (drop the `[ ]` checkbox) rather than leaving it in TODO. Git history is still the authoritative record.
 - `README.md` is minimal; don't rely on it for architecture info.
 
 ## 6. Gotchas & Notes
