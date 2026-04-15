@@ -2,8 +2,6 @@ import { v } from "convex/values";
 
 import { query } from "@/convex/_generated/server";
 
-import { TransactionGroups } from "@/types/convex";
-
 import { requireUserId } from "@/convex/utils/auth";
 
 /**
@@ -41,32 +39,25 @@ export const list = query({
 /**
  * Get all transactions and filtered transactions (income & expense)
  * for the authenticated user in a single query.
+ *
+ * Performs a single full collect and derives the income/expense slices
+ * in-memory to avoid three redundant table scans per dashboard mount.
  */
 export const listAllVariants = query({
   args: {},
   handler: async (ctx) => {
     const userId = await requireUserId(ctx);
 
+    const all = await ctx.db
+      .query("transactions")
+      .withIndex("by_userId_transactionTime", (q) => q.eq("userId", userId))
+      .order("desc")
+      .collect();
+
     return {
-      all: await ctx.db
-        .query("transactions")
-        .withIndex("by_userId_transactionTime", (q) => q.eq("userId", userId))
-        .order("desc")
-        .collect(),
-      income: await ctx.db
-        .query("transactions")
-        .withIndex("by_userId_type", (q) =>
-          q.eq("userId", userId).eq("type", "income"),
-        )
-        .order("desc")
-        .collect(),
-      expense: await ctx.db
-        .query("transactions")
-        .withIndex("by_userId_type", (q) =>
-          q.eq("userId", userId).eq("type", "expense"),
-        )
-        .order("desc")
-        .collect(),
+      all,
+      income: all.filter((txn) => txn.type === "income"),
+      expense: all.filter((txn) => txn.type === "expense"),
     };
   },
 });
@@ -85,81 +76,5 @@ export const getById = query({
     }
 
     return transaction;
-  },
-});
-
-/**
- * Get all transactions grouped by date (YYYY-MM-DD) for the authenticated user.
- */
-export const groupByDate = query({
-  args: {},
-  handler: async (ctx) => {
-    const userId = await requireUserId(ctx);
-
-    const transactions = await ctx.db
-      .query("transactions")
-      .withIndex("by_userId_transactionTime", (q) => q.eq("userId", userId))
-      .order("desc")
-      .collect();
-
-    const grouped = transactions.reduce((acc, txn) => {
-      const dateKey = new Date(txn.transactionTime).toISOString().split("T")[0];
-      if (!acc[dateKey]) acc[dateKey] = [];
-      acc[dateKey].push(txn);
-      return acc;
-    }, {} as TransactionGroups);
-
-    return grouped;
-  },
-});
-
-/**
- * Get all transactions grouped by month (YYYY-MM) for the authenticated user.
- */
-export const groupByMonth = query({
-  args: {},
-  handler: async (ctx) => {
-    const userId = await requireUserId(ctx);
-
-    const transactions = await ctx.db
-      .query("transactions")
-      .withIndex("by_userId_transactionTime", (q) => q.eq("userId", userId))
-      .order("desc")
-      .collect();
-
-    const grouped = transactions.reduce((acc, txn) => {
-      const date = new Date(txn.transactionTime);
-      const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
-      if (!acc[key]) acc[key] = [];
-      acc[key].push(txn);
-      return acc;
-    }, {} as TransactionGroups);
-
-    return grouped;
-  },
-});
-
-/**
- * Get all transactions grouped by category for the authenticated user.
- */
-export const groupByCategory = query({
-  args: {},
-  handler: async (ctx) => {
-    const userId = await requireUserId(ctx);
-
-    const transactions = await ctx.db
-      .query("transactions")
-      .withIndex("by_userId_transactionTime", (q) => q.eq("userId", userId))
-      .order("desc")
-      .collect();
-
-    const grouped = transactions.reduce((acc, txn) => {
-      const key = txn.categoryId;
-      if (!acc[key]) acc[key] = [];
-      acc[key].push(txn);
-      return acc;
-    }, {} as TransactionGroups);
-
-    return grouped;
   },
 });

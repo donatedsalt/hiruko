@@ -89,7 +89,7 @@ Each feature exposes `queries.ts` and `mutations.ts`. Current exports:
 
 - `accounts`: `queries.list`, `queries.getById`; `mutations.create`, `mutations.update`, `mutations.remove`.
 - `categories`: `queries.list`, `queries.getById`; `mutations.create`, `mutations.createDefaultCategories`, `mutations.update`, `mutations.remove`.
-- `transactions`: `queries.list`, `queries.listAllVariants`, `queries.getById`, `queries.groupByDate`, `queries.groupByMonth`, `queries.groupByCategory`; `mutations.create`, `mutations.update`, `mutations.remove`.
+- `transactions`: `queries.list`, `queries.listAllVariants`, `queries.getById`; `mutations.create`, `mutations.update`, `mutations.remove`.
 - `budgets`: `queries.list`; `mutations.createBudget`, `mutations.update`, `mutations.remove`. (Note: the create is named `createBudget`, not `create`.)
 - `goals`: `queries.list`; `mutations.createGoal`, `mutations.update`, `mutations.remove`. (Same naming quirk.)
 
