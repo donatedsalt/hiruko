@@ -31,8 +31,6 @@ list of todos
 
 ## UX
 
-- [ ] middleware treats `/manifest.webmanifest` and icon paths as protected — breaks PWA install previews — `src/middleware.ts:3`
-
 ## UI / Design
 
 ## Done
@@ -69,3 +67,4 @@ list of todos
 - [x] consult page: flex-1 conversation height, real animation-delay on dots, isLoading reset only after stream completes
 - [x] transactions edit: button reads "Discard" while editing; drop the `Button asChild` wrapping a button
 - [x] `ListItem` rows have hover background, cursor, and focus-visible ring
+- [x] middleware allowlists `/manifest.webmanifest`, `/icons/*`, `/favicon.ico` for PWA install previews
