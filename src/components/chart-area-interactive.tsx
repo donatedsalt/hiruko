@@ -2,9 +2,9 @@
 
 import * as React from "react";
 import { Area, AreaChart, CartesianGrid, XAxis } from "recharts";
+import { useQuery } from "convex/react";
 
-import { Transaction } from "@/types/convex";
-
+import { api } from "@/convex/_generated/api";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 import {
@@ -31,7 +31,9 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
-export function ChartAreaInteractive({ data }: { data: Transaction[] }) {
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+export function ChartAreaInteractive() {
   const isMobile = useIsMobile();
   const [timeRange, setTimeRange] = React.useState("30d");
 
@@ -41,50 +43,16 @@ export function ChartAreaInteractive({ data }: { data: Transaction[] }) {
     }
   }, [isMobile]);
 
-  // Prepare chart data with running balance
-  const chartData = React.useMemo(() => {
-    // Group by date (YYYY-MM-DD)
-    const grouped: Record<string, { income: number; expense: number }> = {};
-    data.forEach((transaction) => {
-      const date = new Date(transaction.transactionTime)
-        .toISOString()
-        .split("T")[0];
-      if (!grouped[date]) {
-        grouped[date] = { income: 0, expense: 0 };
-      }
-      if (transaction.type === "income") {
-        grouped[date].income += transaction.amount;
-      } else {
-        grouped[date].expense += transaction.amount;
-      }
-    });
-    // Convert to array and sort by date
-    const sorted = Object.entries(grouped)
-      .map(([date, { income, expense }]) => ({
-        date,
-        income,
-        expense,
-      }))
-      .sort((a, b) => a.date.localeCompare(b.date));
+  const sinceMs = React.useMemo(() => {
+    const days = timeRange === "7d" ? 7 : 30;
+    return Date.now() - days * DAY_MS;
+  }, [timeRange]);
 
-    // Calculate running balance
-    let balance = 0;
-    return sorted.map((item) => {
-      balance += item.income - item.expense;
-      return { ...item, balance };
-    });
-  }, [data]);
+  const filteredData = useQuery(api.transactions.queries.statsByDay, {
+    sinceMs,
+  });
 
-  // Filter by time range
-  const filteredData = React.useMemo(() => {
-    if (!chartData.length) return [];
-    const referenceDate = new Date(chartData[chartData.length - 1].date);
-    let daysToSubtract = 30;
-    if (timeRange === "7d") daysToSubtract = 7;
-    const startDate = new Date(referenceDate);
-    startDate.setDate(startDate.getDate() - daysToSubtract);
-    return chartData.filter((item) => new Date(item.date) >= startDate);
-  }, [chartData, timeRange]);
+  if (filteredData === undefined) return <ChartAreaInteractiveSkeleton />;
 
   const chartConfig = {
     transactions: { label: "Transactions" },

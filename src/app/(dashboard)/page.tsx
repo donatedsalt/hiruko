@@ -4,10 +4,7 @@ import Link from "next/link";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 
-import {
-  ChartAreaInteractive,
-  ChartAreaInteractiveSkeleton,
-} from "@/components/chart-area-interactive";
+import { ChartAreaInteractive } from "@/components/chart-area-interactive";
 import {
   TransactionList,
   TransactionListSkeleton,
@@ -20,32 +17,33 @@ import { Button } from "@/components/ui/button";
 const DASHBOARD_TXN_LIMIT = 10;
 
 export default function Page() {
-  const transactions = useQuery(api.transactions.queries.listAllVariants);
+  const recent = useQuery(api.transactions.queries.listRecent, {
+    limit: DASHBOARD_TXN_LIMIT,
+  });
   const categories = useQuery(api.categories.queries.list);
-  const loading = transactions === undefined || categories === undefined;
+  const loading = recent === undefined || categories === undefined;
 
   return (
     <>
       <SiteHeader title="Overview" />
       <div className="@container/main flex flex-col flex-1 gap-4 p-4 md:gap-6 md:p-6">
         <AccountsCards />
+        <ChartAreaInteractive />
 
         {loading ? (
+          <TransactionListSkeleton />
+        ) : recent && categories ? (
           <>
-            <ChartAreaInteractiveSkeleton />
-            <TransactionListSkeleton />
-          </>
-        ) : transactions && categories ? (
-          <>
-            <ChartAreaInteractive data={transactions.all} />
             <TransactionList
-              allData={transactions.all.slice(0, DASHBOARD_TXN_LIMIT)}
-              incomeData={transactions.income.slice(0, DASHBOARD_TXN_LIMIT)}
-              expenseData={transactions.expense.slice(0, DASHBOARD_TXN_LIMIT)}
+              allData={recent.all}
+              incomeData={recent.income}
+              expenseData={recent.expense}
               categories={categories}
               showEndMarker={false}
             />
-            {transactions.all.length > DASHBOARD_TXN_LIMIT && (
+            {(recent.hasMoreAll ||
+              recent.hasMoreIncome ||
+              recent.hasMoreExpense) && (
               <div className="grid place-items-center">
                 <Button asChild variant="outline">
                   <Link href="/transactions">View More</Link>
