@@ -1,5 +1,3 @@
-import { useEffect, useState } from "react";
-
 import type { Category } from "@/types/convex";
 
 import { cn } from "@/lib/utils";
@@ -53,20 +51,10 @@ export function CategoryList({
   Data: Category[];
   loading?: boolean;
 }) {
-  const [incomeData, setIncomeData] = useState<Category[]>();
-  const [expenseData, setExpenseData] = useState<Category[]>();
-
-  useEffect(() => {
-    if (loading) return;
-
-    const incomeCat = Data.filter((cat) => cat.type === "income");
-    const expenseCat = Data.filter((cat) => cat.type === "expense");
-
-    setIncomeData(incomeCat);
-    setExpenseData(expenseCat);
-  }, [Data, loading]);
-
   if (loading) return <CategoryListSkeleton />;
+
+  const incomeData = Data?.filter((cat) => cat.type === "income");
+  const expenseData = Data?.filter((cat) => cat.type === "expense");
 
   return (
     <Tabs

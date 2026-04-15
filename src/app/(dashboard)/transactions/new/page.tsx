@@ -1,7 +1,7 @@
 "use client";
 
 import { toast } from "sonner";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useMutation, useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { IconCaretDownFilled, IconCaretUpFilled } from "@tabler/icons-react";
@@ -43,39 +43,24 @@ export default function Page() {
 
   const createTransaction = useMutation(api.transactions.mutations.create);
 
-  const [txnType, setTxnType] = useState<"income" | "expense">("expense");
-  const [txnAccount, setTxnAccount] = useState<AccountId | "">("");
-  const [txnCategory, setTxnCategory] = useState<CategoryId | "">("");
+  const [txnTypeState, setTxnType] = useState<"income" | "expense">();
+  const [txnAccountState, setTxnAccount] = useState<AccountId | "">();
+  const [txnCategoryState, setTxnCategory] = useState<CategoryId | "">();
   const [txnBudget, setTxnBudget] = useState<BudgetId | "">("");
   const [txnGoal, setTxnGoal] = useState<GoalId | "">("");
 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const toastShown = useRef(false);
+  const txnAccount = txnAccountState ?? accounts?.[0]?._id ?? "";
+  const txnCategory = txnCategoryState ?? categories?.[0]?._id ?? "";
+  const txnType = txnTypeState ?? categories?.[0]?.type ?? "expense";
 
   useEffect(() => {
-    if (toastShown.current) return;
-    if (!accounts || !categories) return;
-
-    let toastTriggered = false;
-
-    if (accounts.length === 0) {
+    if (accounts && accounts.length === 0) {
       toast.info("Please create an account to continue");
       smartRouter.push("/");
-      toastTriggered = true;
-    } else {
-      if (txnAccount === "") {
-        setTxnAccount(accounts[0]?._id);
-      }
-
-      if (categories.length > 0 && txnCategory === "") {
-        setTxnCategory(categories[0]?._id);
-        setTxnType(categories[0]?.type);
-      }
     }
-
-    if (toastTriggered) toastShown.current = true;
-  }, [accounts, categories, smartRouter, txnAccount, txnCategory]);
+  }, [accounts, smartRouter]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
