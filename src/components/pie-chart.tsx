@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Pie, PieChart } from "recharts";
 
 import { Category } from "@/types/convex";
@@ -40,14 +40,18 @@ export function ChartPie({
 }) {
   const [showPercent, setShowPercent] = useState(false);
 
+  const chartData = useMemo(
+    () =>
+      (categories ?? []).map((cat, idx) => ({
+        ...cat,
+        fill: COLORS[idx % COLORS.length],
+      })),
+    [categories],
+  );
+
   if (!categories) return <ChartPieSkeleton />;
 
   const total = categories.reduce((sum, cat) => sum + cat.transactionAmount, 0);
-
-  const chartData = categories.map((cat, idx) => ({
-    ...cat,
-    fill: COLORS[idx % COLORS.length],
-  }));
 
   const chartConfig = categories.reduce((acc, cat, idx) => {
     acc[cat.name] = {

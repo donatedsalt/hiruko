@@ -1,5 +1,7 @@
+import { useMemo } from "react";
 import { IconCaretDownFilled, IconCaretUpFilled } from "@tabler/icons-react";
 
+import type { Id } from "@/convex/_generated/dataModel";
 import type { Category, Transaction, TransactionGroups } from "@/types/convex";
 
 import { cn } from "@/lib/utils";
@@ -54,6 +56,12 @@ export function RenderGroupedList({
   categories: Category[];
   showEndMarker?: boolean;
 }) {
+  const categoriesById = useMemo(() => {
+    const map = new Map<Id<"categories">, Category>();
+    for (const c of categories) map.set(c._id, c);
+    return map;
+  }, [categories]);
+
   const grouped = groupByDay(transactions);
   const dates = Object.keys(grouped).sort(
     (a, b) => new Date(b).getTime() - new Date(a).getTime(),
@@ -68,7 +76,7 @@ export function RenderGroupedList({
           </div>
           <ul className="grid gap-4">
             {grouped[date].map((txn) => {
-              const cat = categories.find((c) => c._id === txn.categoryId);
+              const cat = categoriesById.get(txn.categoryId);
               if (!cat) return null;
               return (
                 <ListItem
