@@ -1,4 +1,5 @@
 import { v } from "convex/values";
+import { paginationOptsValidator } from "convex/server";
 
 import { query } from "@/convex/_generated/server";
 
@@ -59,6 +60,33 @@ export const listAllVariants = query({
       income: all.filter((txn) => txn.type === "income"),
       expense: all.filter((txn) => txn.type === "expense"),
     };
+  },
+});
+
+/**
+ * Paginated list of transactions, newest first. Optionally filter by type.
+ */
+export const listPaginated = query({
+  args: {
+    paginationOpts: paginationOptsValidator,
+    type: v.optional(v.union(v.literal("income"), v.literal("expense"))),
+  },
+  handler: async (ctx, { paginationOpts, type }) => {
+    const userId = await requireUserId(ctx);
+
+    const q = type
+      ? ctx.db
+          .query("transactions")
+          .withIndex("by_userId_type", (qb) =>
+            qb.eq("userId", userId).eq("type", type),
+          )
+      : ctx.db
+          .query("transactions")
+          .withIndex("by_userId_transactionTime", (qb) =>
+            qb.eq("userId", userId),
+          );
+
+    return await q.order("desc").paginate(paginationOpts);
   },
 });
 

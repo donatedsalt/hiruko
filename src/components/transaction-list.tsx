@@ -48,9 +48,11 @@ function formatDisplayDate(dateStr: string) {
 function RenderGroupedList({
   transactions,
   categories,
+  showEndMarker = true,
 }: {
   transactions: Transaction[];
   categories: Category[];
+  showEndMarker?: boolean;
 }) {
   const grouped = groupByDay(transactions);
   const dates = Object.keys(grouped).sort(
@@ -98,9 +100,11 @@ function RenderGroupedList({
           </ul>
         </div>
       ))}
-      <div className="grid py-12 place-items-center">
-        <p>End of list 🫡</p>
-      </div>
+      {showEndMarker && (
+        <div className="grid py-12 place-items-center">
+          <p>End of list 🫡</p>
+        </div>
+      )}
     </div>
   );
 }
@@ -111,12 +115,14 @@ export function TransactionList({
   expenseData,
   categories,
   loading,
+  showEndMarker,
 }: {
   allData: Transaction[];
   incomeData: Transaction[];
   expenseData: Transaction[];
   categories: Category[];
   loading?: boolean;
+  showEndMarker?: boolean;
 }) {
   if (loading) return <TransactionListSkeleton />;
 
@@ -136,7 +142,11 @@ export function TransactionList({
       {/* All */}
       <TabsContent value="all" className="flex flex-col">
         {allData.length ? (
-          <RenderGroupedList transactions={allData} categories={categories} />
+          <RenderGroupedList
+            transactions={allData}
+            categories={categories}
+            showEndMarker={showEndMarker}
+          />
         ) : (
           <EmptyState text="No transactions found. 😲" />
         )}
@@ -148,6 +158,7 @@ export function TransactionList({
           <RenderGroupedList
             transactions={incomeData}
             categories={categories}
+            showEndMarker={showEndMarker}
           />
         ) : (
           <EmptyState text="No income found. 😬" />
@@ -160,6 +171,7 @@ export function TransactionList({
           <RenderGroupedList
             transactions={expenseData}
             categories={categories}
+            showEndMarker={showEndMarker}
           />
         ) : (
           <EmptyState text="No expense found. 🤯" />
