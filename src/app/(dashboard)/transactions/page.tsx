@@ -17,6 +17,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
 
 const PAGE_SIZE = 20;
+const PAGINATION_OPTIONS = { initialNumItems: PAGE_SIZE } as const;
+const EMPTY_ARGS = {} as const;
+const INCOME_ARGS = { type: "income" } as const;
+const EXPENSE_ARGS = { type: "expense" } as const;
 
 type TxnType = "income" | "expense" | undefined;
 
@@ -29,10 +33,16 @@ function PaginatedTab({
   categories: Category[];
   emptyText: string;
 }) {
+  const args =
+    type === "income"
+      ? INCOME_ARGS
+      : type === "expense"
+        ? EXPENSE_ARGS
+        : EMPTY_ARGS;
   const { results, status, loadMore } = usePaginatedQuery(
     api.transactions.queries.listPaginated,
-    type ? { type } : {},
-    { initialNumItems: PAGE_SIZE },
+    args,
+    PAGINATION_OPTIONS,
   );
 
   const sentinelRef = useRef<HTMLDivElement | null>(null);
