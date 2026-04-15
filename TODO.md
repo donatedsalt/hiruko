@@ -26,7 +26,6 @@ list of todos
 ## Latent / perf
 
 - [ ] race on denormalized counters: handlers read account/category/budget/goal early then patch after many awaits — re-fetch right before patch
-- [ ] `createDefaultCategories` called from a form `useEffect` with no uniqueness guard → can create duplicates — `convex/categories/mutations.ts`, `src/app/(dashboard)/transactions/new/page.tsx:81-85`
 
 ## Security
 
