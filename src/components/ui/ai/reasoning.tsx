@@ -110,16 +110,10 @@ export const Reasoning = memo(
   },
 );
 
-export type ReasoningTriggerProps = ComponentProps<
-  typeof CollapsibleTrigger
->;
+export type ReasoningTriggerProps = ComponentProps<typeof CollapsibleTrigger>;
 
 export const ReasoningTrigger = memo(
-  ({
-    className,
-    children,
-    ...props
-  }: ReasoningTriggerProps) => {
+  ({ className, children, ...props }: ReasoningTriggerProps) => {
     const { isStreaming, isOpen, duration } = useReasoning();
 
     return (

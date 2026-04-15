@@ -117,8 +117,12 @@ export default function Page() {
                 <MessageContent>
                   <div className="flex space-x-1">
                     <span className="animate-bounce">.</span>
-                    <span className="animate-bounce [animation-delay:150ms]">.</span>
-                    <span className="animate-bounce [animation-delay:300ms]">.</span>
+                    <span className="animate-bounce [animation-delay:150ms]">
+                      .
+                    </span>
+                    <span className="animate-bounce [animation-delay:300ms]">
+                      .
+                    </span>
                   </div>
                 </MessageContent>
               </Message>

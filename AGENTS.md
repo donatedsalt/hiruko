@@ -14,12 +14,14 @@ Hiruko is a personal finance tracker built with **Next.js 15 (App Router, Turbop
 - **Required env**: `CLERK_FRONTEND_API_URL` (used by `convex/auth.config.ts`), the standard Clerk `NEXT_PUBLIC_CLERK_*` keys, `NEXT_PUBLIC_CONVEX_URL`, and `GEMINI_API_KEY` (used by `/api/chat`).
 
 ### Testing & Verification
+
 - **No test framework** is configured (no Jest/Vitest/Playwright).
 - Verification protocol: `bun run build` for types, `bun run lint` for lint, manual browser check for UI/flow.
 
 ## 2. Project Structure
 
 ### `src/app` (App Router)
+
 Uses two route groups, each with its **own `<html>`/`<body>` root layout** (there is no top-level `src/app/layout.tsx`):
 
 - `(auth)/layout.tsx` — Clerk + Convex + Theme providers, fixed theme-toggle button.
@@ -38,43 +40,51 @@ Uses two route groups, each with its **own `<html>`/`<body>` root layout** (ther
 - `globals.css` — Tailwind v4 + theme tokens.
 
 ### `src/components`
+
 - `ui/` — shadcn/ui primitives (button, card, dialog, sidebar, calendar, chart, drawer, sonner, etc.) plus `ui/ai/` (AI chat-specific: `conversation.tsx`, `message.tsx`, `prompt-input.tsx`, `reasoning.tsx`, `response.tsx`, `code-block.tsx`, `tool.tsx`, etc.).
 - `icons/hiruko-icon.tsx` — brand mark.
 - Feature-level components live directly under `src/components/` (flat): `app-sidebar.tsx`, `nav-main.tsx`, `nav-businesses.tsx`, `nav-secondary.tsx`, `nav-user.tsx`, `site-header.tsx`, `transaction-list.tsx`, `account-card.tsx`, `accounts-cards.tsx`, `budget-card.tsx`, `goal-card.tsx`, `category-list.tsx`, `category-dialog.tsx`, `chart-area-interactive.tsx`, `pie-chart.tsx`, `list-item.tsx`, `emoji-picker-button.tsx`, `error-message.tsx`, `floating-buttons.tsx`, `history-tracker.tsx` (persists visited paths to localStorage for `useSmartRouter`), `theme-provider.tsx`, `theme-change-button.tsx`, `convex-client-provider.tsx`.
 
 ### `src/hooks`
+
 - `use-mobile.ts` — media-query mobile detection.
 - `use-countdown.ts` — generic countdown timer.
 - `use-smart-router.ts` — wraps `next/navigation` router; adds `replaceWithBack(fallback)` using `localStorage.visitedPaths` populated by `HistoryTracker`.
 
 ### `src/lib`
+
 - `utils.ts` — exports `cn` (clsx + tailwind-merge). **The only util module.**
 
 ### `src/types`
+
 - `convex.ts` — re-exports `Doc<T>` / `Id<T>` as `Transaction`, `TransactionId`, `Category`, `CategoryId`, `Account`, `AccountId`, `Budget`, `BudgetId`, `Goal`, `GoalId`, plus `TransactionGroups = Record<string, Transaction[]>`. Use these instead of re-deriving types at call sites.
 
 ### `src/validation` (Zod v4)
+
 - `account.ts`, `budget.ts`, `category.ts`, `goal.ts`, `transaction.ts` — strict Zod schemas for form input. `TransactionSchema` narrows id strings to the correct branded `Id<"...">` types via `.transform(...)`.
 
 ### `src/middleware.ts`
+
 Clerk `clerkMiddleware`. **Public routes**: `/sign-in(.*)`, `/sign-up(.*)`. **Everything else** calls `auth.protect()` and redirects unauthenticated users to sign-in. Matcher skips Next internals and common static assets; always runs for `/api` and `/trpc`.
 
 ## 3. Backend (Convex)
 
 ### Schema (`convex/schema.ts`)
+
 All tables carry `userId: string` (Clerk subject) and are indexed by it.
 
-| Table | Key fields | Indexes |
-|---|---|---|
-| `accounts` | `name`, `balance`, `transactionCount`, `updatedAt` | `by_userId` |
-| `categories` | `name`, `icon`, `type: "income" \| "expense"`, `transactionCount`, `transactionAmount` | `by_userId`, `by_userId_name` |
+| Table          | Key fields                                                                                                             | Indexes                                                                                                                                |
+| -------------- | ---------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| `accounts`     | `name`, `balance`, `transactionCount`, `updatedAt`                                                                     | `by_userId`                                                                                                                            |
+| `categories`   | `name`, `icon`, `type: "income" \| "expense"`, `transactionCount`, `transactionAmount`                                 | `by_userId`, `by_userId_name`                                                                                                          |
 | `transactions` | `categoryId`, `accountId`, `budgetId?`, `goalId?`, `amount`, `type`, `title?`, `note?`, `transactionTime`, `updatedAt` | `by_userId`, `by_account`, `by_category`, `by_budget`, `by_goal`, `by_userId_type` (userId+type+transactionTime), `by_transactionTime` |
-| `budgets` | `name`, `amount`, `spent`, `transactionCount` | `by_userId` |
-| `goals` | `name`, `amount`, `saved`, `transactionCount` | `by_userId` |
+| `budgets`      | `name`, `amount`, `spent`, `transactionCount`                                                                          | `by_userId`                                                                                                                            |
+| `goals`        | `name`, `amount`, `saved`, `transactionCount`                                                                          | `by_userId`                                                                                                                            |
 
 Relationships: `transactions` references `accounts` + `categories` (required) and optionally `budgets` / `goals`. Parent aggregates (`balance`, `transactionCount`, `transactionAmount`, `spent`, `saved`) are **denormalized** and maintained inside transaction mutations — any code that mutates `transactions` must keep these counters in sync (see `convex/transactions/mutations.ts` and the `adjustAccount` helper in `convex/utils/db/accounts.ts`).
 
 ### Feature folder pattern
+
 Each feature exposes `queries.ts` and `mutations.ts`. Current exports:
 
 - `accounts`: `queries.list`, `queries.getById`; `mutations.create`, `mutations.update`, `mutations.remove`.
@@ -84,19 +94,23 @@ Each feature exposes `queries.ts` and `mutations.ts`. Current exports:
 - `goals`: `queries.list`; `mutations.createGoal`, `mutations.update`, `mutations.remove`. (Same naming quirk.)
 
 Call from React:
+
 ```ts
 const accounts = useQuery(api.accounts.queries.list);
 const create = useMutation(api.transactions.mutations.create);
 ```
 
 ### Auth helper (`convex/utils/auth.ts`)
+
 ```ts
 getUserId(ctx): Promise<string | null>          // Clerk subject or null
 requireUserId(ctx): Promise<string>              // throws "Unauthorized: User not logged in." if missing
 ```
+
 Call `requireUserId(ctx)` at the top of every query/mutation handler that touches user data, and always check `doc.userId === userId` before reading/writing another document. Auth is wired via `convex/auth.config.ts` pointing at `process.env.CLERK_FRONTEND_API_URL` with `applicationID: "convex"`.
 
 ### Shared DB helpers
+
 - `convex/utils/db/accounts.ts` → `adjustAccount(ctx, account, amount, type, sign)` applies a signed balance/count delta. Use this when editing/deleting transactions so balances stay correct.
 
 ## 4. Code Style & Conventions
@@ -117,12 +131,14 @@ Call `requireUserId(ctx)` at the top of every query/mutation handler that touche
 ## 5. Workflow
 
 ### Branching & Commits
+
 - Never commit to `main` directly. New branch per task.
 - Branch naming: `feature/<name>`, `fix/<issue>`, `refactor/<scope>`.
 - Conventional Commits: `feat(ui): ...`, `fix(convex): ...`, `refactor(transactions): ...`.
 - Do not commit unless the user explicitly asks.
 
 ### Planning
+
 - `TODO.md` is the live backlog/progress file (there is no `PLAN.md`). Update it when completing or discovering work.
 - `README.md` is minimal; don't rely on it for architecture info.
 
@@ -136,9 +152,11 @@ Call `requireUserId(ctx)` at the top of every query/mutation handler that touche
 - **`next.config.ts`** is empty — no custom redirects, images, or headers configured.
 
 <!-- convex-ai-start -->
+
 This project uses [Convex](https://convex.dev) as its backend.
 
 When working on Convex code, **always read `convex/_generated/ai/guidelines.md` first** for important guidelines on how to correctly use Convex APIs and patterns. The file contains rules that override what you may have learned about Convex from training data.
 
 Convex agent skills for common tasks can be installed by running `npx convex ai-files install`.
+
 <!-- convex-ai-end -->

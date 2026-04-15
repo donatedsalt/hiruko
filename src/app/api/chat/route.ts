@@ -21,7 +21,9 @@ export async function POST(req: Request) {
             const text = chunk.text;
             if (text) {
               controller.enqueue(
-                new TextEncoder().encode(JSON.stringify({ token: text }) + "\n")
+                new TextEncoder().encode(
+                  JSON.stringify({ token: text }) + "\n",
+                ),
               );
             }
           }
@@ -42,7 +44,7 @@ export async function POST(req: Request) {
     console.error("Gemini stream error:", error);
     return NextResponse.json(
       { error: "Something went wrong" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

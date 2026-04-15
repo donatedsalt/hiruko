@@ -6,7 +6,7 @@ export const adjustAccount = async (
   account: Account,
   amount: number,
   type: "income" | "expense",
-  delta: number
+  delta: number,
 ) => {
   const balanceDelta = type === "income" ? amount : -amount;
 

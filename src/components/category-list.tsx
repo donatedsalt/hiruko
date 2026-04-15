@@ -29,7 +29,7 @@ function RenderList({ categories }: { categories: Category[] }) {
                         "flex items-center [&>svg]:size-4",
                         category.type === "income"
                           ? "text-success"
-                          : "text-destructive"
+                          : "text-destructive",
                       )}
                     >
                       {category.type}

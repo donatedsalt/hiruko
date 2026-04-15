@@ -78,7 +78,8 @@ export function GoalCard({ goal }: { goal: Goal }) {
       form.reset();
       setOpen(false);
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : "Unknown error occurred";
+      const message =
+        err instanceof Error ? err.message : "Unknown error occurred";
       toast.error("Something went wrong!", {
         description: message,
       });
@@ -95,7 +96,8 @@ export function GoalCard({ goal }: { goal: Goal }) {
       toast.success("Goal deleted");
       setOpen(false);
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : "Unknown error occurred";
+      const message =
+        err instanceof Error ? err.message : "Unknown error occurred";
       toast.error("Something went wrong!", {
         description: message,
       });
@@ -126,14 +128,13 @@ export function GoalCard({ goal }: { goal: Goal }) {
             </CardTitle>
             <CardDescription className="text-2xl font-semibold text-foreground tabular-nums">
               <p>
-                {formatCurrency(goal.saved)} / {formatCurrency(goal.amount)} used
+                {formatCurrency(goal.saved)} / {formatCurrency(goal.amount)}{" "}
+                used
               </p>
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <Progress
-              value={Math.min(100, (goal.saved / goal.amount) * 100)}
-            />
+            <Progress value={Math.min(100, (goal.saved / goal.amount) * 100)} />
           </CardContent>
           <CardFooter>
             <p className="text-base font-semibold text-muted-foreground tabular-nums">

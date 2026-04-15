@@ -124,7 +124,8 @@ export function BudgetCard({ budget }: { budget: Budget }) {
             </CardTitle>
             <CardDescription className="text-2xl font-semibold text-foreground tabular-nums">
               <p>
-                {formatCurrency(budget.spent)} / {formatCurrency(budget.amount)} used
+                {formatCurrency(budget.spent)} / {formatCurrency(budget.amount)}{" "}
+                used
               </p>
             </CardDescription>
           </CardHeader>

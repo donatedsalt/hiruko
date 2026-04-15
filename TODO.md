@@ -41,7 +41,6 @@ list of todos
 
 ## UI / Design
 
-
 ## Done
 
 - [x] transaction view

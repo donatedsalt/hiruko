@@ -57,7 +57,7 @@ export function CategoryDialog({
   const [name, setName] = useState(category?.name || "");
   const [icon, setIcon] = useState(category?.icon || "😀");
   const [type, setType] = useState<"income" | "expense">(
-    category?.type || "expense"
+    category?.type || "expense",
   );
 
   const handleSubmit = async () => {
@@ -90,7 +90,8 @@ export function CategoryDialog({
       }
       setOpen(false);
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : "Unknown error occurred";
+      const message =
+        err instanceof Error ? err.message : "Unknown error occurred";
       toast.error("Something went wrong!", {
         description: message,
       });
@@ -107,7 +108,8 @@ export function CategoryDialog({
       toast.success("Category deleted");
       setOpen(false);
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : "Unknown error occurred";
+      const message =
+        err instanceof Error ? err.message : "Unknown error occurred";
       toast.error("Something went wrong!", {
         description: message,
       });

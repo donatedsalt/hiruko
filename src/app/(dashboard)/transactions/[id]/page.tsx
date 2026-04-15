@@ -95,7 +95,7 @@ export default function Page() {
       setTxnGoal(transaction.goalId ?? "");
 
       setOldCategory(
-        categories?.find((cat) => cat._id === transaction.categoryId)
+        categories?.find((cat) => cat._id === transaction.categoryId),
       );
 
       const date = new Date(transaction.transactionTime)
@@ -116,7 +116,8 @@ export default function Page() {
       setOpen(false);
       smartRouter.replaceWithBack();
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : "Unknown error occurred";
+      const message =
+        err instanceof Error ? err.message : "Unknown error occurred";
       toast.error("Something went wrong!", {
         description: message,
       });
@@ -180,7 +181,8 @@ export default function Page() {
       form.reset();
       smartRouter.back();
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : "Unknown error occurred";
+      const message =
+        err instanceof Error ? err.message : "Unknown error occurred";
       toast.error("Something went wrong!", {
         description: message,
       });

@@ -102,16 +102,16 @@ function parseIncompleteMarkdown(text: string): string {
     }
   }
 
-   // Handle incomplete inline code blocks (`) - but avoid code blocks (```)
-   const inlineCodePattern = /(`)([^`]*?)$/;
-   const inlineCodeMatch = result.match(inlineCodePattern);
-   if (inlineCodeMatch) {
-     // Check if we're dealing with a code block (triple backticks)
-     const allTripleBackticks = (result.match(/```/g) || []).length;
+  // Handle incomplete inline code blocks (`) - but avoid code blocks (```)
+  const inlineCodePattern = /(`)([^`]*?)$/;
+  const inlineCodeMatch = result.match(inlineCodePattern);
+  if (inlineCodeMatch) {
+    // Check if we're dealing with a code block (triple backticks)
+    const allTripleBackticks = (result.match(/```/g) || []).length;
 
-     // If we have an odd number of ``` sequences, we're inside an incomplete code block
-     // In this case, don't complete inline code
-     const insideIncompleteCodeBlock = allTripleBackticks % 2 === 1;
+    // If we have an odd number of ``` sequences, we're inside an incomplete code block
+    // In this case, don't complete inline code
+    const insideIncompleteCodeBlock = allTripleBackticks % 2 === 1;
 
     if (!insideIncompleteCodeBlock) {
       // Count the number of single backticks that are NOT part of triple backticks
@@ -275,25 +275,25 @@ const components: Options["components"] = {
     >
       {children}
     </th>
-     ),
-     td: ({ children, className, ...props }) => (
-       <td className={cn("px-4 py-2 text-sm", className)} {...props}>
-         {children}
-       </td>
-     ),
-     blockquote: ({ children, className, ...props }) => (
-       <blockquote
-         className={cn(
-           "my-4 border-muted-foreground/30 border-l-4 pl-4 text-muted-foreground italic",
-           className,
-         )}
-         {...props}
-       >
-         {children}
-       </blockquote>
-     ),
-     code: ({ node, className, ...props }) => {
-       const inline = node?.position?.start.line === node?.position?.end.line;
+  ),
+  td: ({ children, className, ...props }) => (
+    <td className={cn("px-4 py-2 text-sm", className)} {...props}>
+      {children}
+    </td>
+  ),
+  blockquote: ({ children, className, ...props }) => (
+    <blockquote
+      className={cn(
+        "my-4 border-muted-foreground/30 border-l-4 pl-4 text-muted-foreground italic",
+        className,
+      )}
+      {...props}
+    >
+      {children}
+    </blockquote>
+  ),
+  code: ({ node, className, ...props }) => {
+    const inline = node?.position?.start.line === node?.position?.end.line;
 
     if (!inline) {
       return <code className={className} {...props} />;
@@ -308,25 +308,26 @@ const components: Options["components"] = {
         {...props}
       />
     );
-     },
-     pre: ({ node, className, children }) => {
-       let language = "javascript";
+  },
+  pre: ({ node, className, children }) => {
+    let language = "javascript";
 
-     if (typeof node?.properties?.className === "string") {
-       language = node.properties.className.replace("language-", "");
-     }
+    if (typeof node?.properties?.className === "string") {
+      language = node.properties.className.replace("language-", "");
+    }
 
-     // Extract code content from children safely
-     let code = "";
-     if (
-       isValidElement(children) &&
-       children.props &&
-       typeof (children.props as unknown as Record<string, unknown>).children === "string"
-     ) {
-       code = (children.props as unknown as Record<string, string>).children;
-     } else if (typeof children === "string") {
-       code = children;
-     }
+    // Extract code content from children safely
+    let code = "";
+    if (
+      isValidElement(children) &&
+      children.props &&
+      typeof (children.props as unknown as Record<string, unknown>).children ===
+        "string"
+    ) {
+      code = (children.props as unknown as Record<string, string>).children;
+    } else if (typeof children === "string") {
+      code = children;
+    }
 
     return (
       <CodeBlock

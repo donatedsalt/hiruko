@@ -75,7 +75,8 @@ export function AccountCard({ account }: { account: Account }) {
       form.reset();
       setOpen(false);
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : "Unknown error occurred";
+      const message =
+        err instanceof Error ? err.message : "Unknown error occurred";
       toast.error("Something went wrong!", {
         description: message,
       });
@@ -92,7 +93,8 @@ export function AccountCard({ account }: { account: Account }) {
       toast.success("Account deleted");
       setOpen(false);
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : "Unknown error occurred";
+      const message =
+        err instanceof Error ? err.message : "Unknown error occurred";
       toast.error("Something went wrong!", {
         description: message,
       });
@@ -274,7 +276,8 @@ export function AddAccountCard() {
       form.reset();
       setOpen(false);
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : "Unknown error occurred";
+      const message =
+        err instanceof Error ? err.message : "Unknown error occurred";
       toast.error("Something went wrong!", {
         description: message,
       });

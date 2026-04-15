@@ -132,7 +132,8 @@ export default function Page() {
       form.reset();
       smartRouter.back();
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : "Unknown error occurred";
+      const message =
+        err instanceof Error ? err.message : "Unknown error occurred";
       toast.error("Something went wrong!", {
         description: message,
       });
