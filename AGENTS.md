@@ -11,7 +11,7 @@ Hiruko is a personal finance tracker built with **Next.js 15 (App Router, Turbop
   - `bun run build` — production build (also type-checks).
   - `bun run start` — run production build.
   - `bun run lint` — `next lint` (ESLint flat config).
-- **Required env**: `CLERK_FRONTEND_API_URL` (used by `convex/auth.config.ts`), the standard Clerk `NEXT_PUBLIC_CLERK_*` keys, `NEXT_PUBLIC_CONVEX_URL`, and `GEMINI_API_KEY` (used by `/api/chat`).
+- **Required env**: `CLERK_FRONTEND_API_URL` (used by `convex/auth.config.ts`), `CLERK_WEBHOOK_SECRET` (svix verification in `convex/http.ts`), the standard Clerk `NEXT_PUBLIC_CLERK_*` keys, `NEXT_PUBLIC_CONVEX_URL`, and `GEMINI_API_KEY` (used by `/api/chat`).
 
 ### Testing & Verification
 
@@ -27,7 +27,7 @@ Uses two route groups, each with its **own `<html>`/`<body>` root layout** (ther
 - `(auth)/layout.tsx` — Clerk + Convex + Theme providers, fixed theme-toggle button.
   - `sign-in/[[...sign-in]]/page.tsx`
   - `sign-up/[[...sign-up]]/page.tsx`
-- `(dashboard)/layout.tsx` — same providers plus `AppSidebar`, `Toaster`, `FloatingButtons`, `HistoryTracker`.
+- `(dashboard)/layout.tsx` — same providers plus `AppSidebar`, `Toaster`, `FloatingButtons`, `HistoryTracker`, `SpeedInsights`.
   - `page.tsx` (home / overview)
   - `transactions/page.tsx`, `transactions/new/page.tsx`, `transactions/[id]/page.tsx`
   - `categories/page.tsx`
@@ -77,7 +77,7 @@ All tables carry `userId: string` (Clerk subject) and are indexed by it.
 | -------------- | ---------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
 | `accounts`     | `name`, `balance`, `transactionCount`, `updatedAt`                                                                     | `by_userId`                                                                                                                            |
 | `categories`   | `name`, `icon`, `type: "income" \| "expense"`, `transactionCount`, `transactionAmount`                                 | `by_userId`, `by_userId_name`                                                                                                          |
-| `transactions` | `categoryId`, `accountId`, `budgetId?`, `goalId?`, `amount`, `type`, `title?`, `note?`, `transactionTime`, `updatedAt` | `by_userId`, `by_account`, `by_category`, `by_budget`, `by_goal`, `by_userId_type` (userId+type+transactionTime), `by_transactionTime` |
+| `transactions` | `categoryId`, `accountId`, `budgetId?`, `goalId?`, `amount`, `type`, `title?`, `note?`, `transactionTime`, `updatedAt` | `by_userId`, `by_account`, `by_category`, `by_budget`, `by_goal`, `by_userId_type` (userId+type+transactionTime), `by_userId_transactionTime` (userId+transactionTime) |
 | `budgets`      | `name`, `amount`, `spent`, `transactionCount`                                                                          | `by_userId`                                                                                                                            |
 | `goals`        | `name`, `amount`, `saved`, `transactionCount`                                                                          | `by_userId`                                                                                                                            |
 
@@ -92,6 +92,9 @@ Each feature exposes `queries.ts` and `mutations.ts`. Current exports:
 - `transactions`: `queries.list`, `queries.listRecent`, `queries.listPaginated`, `queries.statsByDay`, `queries.getById`; `mutations.create`, `mutations.update`, `mutations.remove`.
 - `budgets`: `queries.list`; `mutations.createBudget`, `mutations.update`, `mutations.remove`. (Note: the create is named `createBudget`, not `create`.)
 - `goals`: `queries.list`; `mutations.createGoal`, `mutations.update`, `mutations.remove`. (Same naming quirk.)
+- `users`: `mutations.initializeUser` (internal). Invoked from the Clerk webhook on `user.created` to seed a Cash account and default categories.
+
+`convex/http.ts` exposes `/clerk-webhook` (svix-verified) which dispatches to `users.mutations.initializeUser` on `user.created`.
 
 Call from React:
 
