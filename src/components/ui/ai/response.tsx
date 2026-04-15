@@ -335,10 +335,7 @@ const components: Options["components"] = {
         code={code}
         language={language}
       >
-        <CodeBlockCopyButton
-          onCopy={() => console.log("Copied code to clipboard")}
-          onError={() => console.error("Failed to copy code to clipboard")}
-        />
+        <CodeBlockCopyButton />
       </CodeBlock>
     );
   },

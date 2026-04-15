@@ -1,6 +1,5 @@
 "use client";
 
-import { ErrorMessage } from "@/components/error-message";
 import {
   AccountCardSkeleton,
   AccountCard,
@@ -19,10 +18,6 @@ export function AccountsCards() {
         <AddAccountCard />
       </div>
     );
-  }
-
-  if (accounts instanceof Error) {
-    return <ErrorMessage error={accounts.message} className="min-h-36" />;
   }
 
   return (

@@ -6,12 +6,10 @@ import {
   IconCash,
   IconCategory2,
   IconChartPie,
-  IconCoin,
   IconMessageCircleQuestion,
   IconMoneybag,
   IconPigMoney,
   IconReport,
-  // IconSearch,
 } from "@tabler/icons-react";
 
 import { NavMain } from "@/components/nav-main";
@@ -61,46 +59,13 @@ const data = {
       url: "/goals",
       icon: IconPigMoney,
     },
-    // {
-    //   title: "Trade",
-    //   url: "#",
-    //   icon: IconChartCandle,
-    // },
     {
       title: "Consult",
       url: "/consult",
       icon: IconMessageCircleQuestion,
     },
   ],
-  navBusinesses: [
-    {
-      name: "Business1",
-      url: "#",
-      icon: IconCoin,
-    },
-    {
-      name: "Business2",
-      url: "#",
-      icon: IconCoin,
-    },
-  ],
-  navSecondary: [
-    // {
-    //   title: "Settings",
-    //   url: "#",
-    //   icon: IconSettings,
-    // },
-    // {
-    //   title: "Get Help",
-    //   url: "#",
-    //   icon: IconHelp,
-    // },
-    // {
-    //   title: "Search",
-    //   url: "#",
-    //   icon: IconSearch,
-    // },
-  ],
+  navSecondary: [],
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
@@ -123,7 +88,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={data.navMain} />
-        {/* <NavBusinesses items={data.navBusinesses} /> */}
         <NavSecondary items={data.navSecondary} className="mt-auto" />
       </SidebarContent>
       <SidebarFooter>

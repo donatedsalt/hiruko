@@ -37,7 +37,6 @@ export default function EmojiPickerButton({
           onEmojiSelect={({ emoji }) => {
             onChange(emoji);
             setIsOpen(false);
-            console.log(emoji);
           }}
         >
           <EmojiPickerSearch />
