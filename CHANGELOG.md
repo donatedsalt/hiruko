@@ -4,6 +4,7 @@ Historical record of completed work. For authoritative history, see `git log`.
 
 ## Unreleased
 
+- `useSmartRouter` / `HistoryTracker`: namespace visitedPaths per Clerk userId (no cross-account leak), wrap router methods so `back`/`forward` are safe to destructure
 - transaction view
 - transaction edit
 - transaction delete

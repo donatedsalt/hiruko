@@ -2,34 +2,34 @@
 
 import { useEffect } from "react";
 import { usePathname } from "next/navigation";
+import { useAuth } from "@clerk/nextjs";
 
-const HISTORY_KEY = "visitedPaths";
+const HISTORY_KEY_PREFIX = "visitedPaths:";
+const ANON_SCOPE = "anon";
 const MAX_HISTORY_LENGTH = 10;
-
 const IGNORED_PATHS = ["/sign-in", "/sign-up"];
 
-function updateHistory(path: string) {
-  if (IGNORED_PATHS.includes(path)) return;
+export function historyKey(userId: string | null | undefined) {
+  return `${HISTORY_KEY_PREFIX}${userId ?? ANON_SCOPE}`;
+}
+
+function updateHistory(key: string, path: string) {
+  if (IGNORED_PATHS.some((p) => path.startsWith(p))) return;
 
   try {
-    const raw = localStorage.getItem(HISTORY_KEY);
+    const raw = localStorage.getItem(key);
     let history: string[] = raw ? JSON.parse(raw) : [];
 
-    // Prevent duplication of current path
     if (history[history.length - 1] === path) return;
 
-    // Remove the current path if it already exists (to ensure uniqueness)
     history = history.filter((p) => p !== path);
-
-    // Add the path at the end
     history.push(path);
 
-    // Keep only the last MAX_HISTORY_LENGTH items
     if (history.length > MAX_HISTORY_LENGTH) {
       history = history.slice(history.length - MAX_HISTORY_LENGTH);
     }
 
-    localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+    localStorage.setItem(key, JSON.stringify(history));
   } catch (err) {
     console.warn("Failed to update history:", err);
   }
@@ -37,10 +37,12 @@ function updateHistory(path: string) {
 
 export function HistoryTracker() {
   const pathname = usePathname();
+  const { userId, isLoaded } = useAuth();
 
   useEffect(() => {
-    updateHistory(pathname);
-  }, [pathname]);
+    if (!isLoaded) return;
+    updateHistory(historyKey(userId), pathname);
+  }, [pathname, userId, isLoaded]);
 
   return null;
 }

@@ -48,8 +48,6 @@ list of todos
 - [ ] typo: `goalLoading = budgets === undefined` (and `budLoading` swap) — `src/app/(dashboard)/transactions/[id]/page.tsx:69,376`
 - [ ] `groupByDate` keys by UTC day → non-UTC users see transactions in wrong bucket — `convex/transactions/queries.ts:106`
 - [ ] `validation/budget.ts` uses `.positive()` on `spent` — rejects legal value `0`
-- [ ] `useSmartRouter` returns unbound `router.back/forward` — can throw — `src/hooks/use-smart-router.ts:23-31`
-- [ ] `useSmartRouter` reads `localStorage.visitedPaths` that nothing writes — feature dead, `replaceWithBack` always falls back to `/` — `src/hooks/use-smart-router.ts`, `src/components/history-tracker.tsx`
 - [ ] Convex `list` queries omit `args: {}` validators (violates Convex guidelines) — `convex/{accounts,budgets,categories,goals}/queries.ts`
 - [ ] unbounded `.collect()` on list queries will collapse as data grows — switch to `.take()` or paginate — `convex/{accounts,budgets,categories,goals,transactions}/queries.ts`
 - [ ] inconsistent error contract on delete: budgets/goals return `{ success: false }` on not-found/unauthorized while other mutations throw — `convex/{budgets,goals}/mutations.ts:59-65`
@@ -66,7 +64,6 @@ list of todos
 - [ ] `console.error` in `/api/chat` logs the full Gemini error object (may include request details / partial key fragments in stack traces) — sanitize before logging — `src/app/api/chat/route.ts:44`
 - [ ] verify Svix `Webhook.verify()` enforces a timestamp tolerance window; if not, manually reject payloads older than ~5 min to block replay — `convex/http.ts:32-36`
 - [ ] `next.config.ts` is empty — add CSP / security headers, `poweredByHeader: false`
-- [ ] `HistoryTracker` localStorage key not namespaced per user — paths leak between accounts after sign-out — `src/components/history-tracker.tsx`
 
 ## UX
 

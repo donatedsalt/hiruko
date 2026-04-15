@@ -43,13 +43,13 @@ Uses two route groups, each with its **own `<html>`/`<body>` root layout** (ther
 
 - `ui/` — shadcn/ui primitives (button, card, dialog, sidebar, calendar, chart, drawer, sonner, etc.) plus `ui/ai/` (AI chat-specific: `conversation.tsx`, `message.tsx`, `prompt-input.tsx`, `reasoning.tsx`, `response.tsx`, `code-block.tsx`, `tool.tsx`, etc.).
 - `icons/hiruko-icon.tsx` — brand mark.
-- Feature-level components live directly under `src/components/` (flat): `app-sidebar.tsx`, `nav-main.tsx`, `nav-businesses.tsx`, `nav-secondary.tsx`, `nav-user.tsx`, `site-header.tsx`, `transaction-list.tsx`, `account-card.tsx`, `accounts-cards.tsx`, `budget-card.tsx`, `goal-card.tsx`, `category-list.tsx`, `category-dialog.tsx`, `chart-area-interactive.tsx`, `pie-chart.tsx`, `list-item.tsx`, `emoji-picker-button.tsx`, `error-message.tsx`, `floating-buttons.tsx`, `history-tracker.tsx` (persists visited paths to localStorage for `useSmartRouter`), `theme-provider.tsx`, `theme-change-button.tsx`, `convex-client-provider.tsx`.
+- Feature-level components live directly under `src/components/` (flat): `app-sidebar.tsx`, `nav-main.tsx`, `nav-businesses.tsx`, `nav-secondary.tsx`, `nav-user.tsx`, `site-header.tsx`, `transaction-list.tsx`, `account-card.tsx`, `accounts-cards.tsx`, `budget-card.tsx`, `goal-card.tsx`, `category-list.tsx`, `category-dialog.tsx`, `chart-area-interactive.tsx`, `pie-chart.tsx`, `list-item.tsx`, `emoji-picker-button.tsx`, `error-message.tsx`, `floating-buttons.tsx`, `history-tracker.tsx` (persists visited paths to localStorage under a Clerk-userId-scoped key for `useSmartRouter`), `theme-provider.tsx`, `theme-change-button.tsx`, `convex-client-provider.tsx`.
 
 ### `src/hooks`
 
 - `use-mobile.ts` — media-query mobile detection.
 - `use-countdown.ts` — generic countdown timer.
-- `use-smart-router.ts` — wraps `next/navigation` router; adds `replaceWithBack(fallback)` using `localStorage.visitedPaths` populated by `HistoryTracker`.
+- `use-smart-router.ts` — wraps `next/navigation` router; methods are returned as arrow wrappers so they're safe to destructure. Adds `replaceWithBack(fallback)` that reads the user-scoped `visitedPaths:<userId>` key populated by `HistoryTracker`.
 
 ### `src/lib`
 
