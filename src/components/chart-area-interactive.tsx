@@ -94,8 +94,7 @@ export function ChartAreaInteractive({ data }: { data: Transaction[] }) {
   } satisfies ChartConfig;
 
   return (
-    <div className="px-4 lg:px-6">
-      <Card className="@container/card">
+    <Card className="@container/card">
         <CardHeader>
           <CardTitle>Transactions</CardTitle>
           <CardDescription>
@@ -234,14 +233,9 @@ export function ChartAreaInteractive({ data }: { data: Transaction[] }) {
           </ChartContainer>
         </CardContent>
       </Card>
-    </div>
   );
 }
 
 export function ChartAreaInteractiveSkeleton() {
-  return (
-    <div className="px-4 lg:px-6">
-      <Skeleton className=" h-98" />
-    </div>
-  );
+  return <Skeleton className="h-98" />;
 }

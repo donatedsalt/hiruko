@@ -14,7 +14,7 @@ export function AccountsCards() {
 
   if (accounts === undefined) {
     return (
-      <div className="flex gap-4 px-4 overflow-auto lg:px-6 scrollbar-none">
+      <div className="flex gap-4 overflow-auto scrollbar-none">
         <AccountCardSkeleton />
         <AddAccountCard />
       </div>
@@ -26,7 +26,7 @@ export function AccountsCards() {
   }
 
   return (
-    <div className="flex gap-4 px-4 overflow-auto lg:px-6 scrollbar-none">
+    <div className="flex gap-4 overflow-auto scrollbar-none">
       {accounts.map((account) => (
         <AccountCard key={account._id} account={account} />
       ))}
