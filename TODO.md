@@ -11,6 +11,11 @@ list of todos
 - [ ] checkbox to disable or enable deletion conformation in settings
 - [ ] premium features like family budgets and goals tracking
 - [ ] take image of receipts to automatically add transactions
+- [ ] decouple categories from `type`: treat income/expense as a UI suggestion, not a constraint
+  - drop the `category.type === txn.type` check in `convex/transactions/mutations.ts`
+  - split `categories.transactionAmount` into `incomeAmount` + `expenseAmount`; one-shot migration backfills from existing `type`
+  - keep `category.type` as a default for the txn form's type toggle and for picker sort order
+  - statistics / pie chart need to pick which bucket to show (income vs expense)
 
 ## Bugs
 
