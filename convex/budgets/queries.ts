@@ -4,11 +4,14 @@ import { requireUserId } from "@/convex/utils/auth";
 /**
  * Get all budgets for the authenticated user.
  */
-export const list = query(async (ctx) => {
-  const userId = await requireUserId(ctx);
+export const list = query({
+  args: {},
+  handler: async (ctx) => {
+    const userId = await requireUserId(ctx);
 
-  return await ctx.db
-    .query("budgets")
-    .withIndex("by_userId", (q) => q.eq("userId", userId))
-    .collect();
+    return await ctx.db
+      .query("budgets")
+      .withIndex("by_userId", (q) => q.eq("userId", userId))
+      .take(10_000);
+  },
 });

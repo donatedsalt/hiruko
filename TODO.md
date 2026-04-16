@@ -41,12 +41,8 @@ list of todos
 ## Bugs
 
 - [ ] `groupByDate` keys by UTC day → non-UTC users see transactions in wrong bucket — `convex/transactions/queries.ts:106`
-- [ ] `validation/budget.ts` uses `.positive()` on `spent` — rejects legal value `0`
-- [ ] Convex `list` queries omit `args: {}` validators (violates Convex guidelines) — `convex/{accounts,budgets,categories,goals}/queries.ts`
-- [ ] unbounded `.collect()` on list queries will collapse as data grows — switch to `.take()` or paginate — `convex/{accounts,budgets,categories,goals,transactions}/queries.ts`
-- [ ] inconsistent error contract on delete: budgets/goals return `{ success: false }` on not-found/unauthorized while other mutations throw — `convex/{budgets,goals}/mutations.ts:59-65`
+- [ ] unbounded `.collect()` / no pagination on `convex/transactions/queries.ts` — switch to `.take()` or paginate
 - [ ] Clerk webhook lacks idempotency/dedup — store Svix event IDs to defend against retries/replays — `convex/http.ts`
-- [ ] `useCountdown` resets unexpectedly when `start` prop changes mid-countdown — `src/hooks/use-countdown.ts:25`, used by `src/components/category-dialog.tsx:51`
 - [ ] `ConvexReactClient` instantiated at module scope can hold stale config across hot reloads — move inside the provider component — `src/components/convex-client-provider.tsx:12`
 - [ ] no delete confirmation/countdown on transaction detail page (other entities use `useCountdown`) — `src/app/(dashboard)/transactions/[id]/page.tsx:475`
 

@@ -4,6 +4,12 @@ Historical record of completed work. For authoritative history, see `git log`.
 
 ## Unreleased
 
+- quick-win hygiene sweep:
+  - add `args: {}` validators on `accounts` / `budgets` / `categories` / `goals` `list` queries
+  - cap list queries with `.take(10_000)` instead of unbounded `.collect()`
+  - `validation/budget.ts`: `spent` is `.nonnegative()` (not `.positive()`) so a fresh budget passes validation
+  - `useCountdown`: track `start` in a ref; effect now only re-runs on `active` flips, not every `start` prop change
+  - `budgets.remove` / `goals.remove` throw on not-found/unauthorized, matching the other delete mutations
 - counter-integrity sweep across Convex mutations:
   - cascading deletes: `accounts.remove` / `categories.remove` now reverse category/budget/goal (or account/budget/goal) counters on the affected transactions before deletion, via a new `reverseTransactionSideEffects` helper in `convex/utils/db/transactions.ts`
   - `accounts.update` balance correction now routes through the shared `adjustAccount` helper instead of hand-rolling the balance/count patch

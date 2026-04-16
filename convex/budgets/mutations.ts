@@ -61,7 +61,7 @@ export const remove = mutation({
 
     const budget = await ctx.db.get(args.id);
     if (!budget || budget.userId !== userId) {
-      return { success: false, reason: "not_found_or_unauthorized" };
+      throw new Error("Budget not found or unauthorized");
     }
 
     const txns = await ctx.db

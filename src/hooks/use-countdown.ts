@@ -1,13 +1,18 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export function useCountdown(start: number, active: boolean) {
   const [count, setCount] = useState(start);
   const [done, setDone] = useState(false);
 
+  const startRef = useRef(start);
+  useEffect(() => {
+    startRef.current = start;
+  }, [start]);
+
   useEffect(() => {
     if (!active) return;
 
-    setCount(start);
+    setCount(startRef.current);
     setDone(false);
 
     const interval = setInterval(() => {
@@ -22,7 +27,7 @@ export function useCountdown(start: number, active: boolean) {
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [start, active]);
+  }, [active]);
 
   return { count, done };
 }
