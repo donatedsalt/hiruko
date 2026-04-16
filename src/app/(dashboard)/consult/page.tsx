@@ -1,6 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useChat } from "@ai-sdk/react";
+import { DefaultChatTransport, type UIMessage } from "ai";
+import { useAuth } from "@clerk/nextjs";
 
 import {
   Conversation,
@@ -17,107 +20,114 @@ import { SiteHeader } from "@/components/site-header";
 import { Response } from "@/components/ui/ai/response";
 import { Message, MessageContent } from "@/components/ui/ai/message";
 import { Suggestion, Suggestions } from "@/components/ui/ai/suggestion";
+import { Button } from "@/components/ui/button";
+import { IconRefresh } from "@tabler/icons-react";
 
-interface IMessage {
-  from: "user" | "assistant" | "system";
-  content: string;
+const SUGGESTIONS = [
+  "Build me a monthly budget using the 50/30/20 rule",
+  "How big should my emergency fund be, and how do I start one?",
+  "Give me 5 concrete ways to cut my grocery bill",
+  "Should I pay off high-interest debt or invest first?",
+  "Explain compound interest with a realistic savings example",
+  "Walk me through choosing between a Roth IRA and a 401(k)",
+];
+
+const HISTORY_PREFIX = "chatHistory:";
+
+function historyKey(userId: string | null | undefined) {
+  return `${HISTORY_PREFIX}${userId ?? "anon"}`;
+}
+
+function loadHistory(userId: string | null | undefined): UIMessage[] {
+  try {
+    const raw = localStorage.getItem(historyKey(userId));
+    return raw ? (JSON.parse(raw) as UIMessage[]) : [];
+  } catch {
+    return [];
+  }
+}
+
+function renderText(msg: UIMessage): string {
+  return msg.parts
+    .map((p) => (p.type === "text" ? p.text : ""))
+    .join("");
 }
 
 export default function Page() {
+  const { userId, isLoaded } = useAuth();
   const [input, setInput] = useState("");
-  const [messages, setMessages] = useState<IMessage[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [prompts, _setPrompts] = useState([
-    "How do i reduce my expenses?",
-    "How do i increase my income?",
-    "How do i save for retirement?",
-    "What are some good budgeting tips?",
-    "What are the best investment strategies?",
-  ]);
+  const [initialMessages, setInitialMessages] = useState<UIMessage[] | null>(
+    null,
+  );
 
-  const handleSubmit = async (e?: React.FormEvent<HTMLFormElement>) => {
-    e?.preventDefault();
-    if (!input.trim()) return;
+  useEffect(() => {
+    if (!isLoaded) return;
+    setInitialMessages(loadHistory(userId));
+  }, [isLoaded, userId]);
 
-    setIsLoading(true);
+  if (initialMessages === null) {
+    return (
+      <>
+        <SiteHeader title="Consult" />
+        <div className="flex flex-1 items-center justify-center p-6 text-muted-foreground text-sm">
+          Loading…
+        </div>
+      </>
+    );
+  }
 
-    const userMessage = { from: "user" as const, content: input };
-    setMessages((prev) => [...prev, userMessage]);
+  return (
+    <Chat
+      userId={userId}
+      initialMessages={initialMessages}
+      input={input}
+      setInput={setInput}
+    />
+  );
+}
 
-    const currentInput = input;
-    setInput("");
+function Chat({
+  userId,
+  initialMessages,
+  input,
+  setInput,
+}: {
+  userId: string | null | undefined;
+  initialMessages: UIMessage[];
+  input: string;
+  setInput: (v: string) => void;
+}) {
+  const { messages, sendMessage, status, error, stop, regenerate } = useChat({
+    messages: initialMessages,
+    transport: new DefaultChatTransport({ api: "/api/chat" }),
+  });
 
-    const appendError = (text: string) => {
-      setMessages((prev) => [...prev, { from: "system", content: text }]);
-    };
-
-    let res: Response;
+  useEffect(() => {
     try {
-      res = await fetch("/api/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt: currentInput }),
-      });
+      localStorage.setItem(historyKey(userId), JSON.stringify(messages));
     } catch {
-      appendError("Network error. Check your connection and try again.");
-      setIsLoading(false);
-      return;
+      // quota exceeded — ignore
     }
+  }, [messages, userId]);
 
-    if (!res.ok) {
-      const msg =
-        res.status === 401
-          ? "You need to sign in again."
-          : res.status === 429
-            ? "Too many requests. Try again in a minute."
-            : res.status === 400
-              ? "That message couldn't be sent."
-              : "Something went wrong. Try again.";
-      appendError(msg);
-      setIsLoading(false);
-      return;
-    }
+  const isBusy = status === "submitted" || status === "streaming";
 
-    if (!res.body) {
-      appendError("Empty response from the server.");
-      setIsLoading(false);
-      return;
-    }
-
-    const reader = res.body.getReader();
-    const decoder = new TextDecoder();
-
-    const assistantMessage = { from: "assistant" as const, content: "" };
-    setMessages((prev) => [...prev, assistantMessage]);
-
-    try {
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-
-        const chunk = decoder.decode(value, { stream: true });
-        const lines = chunk.split("\n").filter((l) => l.trim());
-
-        for (const line of lines) {
-          try {
-            const { token } = JSON.parse(line);
-            assistantMessage.content += token;
-            setMessages((prev) => {
-              const updated = [...prev];
-              updated[updated.length - 1] = { ...assistantMessage };
-              return updated;
-            });
-          } catch {}
-        }
-      }
-    } finally {
-      setIsLoading(false);
-    }
+  const handleSubmit = (e?: React.FormEvent<HTMLFormElement>) => {
+    e?.preventDefault();
+    const text = input.trim();
+    if (!text || isBusy) return;
+    sendMessage({ text });
+    setInput("");
   };
 
-  const handleSuggestionClick = async (prompt: string) => {
-    setInput(prompt);
-    handleSubmit();
+  const handleSuggestionClick = (prompt: string) => {
+    if (isBusy) return;
+    sendMessage({ text: prompt });
+    setInput("");
+  };
+
+  const handlePrimaryClick = () => {
+    if (status === "streaming" || status === "submitted") stop();
   };
 
   return (
@@ -127,28 +137,49 @@ export default function Page() {
       <div className="@container/main flex flex-col flex-1 gap-4 p-4 md:gap-6 md:p-6">
         <Conversation className="relative w-full flex-1 min-h-0">
           <ConversationContent className="px-0">
-            {messages.map((message, idx) => (
-              <Message key={idx} from={message.from}>
+            {messages.map((message) => (
+              <Message key={message.id} from={message.role}>
                 <MessageContent>
-                  {message.from === "assistant" ? (
-                    <Response>{message.content}</Response>
+                  {message.role === "assistant" ? (
+                    <Response>{renderText(message)}</Response>
                   ) : (
-                    message.content
+                    renderText(message)
                   )}
                 </MessageContent>
               </Message>
             ))}
-            {isLoading && messages[messages.length - 1]?.from === "user" && (
-              <Message from="assistant">
+            {status === "submitted" &&
+              messages[messages.length - 1]?.role === "user" && (
+                <Message from="assistant">
+                  <MessageContent>
+                    <div className="flex space-x-1">
+                      <span className="animate-bounce">.</span>
+                      <span className="animate-bounce [animation-delay:150ms]">
+                        .
+                      </span>
+                      <span className="animate-bounce [animation-delay:300ms]">
+                        .
+                      </span>
+                    </div>
+                  </MessageContent>
+                </Message>
+              )}
+            {status === "error" && (
+              <Message from="system">
                 <MessageContent>
-                  <div className="flex space-x-1">
-                    <span className="animate-bounce">.</span>
-                    <span className="animate-bounce [animation-delay:150ms]">
-                      .
+                  <div className="flex flex-col gap-2">
+                    <span>
+                      {error?.message ?? "Something went wrong."}
                     </span>
-                    <span className="animate-bounce [animation-delay:300ms]">
-                      .
-                    </span>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="w-fit"
+                      onClick={() => regenerate()}
+                    >
+                      <IconRefresh className="size-4" />
+                      Retry
+                    </Button>
                   </div>
                 </MessageContent>
               </Message>
@@ -156,24 +187,33 @@ export default function Page() {
           </ConversationContent>
           <ConversationScrollButton />
         </Conversation>
-        <Suggestions>
-          {prompts.map((prompt) => (
-            <Suggestion
-              key={prompt}
-              suggestion={prompt}
-              onClick={handleSuggestionClick}
-            />
-          ))}
-        </Suggestions>
-        <PromptInput onSubmit={(e) => handleSubmit(e)}>
+
+        {messages.length === 0 && (
+          <Suggestions>
+            {SUGGESTIONS.map((prompt) => (
+              <Suggestion
+                key={prompt}
+                suggestion={prompt}
+                onClick={handleSuggestionClick}
+              />
+            ))}
+          </Suggestions>
+        )}
+
+        <PromptInput onSubmit={handleSubmit}>
           <PromptInputTextarea
             value={input}
             onChange={(e) => setInput(e.currentTarget.value)}
             placeholder="Type your message..."
-            disabled={isLoading}
+            disabled={isBusy && status !== "streaming"}
           />
           <PromptInputToolbar className="justify-end">
-            <PromptInputSubmit disabled={!input.trim() || isLoading} />
+            <PromptInputSubmit
+              status={status}
+              disabled={!isBusy && !input.trim()}
+              onClick={isBusy ? handlePrimaryClick : undefined}
+              type={isBusy ? "button" : "submit"}
+            />
           </PromptInputToolbar>
         </PromptInput>
       </div>

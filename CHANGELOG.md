@@ -4,6 +4,10 @@ Historical record of completed work. For authoritative history, see `git log`.
 
 ## Unreleased
 
+- migrate AI chat to the Vercel AI SDK (`streamText` + `@ai-sdk/google` on the server, `useChat` + `DefaultChatTransport` on the client); gains standard UI-message stream, built-in abort (`stop()`) and retry (`regenerate()`), typed message history
+- consult page: persist chat history to `chatHistory:<userId>` localStorage; refresh restores the conversation
+- consult page: replace generic suggestions with six actionable finance prompts (50/30/20 budget, emergency fund, grocery cuts, debt-vs-invest, compound interest, Roth vs 401(k))
+- extend `ui/ai/tool.tsx` to handle the new `ToolUIPart` states (`approval-requested`, `approval-responded`, `output-denied`) introduced by `ai@6`
 - `/api/chat` hardening: Clerk auth (401), same-origin check (403), 8 KB body cap (413), Zod prompt validation (400), per-user 20/min rate limit (429), sanitized error logs, fail-fast on missing `GEMINI_API_KEY` (503)
 - consult page: surface network / 401 / 429 / 400 / 5xx as visible system messages instead of silent failure
 - `useSmartRouter` / `HistoryTracker`: namespace visitedPaths per Clerk userId (no cross-account leak), wrap router methods so `back`/`forward` are safe to destructure

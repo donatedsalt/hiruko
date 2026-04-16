@@ -18,7 +18,6 @@ list of todos
   - statistics / pie chart need to pick which bucket to show (income vs expense)
 
 - [ ] consolidate to a single `src/app/layout.tsx` — `(auth)` and `(dashboard)` layouts each render `<html>`/`<body>` with duplicated Clerk/Convex/Theme/font providers; drift is inevitable
-- [ ] remove unused `ai` SDK from `package.json` (or migrate `/api/chat` to it) — current route emits `{token}\n` lines while `ai` v5 is installed but unused
 - [ ] aggregate `accounts`/`categories`/`budgets`/`goals` into one Convex query for `transactions/new` instead of 4 `useQuery` calls — `src/app/(dashboard)/transactions/new/page.tsx`
 - [ ] use the Convex `statsByDay` / grouped query in `transaction-list.tsx` instead of recomputing `groupByDay` client-side
 - [ ] add `error.tsx` at `(auth)` and `(dashboard)` route boundaries; wrap data-dependent sections in `<Suspense>` with skeletons
@@ -63,8 +62,6 @@ list of todos
 
 ## UX
 
-- [ ] AI consult: add abort + retry for in-flight streams
-- [ ] AI consult: persist message history (DB or localStorage) so refresh doesn't wipe the conversation
 - [ ] first-run onboarding flow after Clerk webhook seeds Cash account + default categories — dashboard and `transactions/new` redirect path are confusing for empty state
 - [ ] statistics page: add date-range controls (match the 7d/30d toggle from `chart-area-interactive`) and show historical trends — `src/app/(dashboard)/statistics/page.tsx`
 - [ ] over-budget warnings: prominent visual state and (eventually) notifications when budgets/goals trip thresholds

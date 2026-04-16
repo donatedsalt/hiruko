@@ -1,17 +1,17 @@
-import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
-import { GoogleGenAI } from "@google/genai";
-import { z } from "zod";
+import { createGoogleGenerativeAI } from "@ai-sdk/google";
+import { streamText, convertToModelMessages, type UIMessage } from "ai";
+import { NextResponse } from "next/server";
+
+export const maxDuration = 30;
 
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 
-const MAX_BODY_BYTES = 8 * 1024;
+const MAX_BODY_BYTES = 32 * 1024;
+const MAX_MESSAGES = 50;
+const MAX_CONTENT_CHARS = 16_000;
 const RATE_WINDOW_MS = 60_000;
 const RATE_MAX = 20;
-
-const PromptSchema = z.object({
-  prompt: z.string().trim().min(1).max(4000),
-});
 
 const hits = new Map<string, number[]>();
 function rateLimit(userId: string): boolean {
@@ -38,6 +38,16 @@ function sameOrigin(req: Request): boolean {
   }
 }
 
+function totalContentChars(messages: UIMessage[]): number {
+  let total = 0;
+  for (const m of messages) {
+    for (const p of m.parts ?? []) {
+      if (p.type === "text") total += p.text.length;
+    }
+  }
+  return total;
+}
+
 export async function POST(req: Request) {
   if (!GEMINI_API_KEY) {
     return NextResponse.json({ error: "AI unavailable" }, { status: 503 });
@@ -62,10 +72,17 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Payload too large" }, { status: 413 });
   }
 
-  let parsed: z.infer<typeof PromptSchema>;
+  let messages: UIMessage[];
   try {
-    const json = JSON.parse(new TextDecoder().decode(buf));
-    parsed = PromptSchema.parse(json);
+    const body = JSON.parse(new TextDecoder().decode(buf));
+    if (!Array.isArray(body.messages)) throw new Error("messages array required");
+    messages = body.messages;
+    if (messages.length === 0 || messages.length > MAX_MESSAGES) {
+      throw new Error("message count out of range");
+    }
+    if (totalContentChars(messages) > MAX_CONTENT_CHARS) {
+      throw new Error("content too long");
+    }
   } catch {
     return NextResponse.json({ error: "Invalid request" }, { status: 400 });
   }
@@ -78,42 +95,13 @@ export async function POST(req: Request) {
   }
 
   try {
-    const ai = new GoogleGenAI({ apiKey: GEMINI_API_KEY });
-    const response = await ai.models.generateContentStream({
-      model: "gemini-2.0-flash-001",
-      contents: parsed.prompt,
+    const google = createGoogleGenerativeAI({ apiKey: GEMINI_API_KEY });
+    const result = streamText({
+      model: google("gemini-2.0-flash-001"),
+      messages: await convertToModelMessages(messages),
     });
 
-    const stream = new ReadableStream({
-      async start(controller) {
-        try {
-          for await (const chunk of response) {
-            const text = chunk.text;
-            if (text) {
-              controller.enqueue(
-                new TextEncoder().encode(
-                  JSON.stringify({ token: text }) + "\n",
-                ),
-              );
-            }
-          }
-          controller.close();
-        } catch (err) {
-          console.error(
-            "Gemini stream error:",
-            err instanceof Error ? err.message : "unknown",
-          );
-          controller.error(err);
-        }
-      },
-    });
-
-    return new NextResponse(stream, {
-      headers: {
-        "Content-Type": "application/json; charset=utf-8",
-        "Transfer-Encoding": "chunked",
-      },
-    });
+    return result.toUIMessageStreamResponse();
   } catch (error) {
     console.error(
       "Gemini stream error:",
