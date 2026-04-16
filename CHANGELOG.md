@@ -4,6 +4,10 @@ Historical record of completed work. For authoritative history, see `git log`.
 
 ## Unreleased
 
+- perf: defer heavy client bundles with `next/dynamic`
+  - Recharts `<ChartAreaInteractive>` (dashboard home) and `<ChartPie>` (statistics) dynamic-imported with inline skeleton placeholders — ~160 KB Recharts lifted off the initial load
+  - `EmojiPickerButton` (frimousse) dynamic-imported inside `CategoryDialog` so the emoji picker only loads when the dialog actually opens
+  - AI `<Response>` (react-markdown + rehype-katex + remark-math + harden-react-markdown + syntax highlighter) dynamic-imported on the consult page
 - perf: React memoization sweep
   - `React.memo` on `ListItem`, `AccountCard`, `BudgetCard`, `GoalCard` so map-rendered rows skip re-render when their own props are unchanged
   - `useMemo` on `groupByDay(transactions)` + date sort in `transaction-list.tsx`

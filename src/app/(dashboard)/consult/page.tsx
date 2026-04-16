@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import dynamic from "next/dynamic";
 import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport, type UIMessage } from "ai";
 import { useAuth } from "@clerk/nextjs";
@@ -17,11 +18,19 @@ import {
   PromptInputSubmit,
 } from "@/components/ui/ai/prompt-input";
 import { SiteHeader } from "@/components/site-header";
-import { Response } from "@/components/ui/ai/response";
 import { Message, MessageContent } from "@/components/ui/ai/message";
 import { Suggestion, Suggestions } from "@/components/ui/ai/suggestion";
 import { Button } from "@/components/ui/button";
 import { IconRefresh } from "@tabler/icons-react";
+
+const Response = dynamic(
+  () =>
+    import("@/components/ui/ai/response").then((m) => ({ default: m.Response })),
+  {
+    ssr: false,
+    loading: () => null,
+  },
+);
 
 const SUGGESTIONS = [
   "Build me a monthly budget using the 50/30/20 rule",

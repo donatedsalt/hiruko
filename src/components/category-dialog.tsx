@@ -2,6 +2,7 @@
 
 import { toast } from "sonner";
 import { useState } from "react";
+import dynamic from "next/dynamic";
 import { useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import {
@@ -29,8 +30,19 @@ import {
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import EmojiPickerButton from "@/components/emoji-picker-button";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+
+const EmojiPickerButton = dynamic(
+  () => import("@/components/emoji-picker-button"),
+  {
+    ssr: false,
+    loading: () => (
+      <Button variant="outline" size="icon" type="button" disabled>
+        {"🙂"}
+      </Button>
+    ),
+  },
+);
 
 interface CategoryDialogProps {
   mode?: "add" | "edit";

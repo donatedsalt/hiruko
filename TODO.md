@@ -21,7 +21,6 @@ list of todos
 - [ ] aggregate `accounts`/`categories`/`budgets`/`goals` into one Convex query for `transactions/new` instead of 4 `useQuery` calls — `src/app/(dashboard)/transactions/new/page.tsx`
 - [ ] use the Convex `statsByDay` / grouped query in `transaction-list.tsx` instead of recomputing `groupByDay` client-side
 - [ ] add `error.tsx` at `(auth)` and `(dashboard)` route boundaries; wrap data-dependent sections in `<Suspense>` with skeletons
-- [ ] lazy-load `chart-area-interactive.tsx` (Recharts) and other heavy chart components
 - [ ] consider virtualization (`react-window` / `@tanstack/react-virtual`) for paginated transaction lists once data volume warrants it
 - [ ] reduce pervasive `"use client"` (66 files) — keep providers/interactive shells client, push pages toward server-first
 - [ ] tighten `tsconfig.json`: enable `noUncheckedIndexedAccess`, `exactOptionalPropertyTypes`, `noImplicitReturns`
@@ -40,9 +39,6 @@ list of todos
 
 ## Performance
 
-- [ ] `next/dynamic` Recharts charts (`chart-area-interactive.tsx`, `pie-chart.tsx`) — ~160 KB deferred
-- [ ] `next/dynamic` `EmojiPickerButton` (frimousse picker) — rarely opened
-- [ ] `next/dynamic` the AI code-block / syntax-highlighter / react-markdown stack in `ui/ai/response.tsx` + `ui/ai/code-block.tsx` — only needed when the assistant returns code/math
 - [ ] `next/image` for Clerk user avatars in `nav-user.tsx`; add image `remotePatterns` for `*.clerk.dev` / `img.clerk.com` in `next.config.ts`
 - [ ] remove the duplicate `<SpeedInsights />` — currently mounted in both `(auth)` and `(dashboard)` layouts
 - [ ] `Promise.all` the sequential `ctx.db.get` / `ctx.db.patch` calls in `convex/transactions/mutations.ts remove` handler

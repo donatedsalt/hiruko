@@ -1,12 +1,28 @@
 "use client";
 
 import { useMemo } from "react";
+import dynamic from "next/dynamic";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 
 import { SiteHeader } from "@/components/site-header";
 import { ErrorMessage } from "@/components/error-message";
-import { ChartPie, ChartPieSkeleton } from "@/components/pie-chart";
+import { Skeleton } from "@/components/ui/skeleton";
+
+const ChartPie = dynamic(
+  () =>
+    import("@/components/pie-chart").then((m) => ({ default: m.ChartPie })),
+  {
+    ssr: false,
+    loading: () => (
+      <Skeleton className="aspect-square max-h-[250px] w-full" />
+    ),
+  },
+);
+
+function ChartPieSkeleton() {
+  return <Skeleton className="aspect-square max-h-[250px] w-full" />;
+}
 
 export default function Page() {
   const categories = useQuery(api.categories.queries.list);

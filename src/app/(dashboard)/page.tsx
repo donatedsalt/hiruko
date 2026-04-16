@@ -1,10 +1,10 @@
 "use client";
 
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 
-import { ChartAreaInteractive } from "@/components/chart-area-interactive";
 import {
   TransactionList,
   TransactionListSkeleton,
@@ -12,7 +12,16 @@ import {
 import { AccountsCards } from "@/components/accounts-cards";
 import { ErrorMessage } from "@/components/error-message";
 import { SiteHeader } from "@/components/site-header";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
+
+const ChartAreaInteractive = dynamic(
+  () =>
+    import("@/components/chart-area-interactive").then((m) => ({
+      default: m.ChartAreaInteractive,
+    })),
+  { ssr: false, loading: () => <Skeleton className="h-98" /> },
+);
 
 const DASHBOARD_TXN_LIMIT = 10;
 
