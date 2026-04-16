@@ -4,6 +4,12 @@ Historical record of completed work. For authoritative history, see `git log`.
 
 ## Unreleased
 
+- counter-integrity sweep across Convex mutations:
+  - cascading deletes: `accounts.remove` / `categories.remove` now reverse category/budget/goal (or account/budget/goal) counters on the affected transactions before deletion, via a new `reverseTransactionSideEffects` helper in `convex/utils/db/transactions.ts`
+  - `accounts.update` balance correction now routes through the shared `adjustAccount` helper instead of hand-rolling the balance/count patch
+  - `transactions.update` now adjusts budget/goal `transactionCount` (not just `spent`/`saved`) when budget/goal membership changes, and distinguishes `null` (clear link) from `undefined` (keep link) on `budgetId`/`goalId` — both `create` and `update` args accept `v.optional(v.union(v.id(...), v.null()))`
+  - transaction validation (`src/validation/transaction.ts`) emits `null` (not `undefined`) for empty `budgetId`/`goalId`, so cleared selections propagate to the server
+  - transaction edit form (`transactions/[id]/page.tsx`) now reads `goalId` from FormData (previously dropped), and the `budLoading`/`goalLoading` typo swap is fixed
 - migrate AI chat to the Vercel AI SDK (`streamText` + `@ai-sdk/google` on the server, `useChat` + `DefaultChatTransport` on the client); gains standard UI-message stream, built-in abort (`stop()`) and retry (`regenerate()`), typed message history
 - consult page: persist chat history to `chatHistory:<userId>` localStorage; refresh restores the conversation
 - consult page: replace generic suggestions with six actionable finance prompts (50/30/20 budget, emergency fund, grocery cuts, debt-vs-invest, compound interest, Roth vs 401(k))

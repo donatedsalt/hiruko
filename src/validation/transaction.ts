@@ -15,11 +15,11 @@ export const TransactionSchema = z
       .transform((val) => val as CategoryId),
     budgetId: z
       .string()
-      .transform((val) => (val === "" ? undefined : (val as BudgetId)))
+      .transform((val) => (val === "" ? null : (val as BudgetId)))
       .optional(),
     goalId: z
       .string()
-      .transform((val) => (val === "" ? undefined : (val as GoalId)))
+      .transform((val) => (val === "" ? null : (val as GoalId)))
       .optional(),
     title: z
       .string()

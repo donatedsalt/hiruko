@@ -40,11 +40,6 @@ list of todos
 
 ## Bugs
 
-- [ ] edit form drops `goalId` (never read from FormData) and type-flip income↔expense can double-count budget — `convex/transactions/mutations.ts`, `src/app/(dashboard)/transactions/[id]/page.tsx`
-- [ ] budget/goal `transactionCount` not adjusted on transaction `update`; budget/goal `remove` doesn't reverse counters — `convex/{transactions,budgets,goals}/mutations.ts`
-- [ ] `accounts.remove` and `categories.remove` cascade-delete transactions without reversing budget/goal/category counters — `convex/{accounts,categories}/mutations.ts`
-- [ ] `accounts.update` balance-correction bypasses `adjustAccount` and overwrites balance non-atomically — `convex/accounts/mutations.ts:107-160`
-- [ ] typo: `goalLoading = budgets === undefined` (and `budLoading` swap) — `src/app/(dashboard)/transactions/[id]/page.tsx:69,376`
 - [ ] `groupByDate` keys by UTC day → non-UTC users see transactions in wrong bucket — `convex/transactions/queries.ts:106`
 - [ ] `validation/budget.ts` uses `.positive()` on `spent` — rejects legal value `0`
 - [ ] Convex `list` queries omit `args: {}` validators (violates Convex guidelines) — `convex/{accounts,budgets,categories,goals}/queries.ts`

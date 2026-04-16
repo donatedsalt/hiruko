@@ -3,6 +3,7 @@ import { v } from "convex/values";
 import { mutation } from "@/convex/_generated/server";
 
 import { requireUserId } from "@/convex/utils/auth";
+import { reverseTransactionSideEffects } from "@/convex/utils/db/transactions";
 
 /**
  * Create a new category.
@@ -118,6 +119,10 @@ export const remove = mutation({
       .query("transactions")
       .withIndex("by_category", (q) => q.eq("categoryId", args.id))
       .collect();
+
+    await reverseTransactionSideEffects(ctx, userId, txns, {
+      skipCategoryId: args.id,
+    });
 
     await Promise.all(txns.map((txn) => ctx.db.delete(txn._id)));
 

@@ -12,8 +12,8 @@ export const create = mutation({
   args: {
     categoryId: v.id("categories"),
     accountId: v.id("accounts"),
-    budgetId: v.optional(v.id("budgets")),
-    goalId: v.optional(v.id("goals")),
+    budgetId: v.optional(v.union(v.id("budgets"), v.null())),
+    goalId: v.optional(v.union(v.id("goals"), v.null())),
     type: v.union(v.literal("income"), v.literal("expense")),
     amount: v.number(),
     title: v.optional(v.string()),
@@ -108,8 +108,8 @@ export const update = mutation({
     updates: v.object({
       categoryId: v.optional(v.id("categories")),
       accountId: v.optional(v.id("accounts")),
-      budgetId: v.optional(v.id("budgets")),
-      goalId: v.optional(v.id("goals")),
+      budgetId: v.optional(v.union(v.id("budgets"), v.null())),
+      goalId: v.optional(v.union(v.id("goals"), v.null())),
       amount: v.optional(v.number()),
       type: v.optional(v.union(v.literal("income"), v.literal("expense"))),
       title: v.optional(v.string()),
@@ -127,6 +127,15 @@ export const update = mutation({
 
     const newAccountId = updates.accountId ?? transaction.accountId;
     const newCategoryId = updates.categoryId ?? transaction.categoryId;
+    // undefined = key absent (keep); null = explicit clear; id = set
+    const newBudgetId =
+      updates.budgetId === undefined
+        ? transaction.budgetId
+        : (updates.budgetId ?? undefined);
+    const newGoalId =
+      updates.goalId === undefined
+        ? transaction.goalId
+        : (updates.goalId ?? undefined);
 
     const [originalAccount, originalCategory, newAccount, newCategory] =
       await Promise.all([
@@ -174,10 +183,7 @@ export const update = mutation({
     const typeChanged = oldType !== newType;
 
     const oldBudgetId = transaction.budgetId;
-    const newBudgetId = updates.budgetId ?? transaction.budgetId;
-
     const oldGoalId = transaction.goalId;
-    const newGoalId = updates.goalId ?? transaction.goalId;
 
     if (accountChanged || amountChanged || typeChanged) {
       await adjustAccount(ctx, originalAccount, oldAmount, oldType, -1);
@@ -254,7 +260,7 @@ export const update = mutation({
       oldBudgetId === newBudgetId;
 
     if (sameBudget && oldBudgetId && oldBudget && oldBudget.userId === userId) {
-      // Preserve original behavior: subtract then add against the mutated value.
+      // Same budget; amount changed. Transaction count is unchanged.
       const afterSubtract = Math.max((oldBudget.spent ?? 0) - oldAmount, 0);
       finalPatches.push(
         ctx.db.patch(oldBudgetId, {
@@ -271,6 +277,7 @@ export const update = mutation({
         finalPatches.push(
           ctx.db.patch(oldBudgetId, {
             spent: Math.max((oldBudget.spent ?? 0) - oldAmount, 0),
+            transactionCount: Math.max(oldBudget.transactionCount - 1, 0),
           }),
         );
       }
@@ -284,6 +291,7 @@ export const update = mutation({
         finalPatches.push(
           ctx.db.patch(newBudgetId, {
             spent: (newBudget.spent ?? 0) + newAmount,
+            transactionCount: newBudget.transactionCount + 1,
           }),
         );
       }
@@ -309,6 +317,7 @@ export const update = mutation({
         finalPatches.push(
           ctx.db.patch(oldGoalId, {
             saved: Math.max((oldGoal.saved ?? 0) - oldAmount, 0),
+            transactionCount: Math.max(oldGoal.transactionCount - 1, 0),
           }),
         );
       }
@@ -322,6 +331,7 @@ export const update = mutation({
         finalPatches.push(
           ctx.db.patch(newGoalId, {
             saved: (newGoal.saved ?? 0) + newAmount,
+            transactionCount: newGoal.transactionCount + 1,
           }),
         );
       }
@@ -329,8 +339,14 @@ export const update = mutation({
 
     await Promise.all(finalPatches);
 
+    const {
+      budgetId: _omitBudget,
+      goalId: _omitGoal,
+      ...restUpdates
+    } = updates;
+
     await ctx.db.patch(id, {
-      ...updates,
+      ...restUpdates,
       accountId: newAccountId,
       categoryId: newCategoryId,
       budgetId: newBudgetId,

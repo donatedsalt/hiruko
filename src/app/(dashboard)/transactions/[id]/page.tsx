@@ -66,7 +66,7 @@ export default function Page() {
   const budgets = useQuery(api.budgets.queries.list);
   const budLoading = budgets === undefined;
   const goals = useQuery(api.goals.queries.list);
-  const goalLoading = budgets === undefined;
+  const goalLoading = goals === undefined;
 
   const updateTransaction = useMutation(api.transactions.mutations.update);
   const deleteTransaction = useMutation(api.transactions.mutations.remove);
@@ -136,6 +136,7 @@ export default function Page() {
     const accountId = formData.get("accountId") as AccountId;
     const categoryId = formData.get("categoryId") as CategoryId;
     const budgetId = formData.get("budgetId") as BudgetId;
+    const goalId = formData.get("goalId") as GoalId;
     const amount = parseFloat(formData.get("amount") as string);
     const type = formData.get("type") as "income" | "expense";
     const title = formData.get("title") as string;
@@ -149,6 +150,7 @@ export default function Page() {
       accountId,
       categoryId,
       budgetId,
+      goalId,
       amount,
       type,
       title: title || undefined,
@@ -377,7 +379,7 @@ export default function Page() {
                 disabled={!isEditing}
                 required
               />
-              {budLoading ? (
+              {goalLoading ? (
                 <Skeleton className="w-full h-9" />
               ) : goals ? (
                 <ToggleGroup

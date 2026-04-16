@@ -5,6 +5,8 @@ import { mutation } from "@/convex/_generated/server";
 import { CategoryId } from "@/types/convex";
 
 import { requireUserId } from "@/convex/utils/auth";
+import { adjustAccount } from "@/convex/utils/db/accounts";
+import { reverseTransactionSideEffects } from "@/convex/utils/db/transactions";
 
 /**
  * Create a new account.
@@ -101,8 +103,9 @@ export const update = mutation({
       throw new Error("Account not found or unauthorized");
     }
 
-    const updates: Partial<typeof account> = {};
-    if (args.name !== undefined) updates.name = args.name;
+    if (args.name !== undefined) {
+      await ctx.db.patch(args.id, { name: args.name });
+    }
 
     if (
       args.balance !== undefined &&
@@ -110,7 +113,7 @@ export const update = mutation({
       args.balance !== account.balance
     ) {
       const difference = args.balance - account.balance;
-      const type = difference > 0 ? "income" : "expense";
+      const type: "income" | "expense" = difference > 0 ? "income" : "expense";
       const now = Date.now();
       const absDiff = Math.abs(difference);
 
@@ -126,7 +129,7 @@ export const update = mutation({
         )
         .unique();
 
-      let categoryId: CategoryId | undefined;
+      let categoryId: CategoryId;
       if (!category) {
         categoryId = await ctx.db.insert("categories", {
           userId,
@@ -155,11 +158,9 @@ export const update = mutation({
         updatedAt: now,
       });
 
-      updates.balance = args.balance;
-      updates.transactionCount = account.transactionCount + 1;
+      await adjustAccount(ctx, account, absDiff, type, 1);
     }
 
-    await ctx.db.patch(args.id, updates);
     return await ctx.db.get(args.id);
   },
 });
@@ -181,6 +182,10 @@ export const remove = mutation({
       .query("transactions")
       .withIndex("by_account", (q) => q.eq("accountId", args.id))
       .collect();
+
+    await reverseTransactionSideEffects(ctx, userId, txns, {
+      skipAccountId: args.id,
+    });
 
     await Promise.all(txns.map((txn) => ctx.db.delete(txn._id)));
 
