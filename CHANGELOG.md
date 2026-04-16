@@ -4,6 +4,8 @@ Historical record of completed work. For authoritative history, see `git log`.
 
 ## Unreleased
 
+- `next.config.ts`: disable `x-powered-by` and set baseline security headers on all routes — `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `Referrer-Policy: strict-origin-when-cross-origin`, `Permissions-Policy` (camera/mic/geo/browsing-topics off), `Strict-Transport-Security: max-age=63072000; includeSubDomains; preload`
+- verify Clerk webhook replay/idempotency story is already covered: `svix` enforces a 5-minute timestamp tolerance via `standardwebhooks`; `users.mutations.initializeUser` early-returns when the account already exists
 - quick-win hygiene sweep:
   - add `args: {}` validators on `accounts` / `budgets` / `categories` / `goals` `list` queries
   - cap list queries with `.take(10_000)` instead of unbounded `.collect()`

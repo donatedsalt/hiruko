@@ -42,14 +42,12 @@ list of todos
 
 - [ ] `groupByDate` keys by UTC day → non-UTC users see transactions in wrong bucket — `convex/transactions/queries.ts:106`
 - [ ] unbounded `.collect()` / no pagination on `convex/transactions/queries.ts` — switch to `.take()` or paginate
-- [ ] Clerk webhook lacks idempotency/dedup — store Svix event IDs to defend against retries/replays — `convex/http.ts`
 - [ ] `ConvexReactClient` instantiated at module scope can hold stale config across hot reloads — move inside the provider component — `src/components/convex-client-provider.tsx:12`
 - [ ] no delete confirmation/countdown on transaction detail page (other entities use `useCountdown`) — `src/app/(dashboard)/transactions/[id]/page.tsx:475`
 
 ## Security
 
-- [ ] verify Svix `Webhook.verify()` enforces a timestamp tolerance window; if not, manually reject payloads older than ~5 min to block replay — `convex/http.ts:32-36`
-- [ ] `next.config.ts` is empty — add CSP / security headers, `poweredByHeader: false`
+- [ ] add a Content-Security-Policy (with Clerk + Convex allowlists) — start in Report-Only mode and promote once clean. `next.config.ts` already has baseline headers.
 
 ## UX
 
