@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useUser, useClerk } from "@clerk/nextjs";
 import {
   IconDotsVertical,
@@ -7,7 +8,9 @@ import {
   IconUserCircle,
 } from "@tabler/icons-react";
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { cn } from "@/lib/utils";
+
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -52,15 +55,12 @@ export function NavUser() {
               size="lg"
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
-              <Avatar className="size-8 rounded-lg grayscale">
-                <AvatarImage
-                  src={user?.imageUrl}
-                  alt={user?.username || "User Avatar"}
-                />
-                <AvatarFallback className="rounded-lg">
-                  {avatarText}
-                </AvatarFallback>
-              </Avatar>
+              <UserAvatar
+                src={user?.imageUrl}
+                alt={user?.username || "User Avatar"}
+                fallback={avatarText}
+                className="grayscale"
+              />
               <div className="grid flex-1 text-sm leading-tight text-left">
                 <span className="font-medium truncate">{user?.username}</span>
                 <span className="text-xs truncate text-current/50">
@@ -78,15 +78,11 @@ export function NavUser() {
           >
             <DropdownMenuLabel className="p-0 font-normal">
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
-                <Avatar className="size-8 rounded-lg">
-                  <AvatarImage
-                    src={user?.imageUrl}
-                    alt={user?.username || "User Avatar"}
-                  />
-                  <AvatarFallback className="rounded-lg">
-                    {avatarText}
-                  </AvatarFallback>
-                </Avatar>
+                <UserAvatar
+                  src={user?.imageUrl}
+                  alt={user?.username || "User Avatar"}
+                  fallback={avatarText}
+                />
                 <div className="grid flex-1 text-sm leading-tight text-left">
                   <span className="font-medium truncate">{user?.username}</span>
                   <span className="text-xs truncate text-muted-foreground">
@@ -111,6 +107,34 @@ export function NavUser() {
         </DropdownMenu>
       </SidebarMenuItem>
     </SidebarMenu>
+  );
+}
+
+function UserAvatar({
+  src,
+  alt,
+  fallback,
+  className,
+}: {
+  src?: string;
+  alt: string;
+  fallback?: string;
+  className?: string;
+}) {
+  return (
+    <Avatar className={cn("size-8 rounded-lg", className)}>
+      {src ? (
+        <Image
+          src={src}
+          alt={alt}
+          width={32}
+          height={32}
+          className="aspect-square size-full object-cover"
+        />
+      ) : (
+        <AvatarFallback className="rounded-lg">{fallback}</AvatarFallback>
+      )}
+    </Avatar>
   );
 }
 

@@ -18,7 +18,6 @@ list of todos
   - statistics / pie chart need to pick which bucket to show (income vs expense)
 
 - [ ] consolidate to a single `src/app/layout.tsx` — `(auth)` and `(dashboard)` layouts each render `<html>`/`<body>` with duplicated Clerk/Convex/Theme/font providers; drift is inevitable
-- [ ] aggregate `accounts`/`categories`/`budgets`/`goals` into one Convex query for `transactions/new` instead of 4 `useQuery` calls — `src/app/(dashboard)/transactions/new/page.tsx`
 - [ ] use the Convex `statsByDay` / grouped query in `transaction-list.tsx` instead of recomputing `groupByDay` client-side
 - [ ] add `error.tsx` at `(auth)` and `(dashboard)` route boundaries; wrap data-dependent sections in `<Suspense>` with skeletons
 - [ ] consider virtualization (`react-window` / `@tanstack/react-virtual`) for paginated transaction lists once data volume warrants it
@@ -39,12 +38,8 @@ list of todos
 
 ## Performance
 
-- [ ] `next/image` for Clerk user avatars in `nav-user.tsx`; add image `remotePatterns` for `*.clerk.dev` / `img.clerk.com` in `next.config.ts`
-- [ ] remove the duplicate `<SpeedInsights />` — currently mounted in both `(auth)` and `(dashboard)` layouts
-- [ ] `Promise.all` the sequential `ctx.db.get` / `ctx.db.patch` calls in `convex/transactions/mutations.ts remove` handler
 - [ ] dashboard home (`(dashboard)/page.tsx`) + `<AccountsCards>` both fetch `categories`/`accounts`; dedupe via a shared aggregate query or context
 - [ ] migrate `convex/transactions/queries.ts list` to the paginated query as the default caller, keep the non-paginated variant for internal-only use
-- [ ] shared Convex `listFormDefaults` query returning accounts/categories/budgets/goals in one RPC for `transactions/new` and `transactions/[id]`
 
 ## Bugs
 

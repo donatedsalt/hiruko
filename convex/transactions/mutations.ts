@@ -371,7 +371,18 @@ export const remove = mutation({
       throw new Error("Transaction not found");
     }
 
-    const account = await ctx.db.get(transaction.accountId);
+    const touchesBudget =
+      !!transaction.budgetId && transaction.type === "expense";
+    const touchesGoal =
+      !!transaction.goalId && transaction.type === "expense";
+
+    const [account, category, budget, goal] = await Promise.all([
+      ctx.db.get(transaction.accountId),
+      ctx.db.get(transaction.categoryId),
+      touchesBudget ? ctx.db.get(transaction.budgetId!) : Promise.resolve(null),
+      touchesGoal ? ctx.db.get(transaction.goalId!) : Promise.resolve(null),
+    ]);
+
     if (!account || account.userId !== userId) {
       throw new Error("Account not found");
     }
@@ -379,42 +390,44 @@ export const remove = mutation({
     const balanceDelta =
       transaction.type === "income" ? -transaction.amount : transaction.amount;
 
-    await ctx.db.patch(transaction.accountId, {
-      balance: account.balance + balanceDelta,
-      transactionCount: Math.max(account.transactionCount - 1, 0),
-    });
+    const patches: Promise<unknown>[] = [
+      ctx.db.patch(transaction.accountId, {
+        balance: account.balance + balanceDelta,
+        transactionCount: Math.max(account.transactionCount - 1, 0),
+      }),
+    ];
 
-    const category = await ctx.db.get(transaction.categoryId);
     if (category && category.userId === userId) {
-      await ctx.db.patch(transaction.categoryId, {
-        transactionCount: Math.max(category.transactionCount - 1, 0),
-        transactionAmount: Math.max(
-          category.transactionAmount - transaction.amount,
-          0,
-        ),
-      });
+      patches.push(
+        ctx.db.patch(transaction.categoryId, {
+          transactionCount: Math.max(category.transactionCount - 1, 0),
+          transactionAmount: Math.max(
+            category.transactionAmount - transaction.amount,
+            0,
+          ),
+        }),
+      );
     }
 
-    if (transaction.budgetId && transaction.type === "expense") {
-      const budget = await ctx.db.get(transaction.budgetId);
-      if (budget && budget.userId === userId) {
-        await ctx.db.patch(transaction.budgetId, {
-          transactionCount: budget.transactionCount - 1,
+    if (touchesBudget && budget && budget.userId === userId) {
+      patches.push(
+        ctx.db.patch(transaction.budgetId!, {
+          transactionCount: Math.max(budget.transactionCount - 1, 0),
           spent: Math.max((budget.spent ?? 0) - transaction.amount, 0),
-        });
-      }
+        }),
+      );
     }
 
-    if (transaction.goalId && transaction.type === "expense") {
-      const goal = await ctx.db.get(transaction.goalId);
-      if (goal && goal.userId === userId) {
-        await ctx.db.patch(transaction.goalId, {
-          transactionCount: goal.transactionCount - 1,
+    if (touchesGoal && goal && goal.userId === userId) {
+      patches.push(
+        ctx.db.patch(transaction.goalId!, {
+          transactionCount: Math.max(goal.transactionCount - 1, 0),
           saved: Math.max((goal.saved ?? 0) - transaction.amount, 0),
-        });
-      }
+        }),
+      );
     }
 
+    await Promise.all(patches);
     await ctx.db.delete(id);
 
     return id;

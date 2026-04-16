@@ -4,6 +4,10 @@ Historical record of completed work. For authoritative history, see `git log`.
 
 ## Unreleased
 
+- perf: `users.queries.formDefaults` — single Convex query returning accounts/categories/budgets/goals; `/transactions/new` and `/transactions/[id]` now issue one subscription instead of four
+- perf: batch the sequential `ctx.db.get` + `ctx.db.patch` work in `transactions.mutations.remove` via `Promise.all`
+- perf: drop the duplicate `<SpeedInsights />` from `(auth)/layout.tsx` (the dashboard layout still mounts it)
+- perf: Clerk user avatar in `nav-user.tsx` renders through `next/image` with 32×32 sizing; `next.config.ts` image `remotePatterns` allow `img.clerk.com` and `images.clerk.dev`
 - perf: defer heavy client bundles with `next/dynamic`
   - Recharts `<ChartAreaInteractive>` (dashboard home) and `<ChartPie>` (statistics) dynamic-imported with inline skeleton placeholders — ~160 KB Recharts lifted off the initial load
   - `EmojiPickerButton` (frimousse) dynamic-imported inside `CategoryDialog` so the emoji picker only loads when the dialog actually opens

@@ -20,6 +20,7 @@ import type * as http from "../http.js";
 import type * as transactions_mutations from "../transactions/mutations.js";
 import type * as transactions_queries from "../transactions/queries.js";
 import type * as users_mutations from "../users/mutations.js";
+import type * as users_queries from "../users/queries.js";
 import type * as utils_auth from "../utils/auth.js";
 import type * as utils_db_accounts from "../utils/db/accounts.js";
 
@@ -42,6 +43,7 @@ declare const fullApi: ApiFromModules<{
   "transactions/mutations": typeof transactions_mutations;
   "transactions/queries": typeof transactions_queries;
   "users/mutations": typeof users_mutations;
+  "users/queries": typeof users_queries;
   "utils/auth": typeof utils_auth;
   "utils/db/accounts": typeof utils_db_accounts;
 }>;

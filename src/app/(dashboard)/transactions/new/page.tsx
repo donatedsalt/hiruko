@@ -32,14 +32,16 @@ import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
 export default function Page() {
   const smartRouter = useSmartRouter();
-  const accounts = useQuery(api.accounts.queries.list);
-  const accLoading = accounts === undefined;
-  const categories = useQuery(api.categories.queries.list);
-  const catLoading = categories === undefined;
-  const budgets = useQuery(api.budgets.queries.list);
-  const budLoading = budgets === undefined;
-  const goals = useQuery(api.goals.queries.list);
-  const goalLoading = goals === undefined;
+  const defaults = useQuery(api.users.queries.formDefaults);
+  const loading = defaults === undefined;
+  const accounts = defaults?.accounts;
+  const categories = defaults?.categories;
+  const budgets = defaults?.budgets;
+  const goals = defaults?.goals;
+  const accLoading = loading;
+  const catLoading = loading;
+  const budLoading = loading;
+  const goalLoading = loading;
 
   const createTransaction = useMutation(api.transactions.mutations.create);
 

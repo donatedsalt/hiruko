@@ -59,14 +59,16 @@ export default function Page() {
     id: id as TransactionId,
   });
   const loading = transaction === undefined;
-  const accounts = useQuery(api.accounts.queries.list);
-  const accLoading = accounts === undefined;
-  const categories = useQuery(api.categories.queries.list);
-  const catLoading = categories === undefined;
-  const budgets = useQuery(api.budgets.queries.list);
-  const budLoading = budgets === undefined;
-  const goals = useQuery(api.goals.queries.list);
-  const goalLoading = goals === undefined;
+  const defaults = useQuery(api.users.queries.formDefaults);
+  const defaultsLoading = defaults === undefined;
+  const accounts = defaults?.accounts;
+  const categories = defaults?.categories;
+  const budgets = defaults?.budgets;
+  const goals = defaults?.goals;
+  const accLoading = defaultsLoading;
+  const catLoading = defaultsLoading;
+  const budLoading = defaultsLoading;
+  const goalLoading = defaultsLoading;
 
   const updateTransaction = useMutation(api.transactions.mutations.update);
   const deleteTransaction = useMutation(api.transactions.mutations.remove);
