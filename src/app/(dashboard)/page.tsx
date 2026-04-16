@@ -26,33 +26,32 @@ const ChartAreaInteractive = dynamic(
 const DASHBOARD_TXN_LIMIT = 10;
 
 export default function Page() {
-  const recent = useQuery(api.transactions.queries.listRecent, {
-    limit: DASHBOARD_TXN_LIMIT,
+  const home = useQuery(api.users.queries.homeDefaults, {
+    recentLimit: DASHBOARD_TXN_LIMIT,
   });
-  const categories = useQuery(api.categories.queries.list);
-  const loading = recent === undefined || categories === undefined;
+  const loading = home === undefined;
 
   return (
     <>
       <SiteHeader title="Overview" />
       <div className="@container/main flex flex-col flex-1 gap-4 p-4 md:gap-6 md:p-6">
-        <AccountsCards />
+        <AccountsCards accounts={home?.accounts} />
         <ChartAreaInteractive />
 
         {loading ? (
           <TransactionListSkeleton />
-        ) : recent && categories ? (
+        ) : home ? (
           <>
             <TransactionList
-              allData={recent.all}
-              incomeData={recent.income}
-              expenseData={recent.expense}
-              categories={categories}
+              allData={home.recent.all}
+              incomeData={home.recent.income}
+              expenseData={home.recent.expense}
+              categories={home.categories}
               showEndMarker={false}
             />
-            {(recent.hasMoreAll ||
-              recent.hasMoreIncome ||
-              recent.hasMoreExpense) && (
+            {(home.recent.hasMoreAll ||
+              home.recent.hasMoreIncome ||
+              home.recent.hasMoreExpense) && (
               <div className="grid place-items-center">
                 <Button asChild variant="outline">
                   <Link href="/transactions">View More</Link>

@@ -6,38 +6,6 @@ import { query } from "@/convex/_generated/server";
 import { requireUserId } from "@/convex/utils/auth";
 
 /**
- * Get all transactions for the authenticated user.
- */
-export const list = query({
-  args: {
-    type: v.optional(v.union(v.literal("income"), v.literal("expense"))),
-  },
-  handler: async (ctx, args) => {
-    const userId = await requireUserId(ctx);
-
-    let transactions;
-
-    if (args.type) {
-      transactions = await ctx.db
-        .query("transactions")
-        .withIndex("by_userId_type", (q) =>
-          q.eq("userId", userId).eq("type", args.type!),
-        )
-        .order("desc")
-        .collect();
-    } else {
-      transactions = await ctx.db
-        .query("transactions")
-        .withIndex("by_userId_transactionTime", (q) => q.eq("userId", userId))
-        .order("desc")
-        .collect();
-    }
-
-    return transactions;
-  },
-});
-
-/**
  * Recent transactions for the dashboard: one .take per tab, each capped at
  * `limit + 1` so the client can tell whether a "View More" link is needed.
  */

@@ -1,17 +1,24 @@
 "use client";
 
+import { useQuery } from "convex/react";
+import { api } from "@/convex/_generated/api";
+
+import type { Account } from "@/types/convex";
+
 import {
   AccountCardSkeleton,
   AccountCard,
   AddAccountCard,
 } from "@/components/account-card";
-import { useQuery } from "convex/react";
-import { api } from "@/convex/_generated/api";
 
-export function AccountsCards() {
-  const accounts = useQuery(api.accounts.queries.list);
+export function AccountsCards({ accounts }: { accounts?: Account[] }) {
+  const fallback = useQuery(
+    api.accounts.queries.list,
+    accounts === undefined ? {} : "skip",
+  );
+  const resolved = accounts ?? fallback;
 
-  if (accounts === undefined) {
+  if (resolved === undefined) {
     return (
       <div className="flex gap-4 overflow-auto scrollbar-none">
         <AccountCardSkeleton />
@@ -22,7 +29,7 @@ export function AccountsCards() {
 
   return (
     <div className="flex gap-4 overflow-auto scrollbar-none">
-      {accounts.map((account) => (
+      {resolved.map((account) => (
         <AccountCard key={account._id} account={account} />
       ))}
 
