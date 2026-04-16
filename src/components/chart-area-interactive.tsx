@@ -33,6 +33,13 @@ import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
+const chartConfig = {
+  transactions: { label: "Transactions" },
+  income: { label: "Income", color: "var(--secondary)" },
+  expense: { label: "Expense", color: "var(--destructive)" },
+  balance: { label: "Balance", color: "var(--primary)" },
+} satisfies ChartConfig;
+
 export function ChartAreaInteractive() {
   const isMobile = useIsMobile();
   const [timeRange, setTimeRange] = React.useState("30d");
@@ -53,13 +60,6 @@ export function ChartAreaInteractive() {
   });
 
   if (filteredData === undefined) return <ChartAreaInteractiveSkeleton />;
-
-  const chartConfig = {
-    transactions: { label: "Transactions" },
-    income: { label: "Income", color: "var(--secondary)" },
-    expense: { label: "Expense", color: "var(--destructive)" },
-    balance: { label: "Balance", color: "var(--primary)" },
-  } satisfies ChartConfig;
 
   return (
     <Card className="@container/card">

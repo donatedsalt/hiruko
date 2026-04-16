@@ -22,7 +22,7 @@ list of todos
 - [ ] use the Convex `statsByDay` / grouped query in `transaction-list.tsx` instead of recomputing `groupByDay` client-side
 - [ ] add `error.tsx` at `(auth)` and `(dashboard)` route boundaries; wrap data-dependent sections in `<Suspense>` with skeletons
 - [ ] lazy-load `chart-area-interactive.tsx` (Recharts) and other heavy chart components
-- [ ] memoize `<ListItem>` and reduce re-renders in `transaction-list.tsx`; consider virtualization for paginated lists
+- [ ] consider virtualization (`react-window` / `@tanstack/react-virtual`) for paginated transaction lists once data volume warrants it
 - [ ] reduce pervasive `"use client"` (66 files) — keep providers/interactive shells client, push pages toward server-first
 - [ ] tighten `tsconfig.json`: enable `noUncheckedIndexedAccess`, `exactOptionalPropertyTypes`, `noImplicitReturns`
 - [ ] tighten ESLint: promote `no-explicit-any` to `error`, add `eslint-plugin-jsx-a11y`, set `react-hooks/exhaustive-deps` to `error`
@@ -37,6 +37,18 @@ list of todos
 - [ ] extract a shared form hook (or adopt react-hook-form) for category/budget/goal/transaction dialogs — surface field-level errors instead of single-issue toasts
 - [ ] separate the type toggle from the category select on `transactions/new` so manual type choices aren't silently overwritten when the category changes — `src/app/(dashboard)/transactions/new/page.tsx:186`
 - [ ] reset dialog form state before closing (not after) to avoid stale fields when rapidly reopening — budget/goal/category dialogs
+
+## Performance
+
+- [ ] `next/dynamic` Recharts charts (`chart-area-interactive.tsx`, `pie-chart.tsx`) — ~160 KB deferred
+- [ ] `next/dynamic` `EmojiPickerButton` (frimousse picker) — rarely opened
+- [ ] `next/dynamic` the AI code-block / syntax-highlighter / react-markdown stack in `ui/ai/response.tsx` + `ui/ai/code-block.tsx` — only needed when the assistant returns code/math
+- [ ] `next/image` for Clerk user avatars in `nav-user.tsx`; add image `remotePatterns` for `*.clerk.dev` / `img.clerk.com` in `next.config.ts`
+- [ ] remove the duplicate `<SpeedInsights />` — currently mounted in both `(auth)` and `(dashboard)` layouts
+- [ ] `Promise.all` the sequential `ctx.db.get` / `ctx.db.patch` calls in `convex/transactions/mutations.ts remove` handler
+- [ ] dashboard home (`(dashboard)/page.tsx`) + `<AccountsCards>` both fetch `categories`/`accounts`; dedupe via a shared aggregate query or context
+- [ ] migrate `convex/transactions/queries.ts list` to the paginated query as the default caller, keep the non-paginated variant for internal-only use
+- [ ] shared Convex `listFormDefaults` query returning accounts/categories/budgets/goals in one RPC for `transactions/new` and `transactions/[id]`
 
 ## Bugs
 

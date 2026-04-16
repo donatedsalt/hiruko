@@ -1,7 +1,7 @@
 "use client";
 
 import { toast } from "sonner";
-import { useState } from "react";
+import { memo, useState } from "react";
 import { useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { IconCirclePlusFilled } from "@tabler/icons-react";
@@ -37,7 +37,7 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
 
-export function GoalCard({ goal }: { goal: Goal }) {
+function GoalCardInner({ goal }: { goal: Goal }) {
   const [open, setOpen] = useState(false);
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
   const { count, done } = useCountdown(3, showConfirmDelete);
@@ -248,6 +248,8 @@ export function GoalCard({ goal }: { goal: Goal }) {
     </Dialog>
   );
 }
+
+export const GoalCard = memo(GoalCardInner);
 
 export function GoalCardSkeleton() {
   return <Skeleton className="h-42" />;

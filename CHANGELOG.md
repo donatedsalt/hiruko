@@ -4,6 +4,11 @@ Historical record of completed work. For authoritative history, see `git log`.
 
 ## Unreleased
 
+- perf: React memoization sweep
+  - `React.memo` on `ListItem`, `AccountCard`, `BudgetCard`, `GoalCard` so map-rendered rows skip re-render when their own props are unchanged
+  - `useMemo` on `groupByDay(transactions)` + date sort in `transaction-list.tsx`
+  - hoist `chartConfig` to module scope in `chart-area-interactive.tsx`; `useMemo` the `chartConfig` and `total` reductions in `pie-chart.tsx`
+  - `useMemo` the income/expense category filters in `category-list.tsx` and `statistics/page.tsx` (dropping the redundant `useEffect` + `useState` pair on the stats page)
 - `next.config.ts`: disable `x-powered-by` and set baseline security headers on all routes — `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `Referrer-Policy: strict-origin-when-cross-origin`, `Permissions-Policy` (camera/mic/geo/browsing-topics off), `Strict-Transport-Security: max-age=63072000; includeSubDomains; preload`
 - verify Clerk webhook replay/idempotency story is already covered: `svix` enforces a 5-minute timestamp tolerance via `standardwebhooks`; `users.mutations.initializeUser` early-returns when the account already exists
 - quick-win hygiene sweep:

@@ -62,9 +62,13 @@ export function RenderGroupedList({
     return map;
   }, [categories]);
 
-  const grouped = groupByDay(transactions);
-  const dates = Object.keys(grouped).sort(
-    (a, b) => new Date(b).getTime() - new Date(a).getTime(),
+  const grouped = useMemo(() => groupByDay(transactions), [transactions]);
+  const dates = useMemo(
+    () =>
+      Object.keys(grouped).sort(
+        (a, b) => new Date(b).getTime() - new Date(a).getTime(),
+      ),
+    [grouped],
   );
 
   return (

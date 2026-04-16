@@ -1,3 +1,5 @@
+import { useMemo } from "react";
+
 import type { Category } from "@/types/convex";
 
 import { cn } from "@/lib/utils";
@@ -51,10 +53,16 @@ export function CategoryList({
   Data: Category[];
   loading?: boolean;
 }) {
-  if (loading) return <CategoryListSkeleton />;
+  const incomeData = useMemo(
+    () => Data?.filter((cat) => cat.type === "income"),
+    [Data],
+  );
+  const expenseData = useMemo(
+    () => Data?.filter((cat) => cat.type === "expense"),
+    [Data],
+  );
 
-  const incomeData = Data?.filter((cat) => cat.type === "income");
-  const expenseData = Data?.filter((cat) => cat.type === "expense");
+  if (loading) return <CategoryListSkeleton />;
 
   return (
     <Tabs

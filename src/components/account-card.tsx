@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { memo, useState } from "react";
 import { toast } from "sonner";
 import { IconCirclePlusFilled } from "@tabler/icons-react";
 
@@ -35,7 +35,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 
-export function AccountCard({ account }: { account: Account }) {
+function AccountCardInner({ account }: { account: Account }) {
   const [open, setOpen] = useState(false);
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
   const { count, done } = useCountdown(3, showConfirmDelete);
@@ -237,6 +237,8 @@ export function AccountCard({ account }: { account: Account }) {
     </Dialog>
   );
 }
+
+export const AccountCard = memo(AccountCardInner);
 
 export function AccountCardSkeleton() {
   return <Skeleton className="min-h-36 aspect-3/2" />;

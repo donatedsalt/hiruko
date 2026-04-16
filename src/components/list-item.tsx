@@ -1,3 +1,4 @@
+import { memo } from "react";
 import Link from "next/link";
 
 import { Badge } from "@/components/ui/badge";
@@ -32,7 +33,7 @@ function ItemBody({ icon, title, badge, amount }: Omit<ListItemProps, "href">) {
   );
 }
 
-export function ListItem({ href, icon, title, badge, amount }: ListItemProps) {
+function ListItemInner({ href, icon, title, badge, amount }: ListItemProps) {
   if (href) {
     return (
       <li>
@@ -48,6 +49,8 @@ export function ListItem({ href, icon, title, badge, amount }: ListItemProps) {
     </li>
   );
 }
+
+export const ListItem = memo(ListItemInner);
 
 export function EmptyState({ text }: { text: string }) {
   return (

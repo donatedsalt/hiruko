@@ -1,26 +1,25 @@
 "use client";
 
+import { useMemo } from "react";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 
 import { SiteHeader } from "@/components/site-header";
 import { ErrorMessage } from "@/components/error-message";
 import { ChartPie, ChartPieSkeleton } from "@/components/pie-chart";
-import { useEffect, useState } from "react";
-import { Category } from "@/types/convex";
 
 export default function Page() {
   const categories = useQuery(api.categories.queries.list);
   const loading = categories === undefined;
 
-  const [incCats, setIncCats] = useState<Category[] | undefined>();
-  const [expCats, setExpCats] = useState<Category[] | undefined>();
-
-  useEffect(() => {
-    if (!categories) return;
-    setIncCats(categories.filter((cat) => cat.type === "income"));
-    setExpCats(categories.filter((cat) => cat.type === "expense"));
-  }, [categories]);
+  const incCats = useMemo(
+    () => categories?.filter((cat) => cat.type === "income"),
+    [categories],
+  );
+  const expCats = useMemo(
+    () => categories?.filter((cat) => cat.type === "expense"),
+    [categories],
+  );
 
   return (
     <>

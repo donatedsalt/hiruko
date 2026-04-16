@@ -49,17 +49,22 @@ export function ChartPie({
     [categories],
   );
 
+  const chartConfig = useMemo<ChartConfig>(() => {
+    return (categories ?? []).reduce((acc, cat, idx) => {
+      acc[cat.name] = {
+        label: cat.name,
+        color: COLORS[idx % COLORS.length],
+      };
+      return acc;
+    }, {} as ChartConfig);
+  }, [categories]);
+
+  const total = useMemo(
+    () => (categories ?? []).reduce((sum, cat) => sum + cat.transactionAmount, 0),
+    [categories],
+  );
+
   if (!categories) return <ChartPieSkeleton />;
-
-  const total = categories.reduce((sum, cat) => sum + cat.transactionAmount, 0);
-
-  const chartConfig = categories.reduce((acc, cat, idx) => {
-    acc[cat.name] = {
-      label: cat.name,
-      color: COLORS[idx % COLORS.length],
-    };
-    return acc;
-  }, {} as ChartConfig);
 
   return (
     <Card className="flex flex-col">
