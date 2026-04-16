@@ -58,16 +58,11 @@ list of todos
 
 ## Security
 
-- [ ] `/api/chat` has no auth, rate limit, or input validation — anyone can drain Gemini key — `src/app/api/chat/route.ts`
-- [ ] `/api/chat` has no body-size limit — `req.json()` can buffer arbitrary payloads (OOM risk) — `src/app/api/chat/route.ts`
-- [ ] `/api/chat` has no CSRF / `origin` allowlist check — `src/app/api/chat/route.ts`
-- [ ] `console.error` in `/api/chat` logs the full Gemini error object (may include request details / partial key fragments in stack traces) — sanitize before logging — `src/app/api/chat/route.ts:44`
 - [ ] verify Svix `Webhook.verify()` enforces a timestamp tolerance window; if not, manually reject payloads older than ~5 min to block replay — `convex/http.ts:32-36`
 - [ ] `next.config.ts` is empty — add CSP / security headers, `poweredByHeader: false`
 
 ## UX
 
-- [ ] AI consult page: surface API/network errors (currently silent when `res.body` is null or fetch fails) — `src/app/(dashboard)/consult/page.tsx`, `src/app/api/chat/route.ts`
 - [ ] AI consult: add abort + retry for in-flight streams
 - [ ] AI consult: persist message history (DB or localStorage) so refresh doesn't wipe the conversation
 - [ ] first-run onboarding flow after Clerk webhook seeds Cash account + default categories — dashboard and `transactions/new` redirect path are confusing for empty state

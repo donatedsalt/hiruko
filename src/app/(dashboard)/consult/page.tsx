@@ -47,13 +47,39 @@ export default function Page() {
     const currentInput = input;
     setInput("");
 
-    const res = await fetch("/api/chat", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ prompt: currentInput }),
-    });
+    const appendError = (text: string) => {
+      setMessages((prev) => [...prev, { from: "system", content: text }]);
+    };
+
+    let res: Response;
+    try {
+      res = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prompt: currentInput }),
+      });
+    } catch {
+      appendError("Network error. Check your connection and try again.");
+      setIsLoading(false);
+      return;
+    }
+
+    if (!res.ok) {
+      const msg =
+        res.status === 401
+          ? "You need to sign in again."
+          : res.status === 429
+            ? "Too many requests. Try again in a minute."
+            : res.status === 400
+              ? "That message couldn't be sent."
+              : "Something went wrong. Try again.";
+      appendError(msg);
+      setIsLoading(false);
+      return;
+    }
 
     if (!res.body) {
+      appendError("Empty response from the server.");
       setIsLoading(false);
       return;
     }

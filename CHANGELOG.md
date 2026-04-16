@@ -4,6 +4,8 @@ Historical record of completed work. For authoritative history, see `git log`.
 
 ## Unreleased
 
+- `/api/chat` hardening: Clerk auth (401), same-origin check (403), 8 KB body cap (413), Zod prompt validation (400), per-user 20/min rate limit (429), sanitized error logs, fail-fast on missing `GEMINI_API_KEY` (503)
+- consult page: surface network / 401 / 429 / 400 / 5xx as visible system messages instead of silent failure
 - `useSmartRouter` / `HistoryTracker`: namespace visitedPaths per Clerk userId (no cross-account leak), wrap router methods so `back`/`forward` are safe to destructure
 - transaction view
 - transaction edit
