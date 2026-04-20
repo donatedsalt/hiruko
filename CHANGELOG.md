@@ -4,6 +4,7 @@ Historical record of completed work. For authoritative history, see `git log`.
 
 ## Unreleased
 
+- fix: `transactions.queries.statsByDay` now buckets by the client's IANA timezone (passed as an optional `tz` arg) using `Intl.DateTimeFormat("en-CA", { timeZone })`; `<ChartAreaInteractive>` sends the browser's resolved zone and parses `YYYY-MM-DD` day keys as local midnight so chart labels render the correct day east and west of UTC
 - perf: `users.queries.homeDefaults` bundles accounts + categories + recent transactions for the dashboard home into a single Convex query; `<AccountsCards>` now accepts an optional `accounts` prop (falls back to `api.accounts.queries.list` when used outside the home)
 - remove dead `convex/transactions/queries.ts` `list` export — all callers use `listPaginated` or `listRecent`
 - perf: `users.queries.formDefaults` — single Convex query returning accounts/categories/budgets/goals; `/transactions/new` and `/transactions/[id]` now issue one subscription instead of four

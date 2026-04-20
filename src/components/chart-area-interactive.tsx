@@ -33,6 +33,14 @@ import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
+// Parse "YYYY-MM-DD" as local midnight so chart labels render the same day
+// the server keyed — `new Date("YYYY-MM-DD")` would parse as UTC midnight and
+// shift a day for users west of UTC.
+function parseLocalYmd(value: string) {
+  const [y, m, d] = value.split("-").map(Number);
+  return new Date(y, m - 1, d);
+}
+
 const chartConfig = {
   transactions: { label: "Transactions" },
   income: { label: "Income", color: "var(--secondary)" },
@@ -55,8 +63,14 @@ export function ChartAreaInteractive() {
     return Date.now() - days * DAY_MS;
   }, [timeRange]);
 
+  const tz = React.useMemo(
+    () => Intl.DateTimeFormat().resolvedOptions().timeZone,
+    [],
+  );
+
   const filteredData = useQuery(api.transactions.queries.statsByDay, {
     sinceMs,
+    tz,
   });
 
   if (filteredData === undefined) return <ChartAreaInteractiveSkeleton />;
@@ -153,8 +167,7 @@ export function ChartAreaInteractive() {
                 tickMargin={8}
                 minTickGap={32}
                 tickFormatter={(value) => {
-                  const date = new Date(value);
-                  return date.toLocaleDateString("en-US", {
+                  return parseLocalYmd(value).toLocaleDateString("en-US", {
                     month: "short",
                     day: "numeric",
                   });
@@ -166,7 +179,7 @@ export function ChartAreaInteractive() {
                 content={
                   <ChartTooltipContent
                     labelFormatter={(value) => {
-                      return new Date(value).toLocaleDateString("en-US", {
+                      return parseLocalYmd(value).toLocaleDateString("en-US", {
                         month: "short",
                         day: "numeric",
                       });

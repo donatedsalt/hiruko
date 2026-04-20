@@ -51,10 +51,13 @@ export const listRecent = query({
 /**
  * Daily income/expense buckets since `sinceMs` with a running balance that
  * starts at 0 at the first visible day. Chart-ready; scoped read.
+ *
+ * `tz` is an IANA timezone name from the client; days are bucketed in that
+ * zone so users east/west of UTC see transactions in the correct day.
  */
 export const statsByDay = query({
-  args: { sinceMs: v.number() },
-  handler: async (ctx, { sinceMs }) => {
+  args: { sinceMs: v.number(), tz: v.optional(v.string()) },
+  handler: async (ctx, { sinceMs, tz }) => {
     const userId = await requireUserId(ctx);
 
     const txns = await ctx.db
@@ -64,9 +67,16 @@ export const statsByDay = query({
       )
       .collect();
 
+    const dayFormatter = new Intl.DateTimeFormat("en-CA", {
+      timeZone: tz ?? "UTC",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    });
+
     const grouped = new Map<string, { income: number; expense: number }>();
     for (const t of txns) {
-      const date = new Date(t.transactionTime).toISOString().split("T")[0];
+      const date = dayFormatter.format(new Date(t.transactionTime));
       const bucket = grouped.get(date) ?? { income: 0, expense: 0 };
       if (t.type === "income") bucket.income += t.amount;
       else bucket.expense += t.amount;
