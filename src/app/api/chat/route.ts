@@ -100,6 +100,7 @@ export async function POST(req: Request) {
     const result = streamText({
       model: google("gemini-2.0-flash-001"),
       messages: await convertToModelMessages(messages),
+      abortSignal: req.signal,
     });
 
     return result.toUIMessageStreamResponse();

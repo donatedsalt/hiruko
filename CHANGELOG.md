@@ -4,6 +4,10 @@ Historical record of completed work. For authoritative history, see `git log`.
 
 ## Unreleased
 
+- fix(api/chat): forward `req.signal` to `streamText(...)` as `abortSignal` so client disconnects actually cancel the Gemini stream instead of draining tokens silently
+- fix(convex/categories): `mutations.update` validator now matches handler usage — `type` is `v.optional(v.union(...))` (handler already guards with `if (args.type !== undefined)`); prevents inconsistent partial-update calls
+- perf: wrap `useSearchParams()` consumers in a `<Suspense fallback={null}>` boundary on `(dashboard)/budgets/page.tsx`, `goals/page.tsx`, `categories/page.tsx` — extracts the `?new=1` reader into a tiny `NewParamWatcher` component so Next 15 doesn't opt the whole page out of prerendering
+- fix(nav): replace `<a href={item.url}>` with `next/link` `<Link>` in `src/components/nav-businesses.tsx` so navigation prefetches and stays SPA
 - chore: GitHub Actions CI — `.github/workflows/ci.yml` runs `typecheck` + `lint` + `format:check` on push to `main` and every pull request. Bun via `oven-sh/setup-bun@v2`, deps via `bun install --frozen-lockfile`. `build` intentionally skipped (requires Clerk env vars at prerender time)
 - chore: Husky + lint-staged pre-commit hook — `.husky/pre-commit` calls `bunx lint-staged`; `lint-staged` config in `package.json` runs `prettier --write` on staged Markdown/JSON/YAML/CSS and `prettier --write` + `eslint --fix` on staged TS/JS source. `prepare: husky` script ensures the hook installs automatically after `bun install` on a fresh clone
 - chore: Prettier — add `.prettierrc.json` (enables `prettier-plugin-tailwindcss` with `cn`/`cva` recognized as tailwind-class functions), `.prettierignore` (skip `.next`, `build`, `node_modules`, `bun.lock`, `skills-lock.json`, `convex/_generated`, `.agents`, `public`), and `format` / `format:check` scripts in `package.json`. First `bun run format` pass normalizes whitespace, quote style, semicolons, and tailwind class order across 63 existing files; all future diffs stay clean when the scripts run locally

@@ -81,7 +81,7 @@ export const update = mutation({
     id: v.id("categories"),
     name: v.optional(v.string()),
     icon: v.optional(v.string()),
-    type: v.union(v.literal("income"), v.literal("expense")),
+    type: v.optional(v.union(v.literal("income"), v.literal("expense"))),
   },
   handler: async (ctx, args) => {
     const userId = await requireUserId(ctx);

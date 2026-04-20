@@ -35,13 +35,8 @@ list of todos
 ## Performance
 
 - [ ] cap unbounded `.collect()` calls with `.take(N)` or pagination per Convex guidelines — `convex/transactions/queries.ts:statsByDay`, `convex/users/mutations.ts:initializeUser`, and the cascade-delete fetches in `accounts` / `categories` / `budgets` / `goals` mutations
-- [ ] wrap `useSearchParams()` consumers in `<Suspense>` so Next 15 doesn't bail the whole page to fully-dynamic — `(dashboard)/budgets/page.tsx`, `goals/page.tsx`, `categories/page.tsx` (the `?new=1` effect is the current consumer)
 
 ## Bugs
-
-- [ ] `/api/chat` doesn't forward `req.signal` to `streamText` — if the client disconnects mid-stream, Gemini keeps emitting tokens. Add `abortSignal: req.signal` to the `streamText(...)` options — `src/app/api/chat/route.ts`
-- [ ] `categories.mutations.update` validator requires `type` but the handler treats it as optional (`if (args.type !== undefined)`) — either make the validator `v.optional(v.union(...))` or make the handler require it — `convex/categories/mutations.ts`
-- [ ] plain `<a href={...}>` in `src/components/nav-businesses.tsx:47` should be `next/link` `<Link>` so navigation prefetches and stays SPA
 
 ## Security
 
