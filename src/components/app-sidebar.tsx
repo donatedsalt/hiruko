@@ -10,6 +10,7 @@ import {
   IconMoneybag,
   IconPigMoney,
   IconReport,
+  IconSearch,
 } from "@tabler/icons-react";
 
 import { NavMain } from "@/components/nav-main";
@@ -24,6 +25,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
+import { useCommandBar } from "@/components/command-bar-provider";
 
 import HirukoIcon from "@/components/icons/hiruko-icon";
 
@@ -69,6 +71,8 @@ const data = {
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const { open: openCommandBar } = useCommandBar();
+
   return (
     <Sidebar collapsible="offcanvas" {...props}>
       <SidebarHeader>
@@ -82,6 +86,18 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 <HirukoIcon className="!size-5" />
                 <span className="text-base font-semibold">Hiruko</span>
               </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+          <SidebarMenuItem>
+            <SidebarMenuButton
+              onClick={openCommandBar}
+              aria-label="Open command bar"
+            >
+              <IconSearch />
+              <span>Search</span>
+              <kbd className="ml-auto inline-flex items-center gap-0.5 rounded border bg-muted px-1.5 font-mono text-[10px] text-muted-foreground">
+                <span>⌘</span>K
+              </kbd>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>

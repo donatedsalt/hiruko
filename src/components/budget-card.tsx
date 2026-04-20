@@ -254,9 +254,17 @@ export function BudgetCardSkeleton() {
   return <Skeleton className="h-42" />;
 }
 
-export function AddBudgetCard() {
+export function AddBudgetCard({
+  open: openProp,
+  onOpenChange: onOpenChangeProp,
+}: {
+  open?: boolean;
+  onOpenChange?: (v: boolean) => void;
+} = {}) {
   const createBudget = useMutation(api.budgets.mutations.createBudget);
-  const [open, setOpen] = useState(false);
+  const [openState, setOpenState] = useState(false);
+  const open = openProp ?? openState;
+  const setOpen = onOpenChangeProp ?? setOpenState;
   const [isSubmitting, setIsSubmitting] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
 

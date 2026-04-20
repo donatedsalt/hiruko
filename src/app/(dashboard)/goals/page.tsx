@@ -1,5 +1,7 @@
 "use client";
 
+import { useEffect, useState } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 
@@ -16,6 +18,18 @@ export default function GoalsPage() {
   const goals = useQuery(api.goals.queries.list);
   const loading = goals === undefined;
 
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const [addOpen, setAddOpen] = useState(false);
+
+  useEffect(() => {
+    if (searchParams.get("new") === "1") {
+      setAddOpen(true);
+      router.replace(pathname);
+    }
+  }, [searchParams, router, pathname]);
+
   return (
     <>
       <SiteHeader title={"Goals"} />
@@ -29,7 +43,7 @@ export default function GoalsPage() {
           ) : (
             goals.map((goal: Goal) => <GoalCard key={goal._id} goal={goal} />)
           )}
-          {!loading && <AddGoalCard />}
+          {!loading && <AddGoalCard open={addOpen} onOpenChange={setAddOpen} />}
         </div>
       </main>
     </>

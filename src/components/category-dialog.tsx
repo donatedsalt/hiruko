@@ -55,6 +55,8 @@ interface CategoryDialogProps {
   category?: Category;
   trigger?: React.ReactNode;
   disabled?: boolean;
+  open?: boolean;
+  onOpenChange?: (v: boolean) => void;
 }
 
 export function CategoryDialog({
@@ -62,8 +64,12 @@ export function CategoryDialog({
   category,
   trigger,
   disabled = false,
+  open: openProp,
+  onOpenChange: onOpenChangeProp,
 }: CategoryDialogProps) {
-  const [open, setOpen] = useState(false);
+  const [openState, setOpenState] = useState(false);
+  const open = openProp ?? openState;
+  const setOpen = onOpenChangeProp ?? setOpenState;
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
   const { count, done } = useCountdown(3, showConfirmDelete);

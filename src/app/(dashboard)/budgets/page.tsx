@@ -1,5 +1,7 @@
 "use client";
 
+import { useEffect, useState } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 
@@ -16,6 +18,18 @@ export default function BudgetsPage() {
   const budgets = useQuery(api.budgets.queries.list);
   const loading = budgets === undefined;
 
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const [addOpen, setAddOpen] = useState(false);
+
+  useEffect(() => {
+    if (searchParams.get("new") === "1") {
+      setAddOpen(true);
+      router.replace(pathname);
+    }
+  }, [searchParams, router, pathname]);
+
   return (
     <>
       <SiteHeader title={"Budgets"} />
@@ -31,7 +45,9 @@ export default function BudgetsPage() {
               <BudgetCard key={budget._id} budget={budget} />
             ))
           )}
-          {!loading && <AddBudgetCard />}
+          {!loading && (
+            <AddBudgetCard open={addOpen} onOpenChange={setAddOpen} />
+          )}
         </div>
       </main>
     </>

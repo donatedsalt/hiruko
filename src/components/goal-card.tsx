@@ -256,9 +256,17 @@ export function GoalCardSkeleton() {
   return <Skeleton className="h-42" />;
 }
 
-export function AddGoalCard() {
+export function AddGoalCard({
+  open: openProp,
+  onOpenChange: onOpenChangeProp,
+}: {
+  open?: boolean;
+  onOpenChange?: (v: boolean) => void;
+} = {}) {
   const createGoal = useMutation(api.goals.mutations.createGoal);
-  const [open, setOpen] = useState(false);
+  const [openState, setOpenState] = useState(false);
+  const open = openProp ?? openState;
+  const setOpen = onOpenChangeProp ?? setOpenState;
   const [isSubmitting, setIsSubmitting] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
 
