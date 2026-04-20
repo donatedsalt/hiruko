@@ -125,7 +125,7 @@ Call `requireUserId(ctx)` at the top of every query/mutation handler that touche
 - **ESLint** extends `next/core-web-vitals` + `next/typescript`. Unused vars are warnings (underscore-prefix ignored). `@typescript-eslint/no-explicit-any` is a **warning** — avoid `any` but it won't fail lint.
 - **Naming**: files `kebab-case`; React components `PascalCase`; functions/variables `camelCase`; Convex functions `camelCase`.
 - **Class merging**: always use `cn` from `@/lib/utils` when composing `className`.
-- **Icons**: `@tabler/icons-react` (shadcn `iconLibrary: "tabler"` in `components.json`). Brand icons via `@icons-pack/react-simple-icons` when needed.
+- **Icons**: `@tabler/icons-react` only (shadcn `iconLibrary: "tabler"` in `components.json`). Tabler's `IconBrand*` set (e.g. `IconBrandGithub`, `IconBrandGoogle`) covers brand marks — no separate brand-icon library.
 - **Client components**: add `"use client"` when using hooks, browser APIs, or events.
 - **Toasts / feedback**: `sonner` (`toast.success(...)`). `<Toaster />` is mounted in the dashboard layout.
 - **Forms & validation**: Zod schemas in `src/validation`. Reuse the branded id types from `src/types/convex.ts`.
