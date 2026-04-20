@@ -41,7 +41,6 @@ list of todos
 ## Bugs
 
 - [ ] `ConvexReactClient` instantiated at module scope can hold stale config across hot reloads — move inside the provider component — `src/components/convex-client-provider.tsx:12`
-- [ ] no delete confirmation/countdown on transaction detail page (other entities use `useCountdown`) — `src/app/(dashboard)/transactions/[id]/page.tsx:475`
 
 ## Security
 
