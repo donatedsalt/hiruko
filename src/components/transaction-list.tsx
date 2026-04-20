@@ -75,7 +75,7 @@ export function RenderGroupedList({
     <div className="grid gap-6">
       {dates.map((date) => (
         <div key={date}>
-          <div className="py-3 text-xs font-semibold text-muted-foreground">
+          <div className="text-muted-foreground py-3 text-xs font-semibold">
             {formatDisplayDate(date)}
           </div>
           <ul className="grid gap-4">
@@ -113,7 +113,7 @@ export function RenderGroupedList({
         </div>
       ))}
       {showEndMarker && (
-        <div className="grid py-12 place-items-center">
+        <div className="grid place-items-center py-12">
           <p>End of list 🫡</p>
         </div>
       )}
@@ -141,7 +141,7 @@ export function TransactionList({
   return (
     <Tabs
       defaultValue="all"
-      className="flex-col justify-start w-full gap-4 md:gap-6"
+      className="w-full flex-col justify-start gap-4 md:gap-6"
     >
       <div>
         <TabsList>
@@ -195,12 +195,12 @@ export function TransactionList({
 
 export function TransactionListSkeleton() {
   return (
-    <div className="flex flex-col justify-start w-full gap-4 md:gap-6">
+    <div className="flex w-full flex-col justify-start gap-4 md:gap-6">
       <div>
         <Skeleton className="h-8 w-42" />
       </div>
       <div className="flex flex-col">
-        <Skeleton className="w-32 h-4 my-3" />
+        <Skeleton className="my-3 h-4 w-32" />
         <ul className="grid gap-4">
           {[...Array(4)].map((_, i) => (
             <ListItemSkeleton key={i} />

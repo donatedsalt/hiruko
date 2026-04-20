@@ -25,7 +25,9 @@ import { IconRefresh } from "@tabler/icons-react";
 
 const Response = dynamic(
   () =>
-    import("@/components/ui/ai/response").then((m) => ({ default: m.Response })),
+    import("@/components/ui/ai/response").then((m) => ({
+      default: m.Response,
+    })),
   {
     ssr: false,
     loading: () => null,
@@ -57,9 +59,7 @@ function loadHistory(userId: string | null | undefined): UIMessage[] {
 }
 
 function renderText(msg: UIMessage): string {
-  return msg.parts
-    .map((p) => (p.type === "text" ? p.text : ""))
-    .join("");
+  return msg.parts.map((p) => (p.type === "text" ? p.text : "")).join("");
 }
 
 export default function Page() {
@@ -78,7 +78,7 @@ export default function Page() {
     return (
       <>
         <SiteHeader title="Consult" />
-        <main className="flex flex-1 items-center justify-center p-6 text-muted-foreground text-sm">
+        <main className="text-muted-foreground flex flex-1 items-center justify-center p-6 text-sm">
           Loading…
         </main>
       </>
@@ -143,8 +143,8 @@ function Chat({
     <>
       <SiteHeader title="Consult" />
 
-      <main className="@container/main flex flex-col flex-1 gap-4 p-4 md:gap-6 md:p-6">
-        <Conversation className="relative w-full flex-1 min-h-0">
+      <main className="@container/main flex flex-1 flex-col gap-4 p-4 md:gap-6 md:p-6">
+        <Conversation className="relative min-h-0 w-full flex-1">
           <ConversationContent className="px-0">
             {messages.map((message) => (
               <Message key={message.id} from={message.role}>
@@ -177,9 +177,7 @@ function Chat({
               <Message from="system">
                 <MessageContent>
                   <div className="flex flex-col gap-2">
-                    <span>
-                      {error?.message ?? "Something went wrong."}
-                    </span>
+                    <span>{error?.message ?? "Something went wrong."}</span>
                     <Button
                       variant="outline"
                       size="sm"

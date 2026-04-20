@@ -95,7 +95,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             >
               <IconSearch />
               <span>Search</span>
-              <kbd className="ml-auto inline-flex items-center gap-0.5 rounded border bg-muted px-1.5 font-mono text-[10px] text-muted-foreground">
+              <kbd className="bg-muted text-muted-foreground ml-auto inline-flex items-center gap-0.5 rounded border px-1.5 font-mono text-[10px]">
                 <span>⌘</span>K
               </kbd>
             </SidebarMenuButton>

@@ -121,13 +121,13 @@ function GoalCardInner({ goal }: { goal: Goal }) {
       <DialogTrigger asChild>
         <Card
           key={goal._id}
-          className="justify-center gap-3 p-6 shadow-xs cursor-pointer select-none min-h-36 shrink-0 from-primary/5 to-card dark:bg-card bg-gradient-to-t"
+          className="from-primary/5 to-card dark:bg-card min-h-36 shrink-0 cursor-pointer justify-center gap-3 bg-gradient-to-t p-6 shadow-xs select-none"
         >
           <CardHeader className="@container-normal">
-            <CardTitle className="text-xl font-semibold text-muted-foreground">
+            <CardTitle className="text-muted-foreground text-xl font-semibold">
               {goal.name}
             </CardTitle>
-            <CardDescription className="text-2xl font-semibold text-foreground tabular-nums">
+            <CardDescription className="text-foreground text-2xl font-semibold tabular-nums">
               <p>
                 {formatCurrency(goal.saved)} / {formatCurrency(goal.amount)}{" "}
                 used
@@ -138,7 +138,7 @@ function GoalCardInner({ goal }: { goal: Goal }) {
             <Progress value={Math.min(100, (goal.saved / goal.amount) * 100)} />
           </CardContent>
           <CardFooter>
-            <p className="text-base font-semibold text-muted-foreground tabular-nums">
+            <p className="text-muted-foreground text-base font-semibold tabular-nums">
               {goal.amount - goal.saved >= 0
                 ? `${formatCurrency(goal.amount - goal.saved)} left`
                 : `Over goal by ${formatCurrency(Math.abs(goal.amount - goal.saved))}`}
@@ -224,7 +224,7 @@ function GoalCardInner({ goal }: { goal: Goal }) {
                 </div>
               </>
             ) : (
-              <div className="flex flex-col-reverse justify-end gap-2 grow sm:flex-row">
+              <div className="flex grow flex-col-reverse justify-end gap-2 sm:flex-row">
                 <Button
                   type="button"
                   variant="outline"
@@ -317,14 +317,14 @@ export function AddGoalCard({
       }}
     >
       <DialogTrigger asChild>
-        <Card className="flex flex-col items-center justify-center gap-0 p-0 bg-transparent border-dashed shadow-xs cursor-pointer select-none min-h-42 shrink-0">
+        <Card className="flex min-h-42 shrink-0 cursor-pointer flex-col items-center justify-center gap-0 border-dashed bg-transparent p-0 shadow-xs select-none">
           <CardHeader className="@container-normal">
-            <CardTitle className="flex flex-col items-center gap-1 text-2xl font-semibold text-muted-foreground">
+            <CardTitle className="text-muted-foreground flex flex-col items-center gap-1 text-2xl font-semibold">
               <IconCirclePlusFilled />
               <span>Add Goal</span>
             </CardTitle>
           </CardHeader>
-          <CardFooter className="text-sm text-muted-foreground">
+          <CardFooter className="text-muted-foreground text-sm">
             Click to add a new Goal
           </CardFooter>
         </Card>

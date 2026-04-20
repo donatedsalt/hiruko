@@ -33,7 +33,7 @@ export default function BudgetsPage() {
   return (
     <>
       <SiteHeader title={"Budgets"} />
-      <main className="@container/main flex flex-col flex-1 gap-4 p-4 md:gap-6 md:p-6">
+      <main className="@container/main flex flex-1 flex-col gap-4 p-4 md:gap-6 md:p-6">
         <div className="grid gap-4 lg:grid-cols-2">
           {loading ? (
             <>

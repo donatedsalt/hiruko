@@ -255,9 +255,7 @@ export const update = mutation({
     }
 
     const sameBudget =
-      oldBudgetTouched &&
-      newBudgetTouched &&
-      oldBudgetId === newBudgetId;
+      oldBudgetTouched && newBudgetTouched && oldBudgetId === newBudgetId;
 
     if (sameBudget && oldBudgetId && oldBudget && oldBudget.userId === userId) {
       // Same budget; amount changed. Transaction count is unchanged.
@@ -308,12 +306,7 @@ export const update = mutation({
         }),
       );
     } else {
-      if (
-        oldGoalTouched &&
-        oldGoalId &&
-        oldGoal &&
-        oldGoal.userId === userId
-      ) {
+      if (oldGoalTouched && oldGoalId && oldGoal && oldGoal.userId === userId) {
         finalPatches.push(
           ctx.db.patch(oldGoalId, {
             saved: Math.max((oldGoal.saved ?? 0) - oldAmount, 0),
@@ -322,12 +315,7 @@ export const update = mutation({
         );
       }
 
-      if (
-        newGoalTouched &&
-        newGoalId &&
-        newGoal &&
-        newGoal.userId === userId
-      ) {
+      if (newGoalTouched && newGoalId && newGoal && newGoal.userId === userId) {
         finalPatches.push(
           ctx.db.patch(newGoalId, {
             saved: (newGoal.saved ?? 0) + newAmount,
@@ -373,8 +361,7 @@ export const remove = mutation({
 
     const touchesBudget =
       !!transaction.budgetId && transaction.type === "expense";
-    const touchesGoal =
-      !!transaction.goalId && transaction.type === "expense";
+    const touchesGoal = !!transaction.goalId && transaction.type === "expense";
 
     const [account, category, budget, goal] = await Promise.all([
       ctx.db.get(transaction.accountId),

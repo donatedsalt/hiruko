@@ -51,9 +51,7 @@ export function CommandBar() {
             <IconReport />
             Overview
           </CommandItem>
-          <CommandItem
-            onSelect={() => run(() => router.push("/transactions"))}
-          >
+          <CommandItem onSelect={() => run(() => router.push("/transactions"))}>
             <IconCash />
             Transactions
           </CommandItem>
@@ -92,9 +90,7 @@ export function CommandBar() {
             <IconPlus />
             New budget
           </CommandItem>
-          <CommandItem
-            onSelect={() => run(() => router.push("/goals?new=1"))}
-          >
+          <CommandItem onSelect={() => run(() => router.push("/goals?new=1"))}>
             <IconPlus />
             New goal
           </CommandItem>

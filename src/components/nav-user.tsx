@@ -61,9 +61,9 @@ export function NavUser() {
                 fallback={avatarText}
                 className="grayscale"
               />
-              <div className="grid flex-1 text-sm leading-tight text-left">
-                <span className="font-medium truncate">{user?.username}</span>
-                <span className="text-xs truncate text-current/50">
+              <div className="grid flex-1 text-left text-sm leading-tight">
+                <span className="truncate font-medium">{user?.username}</span>
+                <span className="truncate text-xs text-current/50">
                   {email}
                 </span>
               </div>
@@ -83,9 +83,9 @@ export function NavUser() {
                   alt={user?.username || "User Avatar"}
                   fallback={avatarText}
                 />
-                <div className="grid flex-1 text-sm leading-tight text-left">
-                  <span className="font-medium truncate">{user?.username}</span>
-                  <span className="text-xs truncate text-muted-foreground">
+                <div className="grid flex-1 text-left text-sm leading-tight">
+                  <span className="truncate font-medium">{user?.username}</span>
+                  <span className="text-muted-foreground truncate text-xs">
                     {email}
                   </span>
                 </div>
@@ -143,8 +143,8 @@ function Loading() {
     <div className="flex items-center gap-2 p-2">
       <Skeleton className="size-8 rounded-lg" />
       <div className="grid gap-1">
-        <Skeleton className="w-24 h-2.5 rounded-lg" />
-        <Skeleton className="w-32 h-2 rounded-lg" />
+        <Skeleton className="h-2.5 w-24 rounded-lg" />
+        <Skeleton className="h-2 w-32 rounded-lg" />
       </div>
     </div>
   );

@@ -9,8 +9,9 @@ type CommandBarContextValue = {
   close: () => void;
 };
 
-const CommandBarContext =
-  React.createContext<CommandBarContextValue | null>(null);
+const CommandBarContext = React.createContext<CommandBarContextValue | null>(
+  null,
+);
 
 export function CommandBarProvider({
   children,

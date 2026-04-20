@@ -67,7 +67,7 @@ function PaginatedTab({
   if (status === "LoadingFirstPage") {
     return (
       <div className="flex flex-col">
-        <Skeleton className="w-32 h-4 my-3" />
+        <Skeleton className="my-3 h-4 w-32" />
         <ul className="grid gap-4">
           {[...Array(4)].map((_, i) => (
             <li key={i}>
@@ -92,12 +92,12 @@ function PaginatedTab({
       />
       <div ref={sentinelRef} aria-hidden className="h-1" />
       {status === "LoadingMore" && (
-        <div className="grid py-6 place-items-center text-sm text-muted-foreground">
+        <div className="text-muted-foreground grid place-items-center py-6 text-sm">
           <p>Loading more…</p>
         </div>
       )}
       {status === "Exhausted" && (
-        <div className="grid py-12 place-items-center">
+        <div className="grid place-items-center py-12">
           <p>End of list 🫡</p>
         </div>
       )}
@@ -112,13 +112,13 @@ export default function Page() {
   return (
     <>
       <SiteHeader title="Transactions" />
-      <main className="@container/main flex flex-col flex-1 gap-4 p-4 md:gap-6 md:p-6">
+      <main className="@container/main flex flex-1 flex-col gap-4 p-4 md:gap-6 md:p-6">
         {initialLoading ? (
           <TransactionListSkeleton />
         ) : categories ? (
           <Tabs
             defaultValue="all"
-            className="flex-col justify-start w-full gap-4 md:gap-6"
+            className="w-full flex-col justify-start gap-4 md:gap-6"
           >
             <div>
               <TabsList>

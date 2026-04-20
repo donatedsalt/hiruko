@@ -1,0 +1,8 @@
+.next
+build
+node_modules
+bun.lock
+skills-lock.json
+convex/_generated
+.agents
+public

@@ -20,7 +20,7 @@ export function AccountsCards({ accounts }: { accounts?: Account[] }) {
 
   if (resolved === undefined) {
     return (
-      <div className="flex gap-4 overflow-auto scrollbar-none">
+      <div className="scrollbar-none flex gap-4 overflow-auto">
         <AccountCardSkeleton />
         <AddAccountCard />
       </div>
@@ -28,7 +28,7 @@ export function AccountsCards({ accounts }: { accounts?: Account[] }) {
   }
 
   return (
-    <div className="flex gap-4 overflow-auto scrollbar-none">
+    <div className="scrollbar-none flex gap-4 overflow-auto">
       {resolved.map((account) => (
         <AccountCard key={account._id} account={account} />
       ))}

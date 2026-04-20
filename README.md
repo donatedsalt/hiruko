@@ -63,14 +63,14 @@ This runs Next.js (Turbopack) and `convex dev` concurrently. Open [http://localh
 
 ## Scripts
 
-| Script              | Description                                  |
-| ------------------- | -------------------------------------------- |
-| `bun run dev`       | Run Next.js and Convex dev servers together  |
-| `bun run dev:next`  | Run only the Next.js dev server              |
-| `bun run dev:convex`| Run only the Convex dev server               |
-| `bun run build`     | Production build (includes type-checking)    |
-| `bun run start`     | Start the production build                   |
-| `bun run lint`      | Run ESLint                                   |
+| Script               | Description                                 |
+| -------------------- | ------------------------------------------- |
+| `bun run dev`        | Run Next.js and Convex dev servers together |
+| `bun run dev:next`   | Run only the Next.js dev server             |
+| `bun run dev:convex` | Run only the Convex dev server              |
+| `bun run build`      | Production build (includes type-checking)   |
+| `bun run start`      | Start the production build                  |
+| `bun run lint`       | Run ESLint                                  |
 
 ## Project Structure
 

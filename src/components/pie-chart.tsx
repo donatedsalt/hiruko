@@ -60,7 +60,8 @@ export function ChartPie({
   }, [categories]);
 
   const total = useMemo(
-    () => (categories ?? []).reduce((sum, cat) => sum + cat.transactionAmount, 0),
+    () =>
+      (categories ?? []).reduce((sum, cat) => sum + cat.transactionAmount, 0),
     [categories],
   );
 
@@ -93,10 +94,10 @@ export function ChartPie({
         {categories.map((cat, idx) => {
           const percent = ((cat.transactionAmount / total) * 100).toFixed(1);
           return (
-            <div key={cat._id} className="flex justify-between w-full">
+            <div key={cat._id} className="flex w-full justify-between">
               <div className="flex items-center gap-2">
                 <div
-                  className="rounded-xs size-4"
+                  className="size-4 rounded-xs"
                   style={{ backgroundColor: COLORS[idx % COLORS.length] }}
                 />
                 <div>{cat.name}</div>
@@ -115,9 +116,9 @@ export function ChartPie({
           );
         })}
         {!showPercent && (
-          <div className="flex justify-between w-full">
+          <div className="flex w-full justify-between">
             <div className="flex items-center gap-2">
-              <div className="rounded-xs size-4 bg-primary" />
+              <div className="bg-primary size-4 rounded-xs" />
               <div>Total</div>
             </div>
             <div>

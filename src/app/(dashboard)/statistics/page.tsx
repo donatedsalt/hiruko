@@ -10,13 +10,10 @@ import { ErrorMessage } from "@/components/error-message";
 import { Skeleton } from "@/components/ui/skeleton";
 
 const ChartPie = dynamic(
-  () =>
-    import("@/components/pie-chart").then((m) => ({ default: m.ChartPie })),
+  () => import("@/components/pie-chart").then((m) => ({ default: m.ChartPie })),
   {
     ssr: false,
-    loading: () => (
-      <Skeleton className="aspect-square max-h-[250px] w-full" />
-    ),
+    loading: () => <Skeleton className="aspect-square max-h-[250px] w-full" />,
   },
 );
 
@@ -40,7 +37,7 @@ export default function Page() {
   return (
     <>
       <SiteHeader title="Statistics" />
-      <main className="@container/main flex flex-col flex-1 gap-4 p-4 md:gap-6 md:p-6">
+      <main className="@container/main flex flex-1 flex-col gap-4 p-4 md:gap-6 md:p-6">
         {loading ? (
           <ChartPieSkeleton />
         ) : categories ? (

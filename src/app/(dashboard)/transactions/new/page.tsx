@@ -135,237 +135,237 @@ export default function Page() {
   return (
     <>
       <SiteHeader title="Add Transaction" />
-      <main className="flex flex-col flex-1">
-      <form
-        onSubmit={handleSubmit}
-        className="@container/main flex flex-col flex-1 gap-4 p-4 md:gap-6 md:p-6"
-      >
-        <div className="grid gap-3 *:w-full">
-          <Label htmlFor="categoryId">
-            Category<span className="text-destructive">*</span>
-          </Label>
-          <div className="flex gap-3">
-            {catLoading ? (
-              <Skeleton className="w-full h-9" />
-            ) : categories ? (
-              <Select
-                name="categoryId"
-                value={txnCategory}
-                onValueChange={(catId: CategoryId) => {
-                  const cat = categories.find((cat) => cat._id === catId);
-                  setTxnCategory(catId);
-                  setTxnType(cat?.type || "expense");
-                }}
-                required
-              >
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Select a category" />
-                </SelectTrigger>
-                <SelectContent>
-                  {categories.map((cat) => (
-                    <SelectItem key={cat._id} value={cat._id}>
-                      {cat.icon} {cat.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            ) : (
-              <ErrorMessage
-                error={"Failed to load categories"}
-                className="min-h-9"
-              />
-            )}
-            <CategoryDialog />
+      <main className="flex flex-1 flex-col">
+        <form
+          onSubmit={handleSubmit}
+          className="@container/main flex flex-1 flex-col gap-4 p-4 md:gap-6 md:p-6"
+        >
+          <div className="grid gap-3 *:w-full">
+            <Label htmlFor="categoryId">
+              Category<span className="text-destructive">*</span>
+            </Label>
+            <div className="flex gap-3">
+              {catLoading ? (
+                <Skeleton className="h-9 w-full" />
+              ) : categories ? (
+                <Select
+                  name="categoryId"
+                  value={txnCategory}
+                  onValueChange={(catId: CategoryId) => {
+                    const cat = categories.find((cat) => cat._id === catId);
+                    setTxnCategory(catId);
+                    setTxnType(cat?.type || "expense");
+                  }}
+                  required
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Select a category" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {categories.map((cat) => (
+                      <SelectItem key={cat._id} value={cat._id}>
+                        {cat.icon} {cat.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              ) : (
+                <ErrorMessage
+                  error={"Failed to load categories"}
+                  className="min-h-9"
+                />
+              )}
+              <CategoryDialog />
+            </div>
           </div>
-        </div>
-        <div className="grid gap-3 *:w-full">
-          <Label htmlFor="type">
-            Type<span className="text-destructive">*</span>
-          </Label>
-          <input type="hidden" name="type" value={txnType} required />
-          <ToggleGroup
-            type="single"
-            value={txnType}
-            onValueChange={(type: "income" | "expense") => {
-              const cat = categories?.find((cat) => cat.type === type);
-              setTxnType(type);
-              setTxnCategory(cat?._id || "");
-            }}
-          >
-            <ToggleGroupItem
-              value="expense"
-              aria-label="Toggle expense"
-              className="border dark:bg-input/30 data-[state=on]:bg-destructive! text-destructive-foreground"
-            >
-              <IconCaretDownFilled />
-              <span>Expense</span>
-            </ToggleGroupItem>
-            <ToggleGroupItem
-              value="income"
-              aria-label="Toggle income"
-              className="border dark:bg-input/30 data-[state=on]:bg-success! text-foreground"
-            >
-              <IconCaretUpFilled />
-              <span>Income</span>
-            </ToggleGroupItem>
-          </ToggleGroup>
-        </div>
-        <div className="grid gap-3 *:w-full">
-          <Label htmlFor="accountId">
-            Account<span className="text-destructive">*</span>
-          </Label>
-          <input type="hidden" name="accountId" value={txnAccount} required />
-          {accLoading ? (
-            <Skeleton className="w-full h-9" />
-          ) : accounts ? (
+          <div className="grid gap-3 *:w-full">
+            <Label htmlFor="type">
+              Type<span className="text-destructive">*</span>
+            </Label>
+            <input type="hidden" name="type" value={txnType} required />
             <ToggleGroup
               type="single"
-              value={txnAccount}
-              onValueChange={(accId: AccountId) => setTxnAccount(accId)}
+              value={txnType}
+              onValueChange={(type: "income" | "expense") => {
+                const cat = categories?.find((cat) => cat.type === type);
+                setTxnType(type);
+                setTxnCategory(cat?._id || "");
+              }}
             >
-              {accounts.map((account) => (
-                <ToggleGroupItem
-                  key={account._id}
-                  value={account._id}
-                  className="border dark:bg-input/30 dark:data-[state=on]:bg-input"
-                >
-                  {account.name}
-                </ToggleGroupItem>
-              ))}
+              <ToggleGroupItem
+                value="expense"
+                aria-label="Toggle expense"
+                className="dark:bg-input/30 data-[state=on]:bg-destructive! text-destructive-foreground border"
+              >
+                <IconCaretDownFilled />
+                <span>Expense</span>
+              </ToggleGroupItem>
+              <ToggleGroupItem
+                value="income"
+                aria-label="Toggle income"
+                className="dark:bg-input/30 data-[state=on]:bg-success! text-foreground border"
+              >
+                <IconCaretUpFilled />
+                <span>Income</span>
+              </ToggleGroupItem>
             </ToggleGroup>
-          ) : (
-            <ErrorMessage
-              error={"Failed to load accounts"}
-              className="min-h-9"
-            />
+          </div>
+          <div className="grid gap-3 *:w-full">
+            <Label htmlFor="accountId">
+              Account<span className="text-destructive">*</span>
+            </Label>
+            <input type="hidden" name="accountId" value={txnAccount} required />
+            {accLoading ? (
+              <Skeleton className="h-9 w-full" />
+            ) : accounts ? (
+              <ToggleGroup
+                type="single"
+                value={txnAccount}
+                onValueChange={(accId: AccountId) => setTxnAccount(accId)}
+              >
+                {accounts.map((account) => (
+                  <ToggleGroupItem
+                    key={account._id}
+                    value={account._id}
+                    className="dark:bg-input/30 dark:data-[state=on]:bg-input border"
+                  >
+                    {account.name}
+                  </ToggleGroupItem>
+                ))}
+              </ToggleGroup>
+            ) : (
+              <ErrorMessage
+                error={"Failed to load accounts"}
+                className="min-h-9"
+              />
+            )}
+          </div>
+          {(budLoading || (budgets && budgets.length > 0)) && (
+            <div className="grid gap-3 *:w-full">
+              <Label htmlFor="budgetId">
+                Budget<span className="text-destructive">*</span>
+              </Label>
+              <input type="hidden" name="budgetId" value={txnBudget} required />
+              {budLoading ? (
+                <Skeleton className="h-9 w-full" />
+              ) : budgets ? (
+                <ToggleGroup
+                  type="single"
+                  value={txnBudget}
+                  onValueChange={(accId: BudgetId) => setTxnBudget(accId)}
+                >
+                  {budgets.map((budget) => (
+                    <ToggleGroupItem
+                      key={budget._id}
+                      value={budget._id}
+                      className="dark:bg-input/30 dark:data-[state=on]:bg-input border"
+                    >
+                      {budget.name}
+                    </ToggleGroupItem>
+                  ))}
+                </ToggleGroup>
+              ) : (
+                <ErrorMessage
+                  error={"Failed to load budgets"}
+                  className="min-h-9"
+                />
+              )}
+            </div>
           )}
-        </div>
-        {(budLoading || (budgets && budgets.length > 0)) && (
+          {(goalLoading || (goals && goals.length > 0)) && (
+            <div className="grid gap-3 *:w-full">
+              <Label htmlFor="goalId">
+                Goal<span className="text-destructive">*</span>
+              </Label>
+              <input type="hidden" name="goalId" value={txnGoal} required />
+              {goalLoading ? (
+                <Skeleton className="h-9 w-full" />
+              ) : goals ? (
+                <ToggleGroup
+                  type="single"
+                  value={txnGoal}
+                  onValueChange={(accId: GoalId) => setTxnGoal(accId)}
+                >
+                  {goals.map((goal) => (
+                    <ToggleGroupItem
+                      key={goal._id}
+                      value={goal._id}
+                      className="dark:bg-input/30 dark:data-[state=on]:bg-input border"
+                    >
+                      {goal.name}
+                    </ToggleGroupItem>
+                  ))}
+                </ToggleGroup>
+              ) : (
+                <ErrorMessage
+                  error={"Failed to load goals"}
+                  className="min-h-9"
+                />
+              )}
+            </div>
+          )}
           <div className="grid gap-3 *:w-full">
-            <Label htmlFor="budgetId">
-              Budget<span className="text-destructive">*</span>
-            </Label>
-            <input type="hidden" name="budgetId" value={txnBudget} required />
-            {budLoading ? (
-              <Skeleton className="w-full h-9" />
-            ) : budgets ? (
-              <ToggleGroup
-                type="single"
-                value={txnBudget}
-                onValueChange={(accId: BudgetId) => setTxnBudget(accId)}
-              >
-                {budgets.map((budget) => (
-                  <ToggleGroupItem
-                    key={budget._id}
-                    value={budget._id}
-                    className="border dark:bg-input/30 dark:data-[state=on]:bg-input"
-                  >
-                    {budget.name}
-                  </ToggleGroupItem>
-                ))}
-              </ToggleGroup>
-            ) : (
-              <ErrorMessage
-                error={"Failed to load budgets"}
-                className="min-h-9"
-              />
-            )}
-          </div>
-        )}
-        {(goalLoading || (goals && goals.length > 0)) && (
-          <div className="grid gap-3 *:w-full">
-            <Label htmlFor="goalId">
-              Goal<span className="text-destructive">*</span>
-            </Label>
-            <input type="hidden" name="goalId" value={txnGoal} required />
-            {goalLoading ? (
-              <Skeleton className="w-full h-9" />
-            ) : goals ? (
-              <ToggleGroup
-                type="single"
-                value={txnGoal}
-                onValueChange={(accId: GoalId) => setTxnGoal(accId)}
-              >
-                {goals.map((goal) => (
-                  <ToggleGroupItem
-                    key={goal._id}
-                    value={goal._id}
-                    className="border dark:bg-input/30 dark:data-[state=on]:bg-input"
-                  >
-                    {goal.name}
-                  </ToggleGroupItem>
-                ))}
-              </ToggleGroup>
-            ) : (
-              <ErrorMessage
-                error={"Failed to load goals"}
-                className="min-h-9"
-              />
-            )}
-          </div>
-        )}
-        <div className="grid gap-3 *:w-full">
-          <Label htmlFor="amount">
-            Amount<span className="text-destructive">*</span>
-          </Label>
-          <Input
-            id="amount"
-            name="amount"
-            type="number"
-            placeholder="99.99"
-            required
-            min="0.01"
-            step="0.01"
-          />
-        </div>
-        <div className="grid gap-3 *:w-full">
-          <Label htmlFor="title">Title</Label>
-          <Input id="title" name="title" type="text" placeholder="Shopping" />
-        </div>
-        <div className="grid gap-3 *:w-full">
-          <Label htmlFor="note">Note</Label>
-          <Textarea
-            id="note"
-            name="note"
-            rows={4}
-            placeholder="something related to current transaction..."
-            className="resize-none"
-          />
-        </div>
-        <div className="grid gap-6 sm:grid-cols-2">
-          <div className="grid gap-3 *:w-full">
-            <Label htmlFor="date">
-              Date<span className="text-destructive">*</span>
-            </Label>
-            <DatePicker id="date" name="date" defaultValue={currentDate} />
-          </div>
-          <div className="grid gap-3 *:w-full">
-            <Label htmlFor="time">
-              Time<span className="text-destructive">*</span>
+            <Label htmlFor="amount">
+              Amount<span className="text-destructive">*</span>
             </Label>
             <Input
-              id="time"
-              name="time"
-              type="time"
-              defaultValue={currentTime}
+              id="amount"
+              name="amount"
+              type="number"
+              placeholder="99.99"
               required
+              min="0.01"
+              step="0.01"
             />
           </div>
-        </div>
-        <div className="flex flex-col-reverse justify-end gap-3 sm:flex-row">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={smartRouter.back}
-            disabled={isSubmitting}
-          >
-            Cancel
-          </Button>
-          <Button type="submit" disabled={isSubmitting}>
-            Add Transaction
-          </Button>
-        </div>
-      </form>
+          <div className="grid gap-3 *:w-full">
+            <Label htmlFor="title">Title</Label>
+            <Input id="title" name="title" type="text" placeholder="Shopping" />
+          </div>
+          <div className="grid gap-3 *:w-full">
+            <Label htmlFor="note">Note</Label>
+            <Textarea
+              id="note"
+              name="note"
+              rows={4}
+              placeholder="something related to current transaction..."
+              className="resize-none"
+            />
+          </div>
+          <div className="grid gap-6 sm:grid-cols-2">
+            <div className="grid gap-3 *:w-full">
+              <Label htmlFor="date">
+                Date<span className="text-destructive">*</span>
+              </Label>
+              <DatePicker id="date" name="date" defaultValue={currentDate} />
+            </div>
+            <div className="grid gap-3 *:w-full">
+              <Label htmlFor="time">
+                Time<span className="text-destructive">*</span>
+              </Label>
+              <Input
+                id="time"
+                name="time"
+                type="time"
+                defaultValue={currentTime}
+                required
+              />
+            </div>
+          </div>
+          <div className="flex flex-col-reverse justify-end gap-3 sm:flex-row">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={smartRouter.back}
+              disabled={isSubmitting}
+            >
+              Cancel
+            </Button>
+            <Button type="submit" disabled={isSubmitting}>
+              Add Transaction
+            </Button>
+          </div>
+        </form>
       </main>
     </>
   );

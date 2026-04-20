@@ -225,7 +225,7 @@ export function CategoryDialog({
                 <ToggleGroupItem
                   value="expense"
                   aria-label="Toggle expense"
-                  className="border dark:bg-input/30 data-[state=on]:bg-destructive! text-destructive-foreground"
+                  className="dark:bg-input/30 data-[state=on]:bg-destructive! text-destructive-foreground border"
                 >
                   <IconCaretDownFilled />
                   <span>Expense</span>
@@ -233,7 +233,7 @@ export function CategoryDialog({
                 <ToggleGroupItem
                   value="income"
                   aria-label="Toggle income"
-                  className="border dark:bg-input/30 data-[state=on]:bg-success! text-foreground"
+                  className="dark:bg-input/30 data-[state=on]:bg-success! text-foreground border"
                 >
                   <IconCaretUpFilled />
                   <span>Income</span>
@@ -249,7 +249,7 @@ export function CategoryDialog({
                   onChange={(val) => setIcon(val)}
                 />
               </div>
-              <div className="grid gap-3 grow">
+              <div className="grid grow gap-3">
                 <Label htmlFor="name">Name</Label>
                 <Input
                   id="name"
@@ -299,7 +299,7 @@ export function CategoryDialog({
               </div>
             </>
           ) : (
-            <div className="flex flex-col-reverse justify-end gap-2 grow sm:flex-row">
+            <div className="flex grow flex-col-reverse justify-end gap-2 sm:flex-row">
               <Button
                 type="button"
                 variant="outline"

@@ -20,7 +20,7 @@ function ItemBody({ icon, title, badge, amount }: Omit<ListItemProps, "href">) {
   return (
     <>
       <div className="flex items-center gap-2">
-        <Avatar className="items-center justify-center border size-12">
+        <Avatar className="size-12 items-center justify-center border">
           {icon}
         </Avatar>
         <div>
@@ -54,7 +54,7 @@ export const ListItem = memo(ListItemInner);
 
 export function EmptyState({ text }: { text: string }) {
   return (
-    <div className="grid border border-dashed rounded-lg place-items-center aspect-video">
+    <div className="grid aspect-video place-items-center rounded-lg border border-dashed">
       <p className="text-xl font-semibold">{text}</p>
     </div>
   );
@@ -64,13 +64,13 @@ export function ListItemSkeleton() {
   return (
     <li className="flex items-center justify-between gap-2">
       <div className="flex items-center gap-2">
-        <Skeleton className="rounded-full size-12" />
+        <Skeleton className="size-12 rounded-full" />
         <div className="grid gap-2">
-          <Skeleton className="w-24 h-4" />
-          <Skeleton className="w-12 h-3" />
+          <Skeleton className="h-4 w-24" />
+          <Skeleton className="h-3 w-12" />
         </div>
       </div>
-      <Skeleton className="w-16 h-6" />
+      <Skeleton className="h-6 w-16" />
     </li>
   );
 }

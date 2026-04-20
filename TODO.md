@@ -23,8 +23,6 @@ list of todos
 - [ ] reduce pervasive `"use client"` (66 files) — keep providers/interactive shells client, push pages toward server-first
 - [ ] tighten `tsconfig.json`: enable `noUncheckedIndexedAccess`, `exactOptionalPropertyTypes`, `noImplicitReturns`
 - [ ] tighten ESLint: promote `no-explicit-any` to `error`, add `eslint-plugin-jsx-a11y`, set `react-hooks/exhaustive-deps` to `error`
-- [ ] add `format`/`format:check` scripts once Prettier is configured (typecheck + lint:fix already in place)
-- [ ] add Prettier config (`.prettierrc.json`) for consistent formatting
 - [ ] add Husky + lint-staged pre-commit hooks (lint + format on staged files)
 - [ ] add GitHub Actions CI workflow running `bun install`, `typecheck`, `lint`, `build`
 - [ ] add Vitest + @testing-library/react; first targets: `convex/transactions/mutations.ts` counter logic, `/api/chat` route, form validators
@@ -37,9 +35,7 @@ list of todos
 
 ## Performance
 
-
 ## Bugs
-
 
 ## Security
 

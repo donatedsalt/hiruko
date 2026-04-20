@@ -75,7 +75,8 @@ export async function POST(req: Request) {
   let messages: UIMessage[];
   try {
     const body = JSON.parse(new TextDecoder().decode(buf));
-    if (!Array.isArray(body.messages)) throw new Error("messages array required");
+    if (!Array.isArray(body.messages))
+      throw new Error("messages array required");
     messages = body.messages;
     if (messages.length === 0 || messages.length > MAX_MESSAGES) {
       throw new Error("message count out of range");

@@ -67,7 +67,7 @@ export function CategoryList({
   return (
     <Tabs
       defaultValue="all"
-      className="flex-col justify-start w-full gap-4 md:gap-6"
+      className="w-full flex-col justify-start gap-4 md:gap-6"
     >
       <div>
         <TabsList>
@@ -109,7 +109,7 @@ export function CategoryList({
 
 export function CategoryListSkeleton() {
   return (
-    <div className="flex flex-col justify-start w-full gap-4 md:gap-6">
+    <div className="flex w-full flex-col justify-start gap-4 md:gap-6">
       <div>
         <Skeleton className="h-8 w-42" />
       </div>
