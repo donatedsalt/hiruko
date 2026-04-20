@@ -4,6 +4,7 @@ Historical record of completed work. For authoritative history, see `git log`.
 
 ## Unreleased
 
+- chore: `package.json` scripts — `typecheck` runs `tsc --noEmit` for standalone type verification (Next's `build` already type-checks, but this is faster and CI-friendly), `lint:fix` runs `next lint --fix` for autofixable lint issues
 - fix: budget/goal/category dialogs reset their form on close (via `onOpenChange`), not after successful submit — rapid reopen during the Radix exit animation no longer shows stale typed-but-uncommitted fields. `CategoryDialog` resets its controlled `useState` fields (`name`/`icon`/`type`/`showConfirmDelete`) to the current `category` prop values; `BudgetCard`/`GoalCard` (edit and add variants) reset the uncontrolled form via a `formRef.current.reset()`, which also removes the now-redundant `form.reset()` calls in the submit handlers
 - feat: route-level `error.tsx` at `(auth)` and `(dashboard)` boundaries — renders the shared `<ErrorMessage>` with a "Try again" button that calls the Next-provided `reset()`, and logs the caught error to the console in a `useEffect`
 - fix: `<ConvexClientProvider>` creates the `ConvexReactClient` inside the component via `useState(() => new ConvexReactClient(url))` (lazy initializer) instead of at module scope, so HMR resets the client on reload instead of reusing stale config; the `NEXT_PUBLIC_CONVEX_URL` presence check moves into the same initializer
