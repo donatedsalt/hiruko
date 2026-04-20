@@ -30,14 +30,23 @@ list of todos
 - [ ] extract a shared form hook (or adopt react-hook-form) for category/budget/goal/transaction dialogs — surface field-level errors instead of single-issue toasts
 - [ ] hoist `AddBudgetCard` / `AddGoalCard` / add-mode `CategoryDialog` bodies into a global provider so the command bar can open them without route navigation — replaces the `?new=1` query-param auto-open pattern used in v1
 - [ ] separate the type toggle from the category select on `transactions/new` so manual type choices aren't silently overwritten when the category changes — `src/app/(dashboard)/transactions/new/page.tsx:186`
+- [ ] per-route `metadata` exports on dashboard pages — currently every page inherits the `"Hiruko"` default title from the route-group layout; each page should set its own `{ title: "<Page>" }`
 
 ## Performance
 
+- [ ] cap unbounded `.collect()` calls with `.take(N)` or pagination per Convex guidelines — `convex/transactions/queries.ts:statsByDay`, `convex/users/mutations.ts:initializeUser`, and the cascade-delete fetches in `accounts` / `categories` / `budgets` / `goals` mutations
+- [ ] wrap `useSearchParams()` consumers in `<Suspense>` so Next 15 doesn't bail the whole page to fully-dynamic — `(dashboard)/budgets/page.tsx`, `goals/page.tsx`, `categories/page.tsx` (the `?new=1` effect is the current consumer)
+
 ## Bugs
+
+- [ ] `/api/chat` doesn't forward `req.signal` to `streamText` — if the client disconnects mid-stream, Gemini keeps emitting tokens. Add `abortSignal: req.signal` to the `streamText(...)` options — `src/app/api/chat/route.ts`
+- [ ] `categories.mutations.update` validator requires `type` but the handler treats it as optional (`if (args.type !== undefined)`) — either make the validator `v.optional(v.union(...))` or make the handler require it — `convex/categories/mutations.ts`
+- [ ] plain `<a href={...}>` in `src/components/nav-businesses.tsx:47` should be `next/link` `<Link>` so navigation prefetches and stays SPA
 
 ## Security
 
 - [ ] add a Content-Security-Policy (with Clerk + Convex allowlists) — start in Report-Only mode and promote once clean. `next.config.ts` already has baseline headers.
+- [ ] add an IP-based fallback rate-limit layer to `/api/chat` — current per-user window is easy to circumvent with multiple accounts; hash `x-forwarded-for` with a higher per-IP threshold for defence-in-depth
 
 ## UX
 
