@@ -26,7 +26,8 @@ Hiruko helps you track accounts, transactions, categories, budgets, and savings 
 - Budget tracking with spend rollups
 - Savings goals with progress tracking
 - Interactive charts and daily statistics
-- AI chat for financial insights (Gemini-powered)
+- AI chat for financial insights (Gemini-powered, Vercel AI SDK)
+- Command palette (⌘K / Ctrl+K) for navigation and quick actions
 - Installable PWA with light/dark theme
 
 ## Getting Started
@@ -63,14 +64,20 @@ This runs Next.js (Turbopack) and `convex dev` concurrently. Open [http://localh
 
 ## Scripts
 
-| Script               | Description                                 |
-| -------------------- | ------------------------------------------- |
-| `bun run dev`        | Run Next.js and Convex dev servers together |
-| `bun run dev:next`   | Run only the Next.js dev server             |
-| `bun run dev:convex` | Run only the Convex dev server              |
-| `bun run build`      | Production build (includes type-checking)   |
-| `bun run start`      | Start the production build                  |
-| `bun run lint`       | Run ESLint                                  |
+| Script                 | Description                                                               |
+| ---------------------- | ------------------------------------------------------------------------- |
+| `bun run dev`          | Run Next.js and Convex dev servers together                               |
+| `bun run dev:next`     | Run only the Next.js dev server                                           |
+| `bun run dev:convex`   | Run only the Convex dev server                                            |
+| `bun run build`        | Production build (includes type-checking)                                 |
+| `bun run start`        | Start the production build                                                |
+| `bun run lint`         | Run ESLint                                                                |
+| `bun run lint:fix`     | Run ESLint with autofix                                                   |
+| `bun run typecheck`    | `tsc --noEmit` (type-check only, no build)                                |
+| `bun run format`       | Prettier write (sorts tailwind classes via `prettier-plugin-tailwindcss`) |
+| `bun run format:check` | Prettier check (exits non-zero on unformatted files)                      |
+
+A Husky pre-commit hook runs `lint-staged` (prettier + eslint --fix on staged files); it installs automatically after `bun install` via the `prepare` script.
 
 ## Project Structure
 

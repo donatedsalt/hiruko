@@ -10,13 +10,16 @@ Hiruko is a personal finance tracker built with **Next.js 15 (App Router, Turbop
   - `bun run dev:next` / `bun run dev:convex` — run them individually.
   - `bun run build` — production build (also type-checks).
   - `bun run start` — run production build.
-  - `bun run lint` — `next lint` (ESLint flat config).
+  - `bun run lint` / `bun run lint:fix` — `next lint` (ESLint flat config), with or without autofix.
+  - `bun run typecheck` — `tsc --noEmit` (types only, faster than `build`).
+  - `bun run format` / `bun run format:check` — Prettier (`.prettierrc.json`; `prettier-plugin-tailwindcss` sorts tailwind classes; `cn`/`cva` are recognized tailwind-class functions).
 - **Required env**: `CLERK_FRONTEND_API_URL` (used by `convex/auth.config.ts`), `CLERK_WEBHOOK_SECRET` (svix verification in `convex/http.ts`), the standard Clerk `NEXT_PUBLIC_CLERK_*` keys, `NEXT_PUBLIC_CONVEX_URL`, and `GEMINI_API_KEY` (used by `/api/chat`).
 
 ### Testing & Verification
 
 - **No test framework** is configured (no Jest/Vitest/Playwright).
-- Verification protocol: `bun run build` for types, `bun run lint` for lint, manual browser check for UI/flow.
+- Verification protocol: `bun run typecheck` for types, `bun run lint` for lint, `bun run format:check` for formatting, manual browser check for UI/flow. `bun run build` also type-checks but is slower.
+- **Pre-commit hook** (Husky + lint-staged): runs `prettier --write` on staged Markdown/JSON/YAML/CSS and `prettier --write` + `eslint --fix` on staged TS/JS. Installed automatically after `bun install` via the `prepare` script.
 
 ## 2. Project Structure
 
@@ -24,10 +27,10 @@ Hiruko is a personal finance tracker built with **Next.js 15 (App Router, Turbop
 
 Uses two route groups, each with its **own `<html>`/`<body>` root layout** (there is no top-level `src/app/layout.tsx`):
 
-- `(auth)/layout.tsx` — Clerk + Convex + Theme providers, fixed theme-toggle button.
+- `(auth)/layout.tsx` — Clerk + Convex + Theme providers, fixed theme-toggle button. Sibling `error.tsx` renders a centered error boundary with "Try again" (calls the Next `reset()` callback).
   - `sign-in/[[...sign-in]]/page.tsx`
   - `sign-up/[[...sign-up]]/page.tsx`
-- `(dashboard)/layout.tsx` — same providers plus `AppSidebar`, `Toaster`, `FloatingButtons`, `HistoryTracker`, `SpeedInsights`.
+- `(dashboard)/layout.tsx` — same providers plus `CommandBarProvider` (wraps the sidebar subtree), `AppSidebar`, `SidebarInset` (`<div>`, page wraps its own content in `<main>`), `CommandBar`, `Toaster`, `FloatingButtons`, `HistoryTracker`, `SpeedInsights`. Sibling `error.tsx` shares the sidebar chrome and renders `SiteHeader` + an `<ErrorMessage>` + reset button.
   - `page.tsx` (home / overview)
   - `transactions/page.tsx`, `transactions/new/page.tsx`, `transactions/[id]/page.tsx`
   - `categories/page.tsx`
@@ -35,15 +38,15 @@ Uses two route groups, each with its **own `<html>`/`<body>` root layout** (ther
   - `goals/page.tsx`
   - `statistics/page.tsx`
   - `consult/page.tsx` (AI chat)
-- `api/chat/route.ts` — POST endpoint that streams Gemini (`gemini-2.0-flash-001`) responses as newline-delimited JSON.
+- `api/chat/route.ts` — POST endpoint using the Vercel AI SDK (`streamText` + `@ai-sdk/google`) against `gemini-2.0-flash-001`; consumed on the client by `useChat` + `DefaultChatTransport`. Hardened with Clerk auth (401), same-origin check (403), 32 KB body cap, Zod message validation (400), per-user 20/min rate limit (429), sanitized logs, fail-fast on missing `GEMINI_API_KEY` (503).
 - `manifest.ts` — PWA manifest.
 - `globals.css` — Tailwind v4 + theme tokens.
 
 ### `src/components`
 
-- `ui/` — shadcn/ui primitives (button, card, dialog, sidebar, calendar, chart, drawer, sonner, etc.) plus `ui/ai/` (AI chat-specific: `conversation.tsx`, `message.tsx`, `prompt-input.tsx`, `reasoning.tsx`, `response.tsx`, `code-block.tsx`, `tool.tsx`, etc.).
+- `ui/` — shadcn/ui primitives (button, card, dialog, sidebar, calendar, chart, command, drawer, sonner, etc.) plus `ui/ai/` (AI chat-specific: `conversation.tsx`, `message.tsx`, `prompt-input.tsx`, `reasoning.tsx`, `response.tsx`, `code-block.tsx`, `tool.tsx`, etc.).
 - `icons/hiruko-icon.tsx` — brand mark.
-- Feature-level components live directly under `src/components/` (flat): `app-sidebar.tsx`, `nav-main.tsx`, `nav-businesses.tsx`, `nav-secondary.tsx`, `nav-user.tsx`, `site-header.tsx`, `transaction-list.tsx`, `account-card.tsx`, `accounts-cards.tsx`, `budget-card.tsx`, `goal-card.tsx`, `category-list.tsx`, `category-dialog.tsx`, `chart-area-interactive.tsx`, `pie-chart.tsx`, `list-item.tsx`, `emoji-picker-button.tsx`, `error-message.tsx`, `floating-buttons.tsx`, `history-tracker.tsx` (persists visited paths to localStorage under a Clerk-userId-scoped key for `useSmartRouter`), `theme-provider.tsx`, `theme-change-button.tsx`, `convex-client-provider.tsx`.
+- Feature-level components live directly under `src/components/` (flat): `app-sidebar.tsx`, `nav-main.tsx`, `nav-businesses.tsx`, `nav-secondary.tsx`, `nav-user.tsx`, `site-header.tsx`, `transaction-list.tsx`, `account-card.tsx`, `accounts-cards.tsx`, `budget-card.tsx`, `goal-card.tsx`, `category-list.tsx`, `category-dialog.tsx`, `chart-area-interactive.tsx`, `pie-chart.tsx`, `list-item.tsx`, `emoji-picker-button.tsx`, `error-message.tsx`, `floating-buttons.tsx`, `history-tracker.tsx` (persists visited paths to localStorage under a Clerk-userId-scoped key for `useSmartRouter`), `theme-provider.tsx`, `theme-change-button.tsx`, `convex-client-provider.tsx`, `command-bar.tsx` + `command-bar-provider.tsx` (Cmd/Ctrl+K palette; provider exposes `useCommandBar().open()/close()` and owns the global keydown listener — accepts both modifiers on all platforms).
 
 ### `src/hooks`
 
@@ -92,7 +95,7 @@ Each feature exposes `queries.ts` and `mutations.ts`. Current exports:
 - `transactions`: `queries.list`, `queries.listRecent`, `queries.listPaginated`, `queries.statsByDay`, `queries.getById`; `mutations.create`, `mutations.update`, `mutations.remove`.
 - `budgets`: `queries.list`; `mutations.createBudget`, `mutations.update`, `mutations.remove`. (Note: the create is named `createBudget`, not `create`.)
 - `goals`: `queries.list`; `mutations.createGoal`, `mutations.update`, `mutations.remove`. (Same naming quirk.)
-- `users`: `mutations.initializeUser` (internal). Invoked from the Clerk webhook on `user.created` to seed a Cash account and default categories.
+- `users`: `queries.homeDefaults` (bundles accounts + categories + recent transactions for the overview page), `queries.formDefaults` (bundles accounts + categories + budgets + goals for the transactions form); `mutations.initializeUser` (internal, invoked from the Clerk webhook on `user.created` to seed a Cash account and default categories).
 
 `convex/http.ts` exposes `/clerk-webhook` (svix-verified) which dispatches to `users.mutations.initializeUser` on `user.created`.
 
@@ -151,9 +154,11 @@ Call `requireUserId(ctx)` at the top of every query/mutation handler that touche
 - **Two root layouts**: `(auth)/layout.tsx` and `(dashboard)/layout.tsx` each render `<html>` because there is no shared `src/app/layout.tsx`. Keep providers (ClerkProvider, ConvexClientProvider, ThemeProvider, fonts, `globals.css`) in sync between the two when editing one.
 - **Denormalized counters**: mutating `transactions` without updating `accounts.balance`/`transactionCount`, `categories.transactionCount`/`transactionAmount`, `budgets.spent`, and `goals.saved` will desync the UI. Follow the patterns already in `convex/transactions/mutations.ts`.
 - **Budget/goal creation naming**: `api.budgets.mutations.createBudget` and `api.goals.mutations.createGoal` (not `create`). Accounts/categories/transactions use plain `create`.
-- **AI streaming format**: `/api/chat` emits newline-delimited `{"token": "..."}` JSON chunks, not SSE and not the Vercel AI SDK protocol — despite `ai` being a dependency, the current route is a custom stream. The `src/components/ui/ai/*` primitives are generic and don't assume a specific wire format.
-- **No tests**. Do not claim coverage; rely on `build` + `lint` + manual QA.
-- **`next.config.ts`** is empty — no custom redirects, images, or headers configured.
+- **AI streaming format**: `/api/chat` uses the Vercel AI SDK (`streamText` + `@ai-sdk/google`) and the client consumes it via `useChat` + `DefaultChatTransport`. Wire format is the AI SDK's UI-message stream — not SSE and not a custom newline-delimited protocol.
+- **No tests**. Do not claim coverage; rely on `typecheck` + `lint` + `format:check` + manual QA.
+- **`next.config.ts`** carries security headers (`X-Content-Type-Options`, `X-Frame-Options: DENY`, `Referrer-Policy`, `Permissions-Policy`, `Strict-Transport-Security`), `poweredByHeader: false`, and `images.remotePatterns` for `img.clerk.com` / `images.clerk.dev`. No CSP yet (tracked in TODO Security).
+- **`?new=1` auto-open**: the command bar's "New budget / goal / category" items navigate to `/<entity>?new=1`. Each target page has a `useEffect` that reads the param, auto-opens its add dialog via controlled `open`/`onOpenChange` props on `AddBudgetCard` / `AddGoalCard` / `CategoryDialog`, and strips the param with `router.replace`. Hoisting these dialogs into a global provider (so the palette can open them without navigating) is on the TODO.
+- **Dashboard landmarks**: `SidebarInset` renders `<div>` (not `<main>`) so `<SiteHeader>` sits as a banner and each page's content wrapper is the `<main>` landmark.
 
 <!-- convex-ai-start -->
 
