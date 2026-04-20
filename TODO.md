@@ -18,7 +18,7 @@ list of todos
   - statistics / pie chart need to pick which bucket to show (income vs expense)
 
 - [ ] consolidate to a single `src/app/layout.tsx` — `(auth)` and `(dashboard)` layouts each render `<html>`/`<body>` with duplicated Clerk/Convex/Theme/font providers; drift is inevitable
-- [ ] add `error.tsx` at `(auth)` and `(dashboard)` route boundaries; wrap data-dependent sections in `<Suspense>` with skeletons
+- [ ] wrap data-dependent sections in `<Suspense>` with skeletons (route-level `error.tsx` already in place for `(auth)` and `(dashboard)`)
 - [ ] consider virtualization (`react-window` / `@tanstack/react-virtual`) for paginated transaction lists once data volume warrants it
 - [ ] reduce pervasive `"use client"` (66 files) — keep providers/interactive shells client, push pages toward server-first
 - [ ] tighten `tsconfig.json`: enable `noUncheckedIndexedAccess`, `exactOptionalPropertyTypes`, `noImplicitReturns`

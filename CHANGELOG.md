@@ -4,6 +4,7 @@ Historical record of completed work. For authoritative history, see `git log`.
 
 ## Unreleased
 
+- feat: route-level `error.tsx` at `(auth)` and `(dashboard)` boundaries — renders the shared `<ErrorMessage>` with a "Try again" button that calls the Next-provided `reset()`, and logs the caught error to the console in a `useEffect`
 - fix: `<ConvexClientProvider>` creates the `ConvexReactClient` inside the component via `useState(() => new ConvexReactClient(url))` (lazy initializer) instead of at module scope, so HMR resets the client on reload instead of reusing stale config; the `NEXT_PUBLIC_CONVEX_URL` presence check moves into the same initializer
 - fix: `transactions.queries.statsByDay` now buckets by the client's IANA timezone (passed as an optional `tz` arg) using `Intl.DateTimeFormat("en-CA", { timeZone })`; `<ChartAreaInteractive>` sends the browser's resolved zone and parses `YYYY-MM-DD` day keys as local midnight so chart labels render the correct day east and west of UTC
 - perf: `users.queries.homeDefaults` bundles accounts + categories + recent transactions for the dashboard home into a single Convex query; `<AccountsCards>` now accepts an optional `accounts` prop (falls back to `api.accounts.queries.list` when used outside the home)
