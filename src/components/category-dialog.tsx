@@ -37,7 +37,13 @@ const EmojiPickerButton = dynamic(
   {
     ssr: false,
     loading: () => (
-      <Button variant="outline" size="icon" type="button" disabled>
+      <Button
+        aria-label="Loading icon picker"
+        variant="outline"
+        size="icon"
+        type="button"
+        disabled
+      >
         {"🙂"}
       </Button>
     ),
@@ -146,11 +152,21 @@ export function CategoryDialog({
         {trigger ? (
           trigger
         ) : mode === "add" ? (
-          <Button size="icon" variant="outline" disabled={disabled}>
+          <Button
+            aria-label="Add category"
+            size="icon"
+            variant="outline"
+            disabled={disabled}
+          >
             <IconPlus />
           </Button>
         ) : (
-          <Button size="icon" variant="ghost" disabled={disabled}>
+          <Button
+            aria-label={`Edit ${category?.name ?? "category"}`}
+            size="icon"
+            variant="ghost"
+            disabled={disabled}
+          >
             <IconEdit />
           </Button>
         )}

@@ -27,7 +27,13 @@ export default function EmojiPickerButton({
   return (
     <Popover onOpenChange={setIsOpen} open={isOpen}>
       <PopoverTrigger asChild>
-        <Button variant="outline" size="icon" type="button" className="text-lg">
+        <Button
+          aria-label="Choose icon"
+          variant="outline"
+          size="icon"
+          type="button"
+          className="text-lg"
+        >
           {value}
         </Button>
       </PopoverTrigger>
