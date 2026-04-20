@@ -40,7 +40,6 @@ list of todos
 
 ## Bugs
 
-- [ ] `ConvexReactClient` instantiated at module scope can hold stale config across hot reloads — move inside the provider component — `src/components/convex-client-provider.tsx:12`
 
 ## Security
 
