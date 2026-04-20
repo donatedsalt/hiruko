@@ -23,7 +23,6 @@ list of todos
 - [ ] reduce pervasive `"use client"` (66 files) — keep providers/interactive shells client, push pages toward server-first
 - [ ] tighten `tsconfig.json`: enable `noUncheckedIndexedAccess`, `exactOptionalPropertyTypes`, `noImplicitReturns`
 - [ ] tighten ESLint: promote `no-explicit-any` to `error`, add `eslint-plugin-jsx-a11y`, set `react-hooks/exhaustive-deps` to `error`
-- [ ] add GitHub Actions CI workflow running `bun install`, `typecheck`, `lint`, `build`
 - [ ] add Vitest + @testing-library/react; first targets: `convex/transactions/mutations.ts` counter logic, `/api/chat` route, form validators
 - [ ] expand `README.md` with architecture overview, env setup, and command reference
 - [ ] settings: locale + currency selector — `formatCurrency` in `src/lib/utils.ts:13` is hardcoded to `USD`/`en-US`
