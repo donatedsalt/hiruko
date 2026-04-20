@@ -1,7 +1,7 @@
 "use client";
 
 import { toast } from "sonner";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import dynamic from "next/dynamic";
 import { useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
@@ -72,6 +72,13 @@ export function CategoryDialog({
     category?.type || "expense",
   );
 
+  const resetForm = useCallback(() => {
+    setName(category?.name || "");
+    setIcon(category?.icon || "😀");
+    setType(category?.type || "expense");
+    setShowConfirmDelete(false);
+  }, [category]);
+
   const handleSubmit = async () => {
     setIsSubmitting(true);
 
@@ -96,9 +103,6 @@ export function CategoryDialog({
       } else {
         await createCategory(result.data);
         toast.success("Category added");
-        setName("");
-        setIcon("😀");
-        setType("expense");
       }
       setOpen(false);
     } catch (err: unknown) {
@@ -131,7 +135,13 @@ export function CategoryDialog({
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog
+      open={open}
+      onOpenChange={(val) => {
+        if (!val) resetForm();
+        setOpen(val);
+      }}
+    >
       <DialogTrigger asChild>
         {trigger ? (
           trigger

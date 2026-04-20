@@ -33,7 +33,6 @@ list of todos
 - [ ] allow toggling `category.type` (income ↔ expense) instead of forcing delete + recreate — `src/components/category-dialog.tsx`
 - [ ] extract a shared form hook (or adopt react-hook-form) for category/budget/goal/transaction dialogs — surface field-level errors instead of single-issue toasts
 - [ ] separate the type toggle from the category select on `transactions/new` so manual type choices aren't silently overwritten when the category changes — `src/app/(dashboard)/transactions/new/page.tsx:186`
-- [ ] reset dialog form state before closing (not after) to avoid stale fields when rapidly reopening — budget/goal/category dialogs
 
 ## Performance
 

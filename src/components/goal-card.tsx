@@ -1,7 +1,7 @@
 "use client";
 
 import { toast } from "sonner";
-import { memo, useState } from "react";
+import { memo, useRef, useState } from "react";
 import { useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { IconCirclePlusFilled } from "@tabler/icons-react";
@@ -42,6 +42,7 @@ function GoalCardInner({ goal }: { goal: Goal }) {
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
   const { count, done } = useCountdown(3, showConfirmDelete);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const formRef = useRef<HTMLFormElement>(null);
   const updateGoal = useMutation(api.goals.mutations.update);
   const deleteGoal = useMutation(api.goals.mutations.remove);
 
@@ -75,7 +76,6 @@ function GoalCardInner({ goal }: { goal: Goal }) {
         ...result.data,
       });
       toast.success("Goal updated");
-      form.reset();
       setOpen(false);
     } catch (err: unknown) {
       const message =
@@ -114,6 +114,7 @@ function GoalCardInner({ goal }: { goal: Goal }) {
           setShowConfirmDelete(false);
           return;
         }
+        if (!val) formRef.current?.reset();
         setOpen(val);
       }}
     >
@@ -146,7 +147,7 @@ function GoalCardInner({ goal }: { goal: Goal }) {
         </Card>
       </DialogTrigger>
       <DialogContent>
-        <form onSubmit={handleSubmit} className="grid gap-4">
+        <form ref={formRef} onSubmit={handleSubmit} className="grid gap-4">
           <DialogHeader>
             <DialogTitle>
               {showConfirmDelete ? "Delete Goal" : "Edit Goal"}
@@ -259,6 +260,7 @@ export function AddGoalCard() {
   const createGoal = useMutation(api.goals.mutations.createGoal);
   const [open, setOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const formRef = useRef<HTMLFormElement>(null);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -288,7 +290,6 @@ export function AddGoalCard() {
     try {
       await createGoal(result.data);
       toast.success("Goal added");
-      form.reset();
       setOpen(false);
     } catch (err) {
       toast.error("Something went wrong!", {
@@ -300,7 +301,13 @@ export function AddGoalCard() {
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog
+      open={open}
+      onOpenChange={(val) => {
+        if (!val) formRef.current?.reset();
+        setOpen(val);
+      }}
+    >
       <DialogTrigger asChild>
         <Card className="flex flex-col items-center justify-center gap-0 p-0 bg-transparent border-dashed shadow-xs cursor-pointer select-none min-h-42 shrink-0">
           <CardHeader className="@container-normal">
@@ -315,7 +322,7 @@ export function AddGoalCard() {
         </Card>
       </DialogTrigger>
       <DialogContent>
-        <form onSubmit={handleSubmit} className="grid gap-4">
+        <form ref={formRef} onSubmit={handleSubmit} className="grid gap-4">
           <DialogHeader>
             <DialogTitle>Create New Goal</DialogTitle>
             <DialogDescription>
