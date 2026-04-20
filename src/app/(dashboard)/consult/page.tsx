@@ -78,9 +78,9 @@ export default function Page() {
     return (
       <>
         <SiteHeader title="Consult" />
-        <div className="flex flex-1 items-center justify-center p-6 text-muted-foreground text-sm">
+        <main className="flex flex-1 items-center justify-center p-6 text-muted-foreground text-sm">
           Loading…
-        </div>
+        </main>
       </>
     );
   }
@@ -143,7 +143,7 @@ function Chat({
     <>
       <SiteHeader title="Consult" />
 
-      <div className="@container/main flex flex-col flex-1 gap-4 p-4 md:gap-6 md:p-6">
+      <main className="@container/main flex flex-col flex-1 gap-4 p-4 md:gap-6 md:p-6">
         <Conversation className="relative w-full flex-1 min-h-0">
           <ConversationContent className="px-0">
             {messages.map((message) => (
@@ -225,7 +225,7 @@ function Chat({
             />
           </PromptInputToolbar>
         </PromptInput>
-      </div>
+      </main>
     </>
   );
 }

@@ -59,7 +59,6 @@ list of todos
 
 ## UI / Design
 
-- [ ] wrap dashboard page content in a `<main>` landmark — `src/components/site-header.tsx`
 - [ ] add `aria-describedby` to dialogs; use `alertdialog` role for destructive confirmations
 
 ---

@@ -135,6 +135,7 @@ export default function Page() {
   return (
     <>
       <SiteHeader title="Add Transaction" />
+      <main className="flex flex-col flex-1">
       <form
         onSubmit={handleSubmit}
         className="@container/main flex flex-col flex-1 gap-4 p-4 md:gap-6 md:p-6"
@@ -365,6 +366,7 @@ export default function Page() {
           </Button>
         </div>
       </form>
+      </main>
     </>
   );
 }

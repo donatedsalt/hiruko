@@ -199,6 +199,7 @@ export default function Page() {
     <>
       <SiteHeader title="Edit Transaction" />
 
+      <main className="flex flex-col flex-1">
       {loading ? (
         <div className="flex items-center justify-center h-full gap-2 text-muted-foreground">
           <IconLoader2 className="animate-spin" />
@@ -537,6 +538,7 @@ export default function Page() {
       ) : (
         <ErrorMessage error="Transaction not found." />
       )}
+      </main>
     </>
   );
 }

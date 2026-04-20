@@ -34,7 +34,7 @@ export default function Page() {
   return (
     <>
       <SiteHeader title="Overview" />
-      <div className="@container/main flex flex-col flex-1 gap-4 p-4 md:gap-6 md:p-6">
+      <main className="@container/main flex flex-col flex-1 gap-4 p-4 md:gap-6 md:p-6">
         <AccountsCards accounts={home?.accounts} />
         <ChartAreaInteractive />
 
@@ -62,7 +62,7 @@ export default function Page() {
         ) : (
           <ErrorMessage error="Failed to load transactions" />
         )}
-      </div>
+      </main>
     </>
   );
 }
