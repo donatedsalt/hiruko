@@ -40,7 +40,6 @@ list of todos
 ## Security
 
 - [ ] add a Content-Security-Policy (with Clerk + Convex allowlists) — start in Report-Only mode and promote once clean. `next.config.ts` already has baseline headers.
-- [ ] add an IP-based fallback rate-limit layer to `/api/chat` — current per-user window is easy to circumvent with multiple accounts; hash `x-forwarded-for` with a higher per-IP threshold for defence-in-depth
 
 ## UX
 

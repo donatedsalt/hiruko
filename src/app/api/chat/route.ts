@@ -11,21 +11,52 @@ const MAX_BODY_BYTES = 32 * 1024;
 const MAX_MESSAGES = 50;
 const MAX_CONTENT_CHARS = 16_000;
 const RATE_WINDOW_MS = 60_000;
-const RATE_MAX = 20;
+const RATE_MAX_USER = 20;
+// Higher per-IP cap accommodates shared NATs while still capping multi-account
+// abuse from a single source. In-memory and per-process: not effective across
+// serverless instances; treat as best-effort defence in depth.
+const RATE_MAX_IP = 60;
 
-const hits = new Map<string, number[]>();
-function rateLimit(userId: string): boolean {
+const userHits = new Map<string, number[]>();
+const ipHits = new Map<string, number[]>();
+
+function rateLimit(
+  bucket: Map<string, number[]>,
+  key: string,
+  limit: number,
+): boolean {
   const now = Date.now();
-  const recent = (hits.get(userId) ?? []).filter(
+  const recent = (bucket.get(key) ?? []).filter(
     (t) => now - t < RATE_WINDOW_MS,
   );
-  if (recent.length >= RATE_MAX) {
-    hits.set(userId, recent);
+  if (recent.length >= limit) {
+    bucket.set(key, recent);
     return false;
   }
   recent.push(now);
-  hits.set(userId, recent);
+  bucket.set(key, recent);
   return true;
+}
+
+function getClientIp(req: Request): string | null {
+  const xff = req.headers.get("x-forwarded-for");
+  if (xff) {
+    const first = xff.split(",")[0]?.trim();
+    if (first) return first;
+  }
+  const xri = req.headers.get("x-real-ip");
+  return xri?.trim() || null;
+}
+
+// Per-process salt so map keys aren't reversible from a memory dump.
+const IP_SALT = crypto.randomUUID();
+
+async function hashIp(ip: string): Promise<string> {
+  const data = new TextEncoder().encode(IP_SALT + ip);
+  const buf = await crypto.subtle.digest("SHA-256", data);
+  return Array.from(new Uint8Array(buf), (b) =>
+    b.toString(16).padStart(2, "0"),
+  ).join("");
 }
 
 function sameOrigin(req: Request): boolean {
@@ -88,11 +119,22 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Invalid request" }, { status: 400 });
   }
 
-  if (!rateLimit(userId)) {
+  if (!rateLimit(userHits, userId, RATE_MAX_USER)) {
     return NextResponse.json(
       { error: "Too many requests" },
       { status: 429, headers: { "Retry-After": "60" } },
     );
+  }
+
+  const ip = getClientIp(req);
+  if (ip) {
+    const ipKey = await hashIp(ip);
+    if (!rateLimit(ipHits, ipKey, RATE_MAX_IP)) {
+      return NextResponse.json(
+        { error: "Too many requests" },
+        { status: 429, headers: { "Retry-After": "60" } },
+      );
+    }
   }
 
   try {
