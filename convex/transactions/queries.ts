@@ -65,7 +65,7 @@ export const statsByDay = query({
       .withIndex("by_userId_transactionTime", (q) =>
         q.eq("userId", userId).gte("transactionTime", sinceMs),
       )
-      .collect();
+      .take(5000);
 
     const dayFormatter = new Intl.DateTimeFormat("en-CA", {
       timeZone: tz ?? "UTC",

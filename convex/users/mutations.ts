@@ -32,10 +32,11 @@ export const initializeUser = internalMutation({
     const existingCategories = await ctx.db
       .query("categories")
       .withIndex("by_userId", (q) => q.eq("userId", userId))
-      .collect();
+      .take(3);
 
     const onlyBalanceCorrection =
       existingCategories.length > 0 &&
+      existingCategories.length <= 2 &&
       existingCategories.every((cat) =>
         cat.name.trim().toLowerCase().startsWith("balance correction"),
       );

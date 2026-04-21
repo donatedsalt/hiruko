@@ -3,6 +3,10 @@ import { v } from "convex/values";
 import { mutation } from "@/convex/_generated/server";
 
 import { requireUserId } from "@/convex/utils/auth";
+import {
+  MAX_CASCADE_TRANSACTIONS,
+  cascadeCapError,
+} from "@/convex/utils/limits";
 
 /**
  * Create a goal.
@@ -67,7 +71,11 @@ export const remove = mutation({
     const txns = await ctx.db
       .query("transactions")
       .withIndex("by_goal", (q) => q.eq("goalId", args.id))
-      .collect();
+      .take(MAX_CASCADE_TRANSACTIONS);
+
+    if (txns.length === MAX_CASCADE_TRANSACTIONS) {
+      throw cascadeCapError("goal");
+    }
 
     await Promise.all(
       txns.map((txn) => ctx.db.patch(txn._id, { goalId: undefined })),

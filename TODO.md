@@ -34,7 +34,7 @@ list of todos
 
 ## Performance
 
-- [ ] cap unbounded `.collect()` calls with `.take(N)` or pagination per Convex guidelines — `convex/transactions/queries.ts:statsByDay`, `convex/users/mutations.ts:initializeUser`, and the cascade-delete fetches in `accounts` / `categories` / `budgets` / `goals` mutations
+- [ ] cascade deletes hit a hard 5,000-transaction cap (throws `cascadeCapError`); for true scale, switch to batch + `ctx.scheduler.runAfter` per Convex guidelines — applies to `accounts.remove`, `categories.remove`, `budgets.remove`, `goals.remove`
 
 ## Bugs
 

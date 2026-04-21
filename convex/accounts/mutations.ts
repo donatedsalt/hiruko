@@ -7,6 +7,10 @@ import { CategoryId } from "@/types/convex";
 import { requireUserId } from "@/convex/utils/auth";
 import { adjustAccount } from "@/convex/utils/db/accounts";
 import { reverseTransactionSideEffects } from "@/convex/utils/db/transactions";
+import {
+  MAX_CASCADE_TRANSACTIONS,
+  cascadeCapError,
+} from "@/convex/utils/limits";
 
 /**
  * Create a new account.
@@ -181,7 +185,11 @@ export const remove = mutation({
     const txns = await ctx.db
       .query("transactions")
       .withIndex("by_account", (q) => q.eq("accountId", args.id))
-      .collect();
+      .take(MAX_CASCADE_TRANSACTIONS);
+
+    if (txns.length === MAX_CASCADE_TRANSACTIONS) {
+      throw cascadeCapError("account");
+    }
 
     await reverseTransactionSideEffects(ctx, userId, txns, {
       skipAccountId: args.id,

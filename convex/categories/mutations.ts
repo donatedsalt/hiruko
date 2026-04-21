@@ -4,6 +4,10 @@ import { mutation } from "@/convex/_generated/server";
 
 import { requireUserId } from "@/convex/utils/auth";
 import { reverseTransactionSideEffects } from "@/convex/utils/db/transactions";
+import {
+  MAX_CASCADE_TRANSACTIONS,
+  cascadeCapError,
+} from "@/convex/utils/limits";
 
 /**
  * Create a new category.
@@ -40,7 +44,7 @@ export const createDefaultCategories = mutation({
     const existingCategories = await ctx.db
       .query("categories")
       .withIndex("by_userId", (q) => q.eq("userId", userId))
-      .collect();
+      .take(3);
 
     const hasOnlyBalanceCorrection =
       existingCategories.length <= 2 &&
@@ -118,7 +122,11 @@ export const remove = mutation({
     const txns = await ctx.db
       .query("transactions")
       .withIndex("by_category", (q) => q.eq("categoryId", args.id))
-      .collect();
+      .take(MAX_CASCADE_TRANSACTIONS);
+
+    if (txns.length === MAX_CASCADE_TRANSACTIONS) {
+      throw cascadeCapError("category");
+    }
 
     await reverseTransactionSideEffects(ctx, userId, txns, {
       skipCategoryId: args.id,
