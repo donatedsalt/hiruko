@@ -25,12 +25,13 @@ Hiruko is a personal finance tracker built with **Next.js 15 (App Router, Turbop
 
 ### `src/app` (App Router)
 
-Uses two route groups, each with its **own `<html>`/`<body>` root layout** (there is no top-level `src/app/layout.tsx`):
+Single root layout + two route groups for chrome:
 
-- `(auth)/layout.tsx` — Clerk + Convex + Theme providers, fixed theme-toggle button. Sibling `error.tsx` renders a centered error boundary with "Try again" (calls the Next `reset()` callback).
+- `layout.tsx` — the only `<html>`/`<body>`. Owns Geist + Geist_Mono fonts, `globals.css`, the provider stack (ClerkProvider → ConvexClientProvider → ThemeProvider), and the shared `metadata` (title template `"%s | Hiruko"`, default `"Hiruko"`, keywords/description/icons).
+- `(auth)/layout.tsx` — slim group wrapper: `{children}` plus the fixed `<ThemeChangeButton>`. Sibling `error.tsx` renders a centered error boundary with "Try again" (calls the Next `reset()` callback).
   - `sign-in/[[...sign-in]]/page.tsx`
   - `sign-up/[[...sign-up]]/page.tsx`
-- `(dashboard)/layout.tsx` — same providers plus `CommandBarProvider` (wraps the sidebar subtree), `AppSidebar`, `SidebarInset` (`<div>`, page wraps its own content in `<main>`), `CommandBar`, `Toaster`, `FloatingButtons`, `HistoryTracker`, `SpeedInsights`. Sibling `error.tsx` shares the sidebar chrome and renders `SiteHeader` + an `<ErrorMessage>` + reset button.
+- `(dashboard)/layout.tsx` — slim group wrapper: `CommandBarProvider` around the sidebar subtree (`SidebarProvider` + `AppSidebar` + `SidebarInset` — `<div>`, page wraps its own content in `<main>`), plus `CommandBar`, `Toaster`, `FloatingButtons`, `HistoryTracker`, `SpeedInsights`. Sibling `error.tsx` shares the sidebar chrome and renders `SiteHeader` + an `<ErrorMessage>` + reset button. Each segment (transactions, categories, budgets, goals, statistics, consult, plus `transactions/new` and `transactions/[id]`) has a tiny server `layout.tsx` exporting `{ title: "<Page>" }` so the browser tab reads e.g. `"Categories | Hiruko"`.
   - `page.tsx` (home / overview)
   - `transactions/page.tsx`, `transactions/new/page.tsx`, `transactions/[id]/page.tsx`
   - `categories/page.tsx`
@@ -151,7 +152,7 @@ Call `requireUserId(ctx)` at the top of every query/mutation handler that touche
 
 ## 6. Gotchas & Notes
 
-- **Two root layouts**: `(auth)/layout.tsx` and `(dashboard)/layout.tsx` each render `<html>` because there is no shared `src/app/layout.tsx`. Keep providers (ClerkProvider, ConvexClientProvider, ThemeProvider, fonts, `globals.css`) in sync between the two when editing one.
+- **Single root layout**: `src/app/layout.tsx` is the only `<html>`/`<body>` and owns the provider stack + fonts + `globals.css` + shared metadata. Both route groups render their group-specific chrome only — when adding a provider, add it once at the root and not in either group layout.
 - **Denormalized counters**: mutating `transactions` without updating `accounts.balance`/`transactionCount`, `categories.transactionCount`/`transactionAmount`, `budgets.spent`, and `goals.saved` will desync the UI. Follow the patterns already in `convex/transactions/mutations.ts`.
 - **Budget/goal creation naming**: `api.budgets.mutations.createBudget` and `api.goals.mutations.createGoal` (not `create`). Accounts/categories/transactions use plain `create`.
 - **AI streaming format**: `/api/chat` uses the Vercel AI SDK (`streamText` + `@ai-sdk/google`) and the client consumes it via `useChat` + `DefaultChatTransport`. Wire format is the AI SDK's UI-message stream — not SSE and not a custom newline-delimited protocol.

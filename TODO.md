@@ -17,7 +17,6 @@ list of todos
   - keep `category.type` as a default for the txn form's type toggle and for picker sort order
   - statistics / pie chart need to pick which bucket to show (income vs expense)
 
-- [ ] consolidate to a single `src/app/layout.tsx` — `(auth)` and `(dashboard)` layouts each render `<html>`/`<body>` with duplicated Clerk/Convex/Theme/font providers; drift is inevitable
 - [ ] wrap data-dependent sections in `<Suspense>` with skeletons (route-level `error.tsx` already in place for `(auth)` and `(dashboard)`)
 - [ ] consider virtualization (`react-window` / `@tanstack/react-virtual`) for paginated transaction lists once data volume warrants it
 - [ ] reduce pervasive `"use client"` (66 files) — keep providers/interactive shells client, push pages toward server-first
