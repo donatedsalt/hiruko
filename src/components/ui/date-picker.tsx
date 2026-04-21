@@ -76,11 +76,11 @@ function DatePicker({
         </PopoverContent>
       </Popover>
 
-      {name && date && (
+      {name && (
         <input
           type="hidden"
           name={name}
-          value={toDateInputValue(date)}
+          value={date ? toDateInputValue(date) : ""}
           disabled={disabled}
         />
       )}

@@ -100,13 +100,14 @@ export default function Page() {
         categories?.find((cat) => cat._id === transaction.categoryId),
       );
 
-      const date = new Date(transaction.transactionTime)
-        .toISOString()
-        .split("T")[0];
-      const time = new Date(transaction.transactionTime)
-        .toTimeString()
-        .slice(0, 5);
-      setTxnTime({ date: date, time: time });
+      const txnDate = new Date(transaction.transactionTime);
+      if (Number.isFinite(txnDate.getTime())) {
+        const date = txnDate.toISOString().split("T")[0];
+        const time = txnDate.toTimeString().slice(0, 5);
+        setTxnTime({ date, time });
+      } else {
+        setTxnTime({ date: "", time: "" });
+      }
     }
   }, [transaction, categories]);
 

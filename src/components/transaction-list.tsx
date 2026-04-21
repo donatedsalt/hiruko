@@ -10,10 +10,15 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { EmptyState, ListItem, ListItemSkeleton } from "./list-item";
 
+const UNKNOWN_DATE = "Unknown date";
+
 // TODO: use the already defined groupByDay convex function
 function groupByDay(transactions: Transaction[]) {
   return transactions.reduce((groupedTransactions, transaction) => {
-    const dateStr = new Date(transaction.transactionTime).toLocaleDateString();
+    const d = new Date(transaction.transactionTime);
+    const dateStr = Number.isFinite(d.getTime())
+      ? d.toLocaleDateString()
+      : UNKNOWN_DATE;
     if (!groupedTransactions[dateStr]) groupedTransactions[dateStr] = [];
     groupedTransactions[dateStr].push(transaction);
     return groupedTransactions;
@@ -22,6 +27,7 @@ function groupByDay(transactions: Transaction[]) {
 
 function formatDisplayDate(dateStr: string) {
   const date = new Date(dateStr);
+  if (!Number.isFinite(date.getTime())) return dateStr;
   const today = new Date();
   const yesterday = new Date();
   yesterday.setDate(today.getDate() - 1);
@@ -65,9 +71,14 @@ export function RenderGroupedList({
   const grouped = useMemo(() => groupByDay(transactions), [transactions]);
   const dates = useMemo(
     () =>
-      Object.keys(grouped).sort(
-        (a, b) => new Date(b).getTime() - new Date(a).getTime(),
-      ),
+      Object.keys(grouped).sort((a, b) => {
+        const ta = new Date(b).getTime();
+        const tb = new Date(a).getTime();
+        return (
+          (Number.isFinite(ta) ? ta : -Infinity) -
+          (Number.isFinite(tb) ? tb : -Infinity)
+        );
+      }),
     [grouped],
   );
 

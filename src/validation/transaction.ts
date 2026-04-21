@@ -29,7 +29,9 @@ export const TransactionSchema = z
     note: z.string().optional().default(""),
     type: z.enum(["income", "expense"]),
     amount: z.number().positive("Amount must be a positive number."),
-    transactionTime: z.number(),
+    transactionTime: z
+      .number()
+      .refine(Number.isFinite, "Date and time are required."),
     updatedAt: z.number().optional(),
   })
   .strict();
