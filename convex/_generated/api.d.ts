@@ -23,6 +23,8 @@ import type * as users_mutations from "../users/mutations.js";
 import type * as users_queries from "../users/queries.js";
 import type * as utils_auth from "../utils/auth.js";
 import type * as utils_db_accounts from "../utils/db/accounts.js";
+import type * as utils_db_transactions from "../utils/db/transactions.js";
+import type * as utils_limits from "../utils/limits.js";
 
 import type {
   ApiFromModules,
@@ -46,6 +48,8 @@ declare const fullApi: ApiFromModules<{
   "users/queries": typeof users_queries;
   "utils/auth": typeof utils_auth;
   "utils/db/accounts": typeof utils_db_accounts;
+  "utils/db/transactions": typeof utils_db_transactions;
+  "utils/limits": typeof utils_limits;
 }>;
 
 /**
