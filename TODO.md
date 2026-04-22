@@ -27,7 +27,6 @@ list of todos
 - [ ] allow toggling `category.type` (income ↔ expense) instead of forcing delete + recreate — `src/components/category-dialog.tsx`
 - [ ] extract a shared form hook (or adopt react-hook-form) for category/budget/goal/transaction dialogs — surface field-level errors instead of single-issue toasts
 - [ ] hoist `AddBudgetCard` / `AddGoalCard` / add-mode `CategoryDialog` bodies into a global provider so the command bar can open them without route navigation — replaces the `?new=1` query-param auto-open pattern used in v1
-- [ ] separate the type toggle from the category select on `transactions/new` so manual type choices aren't silently overwritten when the category changes — `src/app/(dashboard)/transactions/new/page.tsx:186`
 
 ## Performance
 

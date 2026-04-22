@@ -55,7 +55,10 @@ export default function Page() {
 
   const txnAccount = txnAccountState ?? accounts?.[0]?._id ?? "";
   const txnCategory = txnCategoryState ?? categories?.[0]?._id ?? "";
-  const txnType = txnTypeState ?? categories?.[0]?.type ?? "expense";
+  const txnType =
+    txnTypeState ??
+    categories?.find((c) => c._id === txnCategory)?.type ??
+    "expense";
 
   useEffect(() => {
     if (accounts && accounts.length === 0) {
@@ -151,11 +154,7 @@ export default function Page() {
                 <Select
                   name="categoryId"
                   value={txnCategory}
-                  onValueChange={(catId: CategoryId) => {
-                    const cat = categories.find((cat) => cat._id === catId);
-                    setTxnCategory(catId);
-                    setTxnType(cat?.type || "expense");
-                  }}
+                  onValueChange={(catId: CategoryId) => setTxnCategory(catId)}
                   required
                 >
                   <SelectTrigger className="w-full">
@@ -186,11 +185,7 @@ export default function Page() {
             <ToggleGroup
               type="single"
               value={txnType}
-              onValueChange={(type: "income" | "expense") => {
-                const cat = categories?.find((cat) => cat.type === type);
-                setTxnType(type);
-                setTxnCategory(cat?._id || "");
-              }}
+              onValueChange={(type: "income" | "expense") => setTxnType(type)}
             >
               <ToggleGroupItem
                 value="expense"
