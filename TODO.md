@@ -36,8 +36,6 @@ list of todos
 
 ## Security
 
-- [ ] add a Content-Security-Policy (with Clerk + Convex allowlists) — start in Report-Only mode and promote once clean. `next.config.ts` already has baseline headers.
-
 ## UX
 
 - [ ] first-run onboarding flow after Clerk webhook seeds Cash account + default categories — dashboard and `transactions/new` redirect path are confusing for empty state
