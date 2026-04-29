@@ -26,6 +26,14 @@ import { TransactionSchema } from "@/validation/transaction";
 import { useSmartRouter } from "@/hooks/use-smart-router";
 
 import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
+import {
   Dialog,
   DialogTrigger,
   DialogContent,
@@ -40,6 +48,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import Link from "next/link";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -201,6 +210,21 @@ export default function Page() {
       <SiteHeader title="Edit Transaction" />
 
       <main className="flex flex-1 flex-col">
+        <Breadcrumb className="px-4 pt-4 md:px-6 md:pt-6">
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink asChild>
+                <Link href="/transactions">Transactions</Link>
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbPage>
+                {transaction?.title || "Transaction"}
+              </BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
         {loading ? (
           <div className="text-muted-foreground flex h-full items-center justify-center gap-2">
             <IconLoader2 className="animate-spin" />
