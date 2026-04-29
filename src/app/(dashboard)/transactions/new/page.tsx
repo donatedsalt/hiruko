@@ -25,7 +25,6 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Skeleton } from "@/components/ui/skeleton";
 import { SiteHeader } from "@/components/site-header";
-import { DatePicker } from "@/components/ui/date-picker";
 import { ErrorMessage } from "@/components/error-message";
 import { CategoryDialog } from "@/components/category-dialog";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
@@ -82,10 +81,9 @@ export default function Page() {
     const type = formData.get("type") as "income" | "expense";
     const title = formData.get("title") as string;
     const note = formData.get("note") as string;
-    const date = formData.get("date") as string;
-    const time = formData.get("time") as string;
+    const transactionTimeRaw = formData.get("transactionTime") as string;
 
-    const transactionTime = new Date(`${date}T${time}`).getTime();
+    const transactionTime = new Date(transactionTimeRaw).getTime();
 
     const payload = {
       accountId,
@@ -132,8 +130,9 @@ export default function Page() {
     }
   };
 
-  const currentDate = new Date().toISOString().split("T")[0]; // YYYY-MM-DD
-  const currentTime = new Date().toTimeString().slice(0, 5); // HH:MM
+  const now = new Date();
+  const pad = (n: number) => String(n).padStart(2, "0");
+  const currentDateTime = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}T${pad(now.getHours())}:${pad(now.getMinutes())}`;
 
   return (
     <>
@@ -327,25 +326,17 @@ export default function Page() {
               className="resize-none"
             />
           </div>
-          <div className="grid gap-6 sm:grid-cols-2">
-            <div className="grid gap-3 *:w-full">
-              <Label htmlFor="date">
-                Date<span className="text-destructive">*</span>
-              </Label>
-              <DatePicker id="date" name="date" defaultValue={currentDate} />
-            </div>
-            <div className="grid gap-3 *:w-full">
-              <Label htmlFor="time">
-                Time<span className="text-destructive">*</span>
-              </Label>
-              <Input
-                id="time"
-                name="time"
-                type="time"
-                defaultValue={currentTime}
-                required
-              />
-            </div>
+          <div className="grid gap-3 *:w-full">
+            <Label htmlFor="transactionTime">
+              Date &amp; Time<span className="text-destructive">*</span>
+            </Label>
+            <Input
+              id="transactionTime"
+              name="transactionTime"
+              type="datetime-local"
+              defaultValue={currentDateTime}
+              required
+            />
           </div>
           <div className="flex flex-col-reverse justify-end gap-3 sm:flex-row">
             <Button
