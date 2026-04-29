@@ -24,6 +24,16 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import {
   Card,
   CardHeader,
   CardTitle,
@@ -94,6 +104,7 @@ function GoalCardInner({ goal }: { goal: Goal }) {
     try {
       await deleteGoal({ id: goal._id });
       toast.success("Goal deleted");
+      setShowConfirmDelete(false);
       setOpen(false);
     } catch (err: unknown) {
       const message =
@@ -107,70 +118,53 @@ function GoalCardInner({ goal }: { goal: Goal }) {
   };
 
   return (
-    <Dialog
-      open={open}
-      onOpenChange={(val) => {
-        if (showConfirmDelete && val === false) {
-          setShowConfirmDelete(false);
-          return;
-        }
-        if (!val) formRef.current?.reset();
-        setOpen(val);
-      }}
-    >
-      <DialogTrigger asChild>
-        <Card
-          key={goal._id}
-          className="from-primary/5 to-card dark:bg-card min-h-36 shrink-0 cursor-pointer justify-center gap-3 bg-gradient-to-t p-6 shadow-xs select-none"
-        >
-          <CardHeader className="@container-normal">
-            <CardTitle className="text-muted-foreground text-xl font-semibold">
-              {goal.name}
-            </CardTitle>
-            <CardDescription className="text-foreground text-2xl font-semibold tabular-nums">
-              <p>
-                {formatCurrency(goal.saved)} / {formatCurrency(goal.amount)}{" "}
-                used
+    <>
+      <Dialog
+        open={open}
+        onOpenChange={(val) => {
+          if (!val) formRef.current?.reset();
+          setOpen(val);
+        }}
+      >
+        <DialogTrigger asChild>
+          <Card
+            key={goal._id}
+            className="from-primary/5 to-card dark:bg-card min-h-36 shrink-0 cursor-pointer justify-center gap-3 bg-gradient-to-t p-6 shadow-xs select-none"
+          >
+            <CardHeader className="@container-normal">
+              <CardTitle className="text-muted-foreground text-xl font-semibold">
+                {goal.name}
+              </CardTitle>
+              <CardDescription className="text-foreground text-2xl font-semibold tabular-nums">
+                <p>
+                  {formatCurrency(goal.saved)} / {formatCurrency(goal.amount)}{" "}
+                  used
+                </p>
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Progress
+                value={Math.min(100, (goal.saved / goal.amount) * 100)}
+              />
+            </CardContent>
+            <CardFooter>
+              <p className="text-muted-foreground text-base font-semibold tabular-nums">
+                {goal.amount - goal.saved >= 0
+                  ? `${formatCurrency(goal.amount - goal.saved)} left`
+                  : `Over goal by ${formatCurrency(Math.abs(goal.amount - goal.saved))}`}
               </p>
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Progress value={Math.min(100, (goal.saved / goal.amount) * 100)} />
-          </CardContent>
-          <CardFooter>
-            <p className="text-muted-foreground text-base font-semibold tabular-nums">
-              {goal.amount - goal.saved >= 0
-                ? `${formatCurrency(goal.amount - goal.saved)} left`
-                : `Over goal by ${formatCurrency(Math.abs(goal.amount - goal.saved))}`}
-            </p>
-          </CardFooter>
-        </Card>
-      </DialogTrigger>
-      <DialogContent>
-        <form ref={formRef} onSubmit={handleSubmit} className="grid gap-4">
-          <DialogHeader>
-            <DialogTitle>
-              {showConfirmDelete ? "Delete Goal" : "Edit Goal"}
-            </DialogTitle>
-            <DialogDescription>
-              {showConfirmDelete ? (
-                <>
-                  <span>
-                    Are you sure? This will delete the goal and remove goal from
-                    associated transactions.
-                  </span>
-                  <br />
-                  <span className="text-destructive">
-                    {goal.transactionCount} Transactions will be updated
-                  </span>
-                </>
-              ) : (
-                "Update your goal details below."
-              )}
-            </DialogDescription>
-          </DialogHeader>
+            </CardFooter>
+          </Card>
+        </DialogTrigger>
+        <DialogContent>
+          <form ref={formRef} onSubmit={handleSubmit} className="grid gap-4">
+            <DialogHeader>
+              <DialogTitle>Edit Goal</DialogTitle>
+              <DialogDescription>
+                Update your goal details below.
+              </DialogDescription>
+            </DialogHeader>
 
-          {!showConfirmDelete && (
             <div className="grid gap-4">
               <div className="grid gap-3">
                 <Label htmlFor="name">Name</Label>
@@ -195,58 +189,73 @@ function GoalCardInner({ goal }: { goal: Goal }) {
                 />
               </div>
             </div>
-          )}
 
-          <DialogFooter className="mt-4 justify-between!">
-            {!showConfirmDelete ? (
-              <>
-                <Button
-                  type="button"
-                  variant="destructive"
-                  onClick={() => setShowConfirmDelete(true)}
-                  disabled={isSubmitting}
-                >
-                  Delete
-                </Button>
-                <div className="flex flex-col-reverse gap-2 sm:flex-row">
-                  <DialogClose asChild>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      disabled={isSubmitting}
-                    >
-                      Cancel
-                    </Button>
-                  </DialogClose>
-                  <Button type="submit" disabled={isSubmitting}>
-                    Save changes
+            <DialogFooter className="mt-4 justify-between!">
+              <Button
+                type="button"
+                variant="destructive"
+                onClick={() => {
+                  setOpen(false);
+                  setShowConfirmDelete(true);
+                }}
+                disabled={isSubmitting}
+              >
+                Delete
+              </Button>
+              <div className="flex flex-col-reverse gap-2 sm:flex-row">
+                <DialogClose asChild>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    disabled={isSubmitting}
+                  >
+                    Cancel
                   </Button>
-                </div>
-              </>
-            ) : (
-              <div className="flex grow flex-col-reverse justify-end gap-2 sm:flex-row">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => setShowConfirmDelete(false)}
-                  disabled={isSubmitting}
-                >
-                  Cancel
-                </Button>
-                <Button
-                  type="button"
-                  variant="destructive"
-                  onClick={handleDelete}
-                  disabled={isSubmitting || !done}
-                >
-                  {done ? "Confirm Delete" : `Confirm in ${count}s`}
+                </DialogClose>
+                <Button type="submit" disabled={isSubmitting}>
+                  Save changes
                 </Button>
               </div>
-            )}
-          </DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      <AlertDialog open={showConfirmDelete} onOpenChange={setShowConfirmDelete}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Goal</AlertDialogTitle>
+            <AlertDialogDescription asChild>
+              <div>
+                <span>
+                  Are you sure? This will delete the goal and remove goal from
+                  associated transactions.
+                </span>
+                <br />
+                <span className="text-destructive">
+                  {goal.transactionCount} Transactions will be updated
+                </span>
+              </div>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isSubmitting}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              variant="destructive"
+              onClick={(e) => {
+                e.preventDefault();
+                handleDelete();
+              }}
+              disabled={isSubmitting || !done}
+            >
+              {done ? "Confirm Delete" : `Confirm in ${count}s`}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   );
 }
 
