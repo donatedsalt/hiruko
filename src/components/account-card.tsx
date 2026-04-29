@@ -30,6 +30,16 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -91,6 +101,7 @@ function AccountCardInner({ account }: { account: Account }) {
     try {
       await deleteAccount({ id: account._id });
       toast.success("Account deleted");
+      setShowConfirmDelete(false);
       setOpen(false);
     } catch (err: unknown) {
       const message =
@@ -104,61 +115,37 @@ function AccountCardInner({ account }: { account: Account }) {
   };
 
   return (
-    <Dialog
-      open={open}
-      onOpenChange={(val) => {
-        if (showConfirmDelete && val === false) {
-          setShowConfirmDelete(false);
-          return;
-        }
-        setOpen(val);
-      }}
-    >
-      <DialogTrigger asChild>
-        <Card className="from-primary/5 to-card dark:bg-card min-h-36 shrink-0 cursor-pointer justify-center gap-3 bg-gradient-to-t p-6 shadow-xs select-none">
-          <CardHeader className="@container-normal">
-            <CardTitle className="text-muted-foreground text-xl font-semibold">
-              {account.name}
-            </CardTitle>
-            <CardDescription className="text-foreground text-2xl font-semibold tabular-nums">
-              {account.balance.toLocaleString("en-US", {
-                style: "currency",
-                currency: "USD",
-              })}
-            </CardDescription>
-          </CardHeader>
-          <CardFooter className="text-sm">
-            <p className="text-muted-foreground">
-              {account.transactionCount} Transactions
-            </p>
-          </CardFooter>
-        </Card>
-      </DialogTrigger>
-      <DialogContent>
-        <form onSubmit={handleSubmit} className="grid gap-4">
-          <DialogHeader>
-            <DialogTitle>
-              {showConfirmDelete ? "Delete Account" : "Edit Account"}
-            </DialogTitle>
-            <DialogDescription>
-              {showConfirmDelete ? (
-                <>
-                  <span>
-                    Are you sure? This will delete the account and its
-                    transactions.
-                  </span>
-                  <br />
-                  <span className="text-destructive">
-                    {account.transactionCount} Transactions will be deleted
-                  </span>
-                </>
-              ) : (
-                "Update your account details below."
-              )}
-            </DialogDescription>
-          </DialogHeader>
+    <>
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogTrigger asChild>
+          <Card className="from-primary/5 to-card dark:bg-card min-h-36 shrink-0 cursor-pointer justify-center gap-3 bg-gradient-to-t p-6 shadow-xs select-none">
+            <CardHeader className="@container-normal">
+              <CardTitle className="text-muted-foreground text-xl font-semibold">
+                {account.name}
+              </CardTitle>
+              <CardDescription className="text-foreground text-2xl font-semibold tabular-nums">
+                {account.balance.toLocaleString("en-US", {
+                  style: "currency",
+                  currency: "USD",
+                })}
+              </CardDescription>
+            </CardHeader>
+            <CardFooter className="text-sm">
+              <p className="text-muted-foreground">
+                {account.transactionCount} Transactions
+              </p>
+            </CardFooter>
+          </Card>
+        </DialogTrigger>
+        <DialogContent>
+          <form onSubmit={handleSubmit} className="grid gap-4">
+            <DialogHeader>
+              <DialogTitle>Edit Account</DialogTitle>
+              <DialogDescription>
+                Update your account details below.
+              </DialogDescription>
+            </DialogHeader>
 
-          {!showConfirmDelete && (
             <div className="grid gap-4">
               <div className="grid gap-3">
                 <Label htmlFor="name">Name</Label>
@@ -183,58 +170,73 @@ function AccountCardInner({ account }: { account: Account }) {
                 />
               </div>
             </div>
-          )}
 
-          <DialogFooter className="mt-4 justify-between!">
-            {!showConfirmDelete ? (
-              <>
-                <Button
-                  type="button"
-                  variant="destructive"
-                  onClick={() => setShowConfirmDelete(true)}
-                  disabled={isSubmitting}
-                >
-                  Delete
-                </Button>
-                <div className="flex flex-col-reverse gap-2 sm:flex-row">
-                  <DialogClose asChild>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      disabled={isSubmitting}
-                    >
-                      Cancel
-                    </Button>
-                  </DialogClose>
-                  <Button type="submit" disabled={isSubmitting}>
-                    Save changes
+            <DialogFooter className="mt-4 justify-between!">
+              <Button
+                type="button"
+                variant="destructive"
+                onClick={() => {
+                  setOpen(false);
+                  setShowConfirmDelete(true);
+                }}
+                disabled={isSubmitting}
+              >
+                Delete
+              </Button>
+              <div className="flex flex-col-reverse gap-2 sm:flex-row">
+                <DialogClose asChild>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    disabled={isSubmitting}
+                  >
+                    Cancel
                   </Button>
-                </div>
-              </>
-            ) : (
-              <div className="flex grow flex-col-reverse justify-end gap-2 sm:flex-row">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => setShowConfirmDelete(false)}
-                  disabled={isSubmitting}
-                >
-                  Cancel
-                </Button>
-                <Button
-                  type="button"
-                  variant="destructive"
-                  onClick={handleDelete}
-                  disabled={isSubmitting || !done}
-                >
-                  {done ? "Confirm Delete" : `Confirm in ${count}s`}
+                </DialogClose>
+                <Button type="submit" disabled={isSubmitting}>
+                  Save changes
                 </Button>
               </div>
-            )}
-          </DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      <AlertDialog open={showConfirmDelete} onOpenChange={setShowConfirmDelete}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Account</AlertDialogTitle>
+            <AlertDialogDescription asChild>
+              <div>
+                <span>
+                  Are you sure? This will delete the account and its
+                  transactions.
+                </span>
+                <br />
+                <span className="text-destructive">
+                  {account.transactionCount} Transactions will be deleted
+                </span>
+              </div>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isSubmitting}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              variant="destructive"
+              onClick={(e) => {
+                e.preventDefault();
+                handleDelete();
+              }}
+              disabled={isSubmitting || !done}
+            >
+              {done ? "Confirm Delete" : `Confirm in ${count}s`}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   );
 }
 

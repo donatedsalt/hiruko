@@ -24,6 +24,16 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import {
   Card,
   CardHeader,
   CardTitle,
@@ -92,6 +102,7 @@ function BudgetCardInner({ budget }: { budget: Budget }) {
     try {
       await deleteBudget({ id: budget._id });
       toast.success("Budget deleted");
+      setShowConfirmDelete(false);
       setOpen(false);
     } catch (err) {
       toast.error("Something went wrong!", {
@@ -103,72 +114,53 @@ function BudgetCardInner({ budget }: { budget: Budget }) {
   };
 
   return (
-    <Dialog
-      open={open}
-      onOpenChange={(val) => {
-        if (showConfirmDelete && val === false) {
-          setShowConfirmDelete(false);
-          return;
-        }
-        if (!val) formRef.current?.reset();
-        setOpen(val);
-      }}
-    >
-      <DialogTrigger asChild>
-        <Card
-          key={budget._id}
-          className="from-primary/5 to-card dark:bg-card min-h-36 shrink-0 cursor-pointer justify-center gap-3 bg-linear-to-t p-6 shadow-xs select-none"
-        >
-          <CardHeader className="@container-normal">
-            <CardTitle className="text-muted-foreground text-xl font-semibold">
-              {budget.name}
-            </CardTitle>
-            <CardDescription className="text-foreground text-2xl font-semibold tabular-nums">
-              <p>
-                {formatCurrency(budget.spent)} / {formatCurrency(budget.amount)}{" "}
-                used
+    <>
+      <Dialog
+        open={open}
+        onOpenChange={(val) => {
+          if (!val) formRef.current?.reset();
+          setOpen(val);
+        }}
+      >
+        <DialogTrigger asChild>
+          <Card
+            key={budget._id}
+            className="from-primary/5 to-card dark:bg-card min-h-36 shrink-0 cursor-pointer justify-center gap-3 bg-linear-to-t p-6 shadow-xs select-none"
+          >
+            <CardHeader className="@container-normal">
+              <CardTitle className="text-muted-foreground text-xl font-semibold">
+                {budget.name}
+              </CardTitle>
+              <CardDescription className="text-foreground text-2xl font-semibold tabular-nums">
+                <p>
+                  {formatCurrency(budget.spent)} /{" "}
+                  {formatCurrency(budget.amount)} used
+                </p>
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Progress
+                value={Math.min(100, (budget.spent / budget.amount) * 100)}
+              />
+            </CardContent>
+            <CardFooter>
+              <p className="text-muted-foreground text-base font-semibold tabular-nums">
+                {budget.amount - budget.spent >= 0
+                  ? `${formatCurrency(budget.amount - budget.spent)} left`
+                  : `Over budget by ${formatCurrency(Math.abs(budget.amount - budget.spent))}`}
               </p>
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Progress
-              value={Math.min(100, (budget.spent / budget.amount) * 100)}
-            />
-          </CardContent>
-          <CardFooter>
-            <p className="text-muted-foreground text-base font-semibold tabular-nums">
-              {budget.amount - budget.spent >= 0
-                ? `${formatCurrency(budget.amount - budget.spent)} left`
-                : `Over budget by ${formatCurrency(Math.abs(budget.amount - budget.spent))}`}
-            </p>
-          </CardFooter>
-        </Card>
-      </DialogTrigger>
-      <DialogContent>
-        <form ref={formRef} onSubmit={handleSubmit} className="grid gap-4">
-          <DialogHeader>
-            <DialogTitle>
-              {showConfirmDelete ? "Delete Budget" : "Edit Budget"}
-            </DialogTitle>
-            <DialogDescription>
-              {showConfirmDelete ? (
-                <>
-                  <span>
-                    Are you sure? This will delete the budget and remove budget
-                    from associated transactions.
-                  </span>
-                  <br />
-                  <span className="text-destructive">
-                    {budget.transactionCount} Transactions will be updated
-                  </span>
-                </>
-              ) : (
-                "Update your budget details below."
-              )}
-            </DialogDescription>
-          </DialogHeader>
+            </CardFooter>
+          </Card>
+        </DialogTrigger>
+        <DialogContent>
+          <form ref={formRef} onSubmit={handleSubmit} className="grid gap-4">
+            <DialogHeader>
+              <DialogTitle>Edit Budget</DialogTitle>
+              <DialogDescription>
+                Update your budget details below.
+              </DialogDescription>
+            </DialogHeader>
 
-          {!showConfirmDelete && (
             <div className="grid gap-4">
               <div className="grid gap-3">
                 <Label htmlFor="name">Name</Label>
@@ -193,58 +185,73 @@ function BudgetCardInner({ budget }: { budget: Budget }) {
                 />
               </div>
             </div>
-          )}
 
-          <DialogFooter className="mt-4 justify-between!">
-            {!showConfirmDelete ? (
-              <>
-                <Button
-                  type="button"
-                  variant="destructive"
-                  onClick={() => setShowConfirmDelete(true)}
-                  disabled={isSubmitting}
-                >
-                  Delete
-                </Button>
-                <div className="flex flex-col-reverse gap-2 sm:flex-row">
-                  <DialogClose asChild>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      disabled={isSubmitting}
-                    >
-                      Cancel
-                    </Button>
-                  </DialogClose>
-                  <Button type="submit" disabled={isSubmitting}>
-                    Save changes
+            <DialogFooter className="mt-4 justify-between!">
+              <Button
+                type="button"
+                variant="destructive"
+                onClick={() => {
+                  setOpen(false);
+                  setShowConfirmDelete(true);
+                }}
+                disabled={isSubmitting}
+              >
+                Delete
+              </Button>
+              <div className="flex flex-col-reverse gap-2 sm:flex-row">
+                <DialogClose asChild>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    disabled={isSubmitting}
+                  >
+                    Cancel
                   </Button>
-                </div>
-              </>
-            ) : (
-              <div className="flex grow flex-col-reverse justify-end gap-2 sm:flex-row">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => setShowConfirmDelete(false)}
-                  disabled={isSubmitting}
-                >
-                  Cancel
-                </Button>
-                <Button
-                  type="button"
-                  variant="destructive"
-                  onClick={handleDelete}
-                  disabled={isSubmitting || !done}
-                >
-                  {done ? "Confirm Delete" : `Confirm in ${count}s`}
+                </DialogClose>
+                <Button type="submit" disabled={isSubmitting}>
+                  Save changes
                 </Button>
               </div>
-            )}
-          </DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      <AlertDialog open={showConfirmDelete} onOpenChange={setShowConfirmDelete}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Budget</AlertDialogTitle>
+            <AlertDialogDescription asChild>
+              <div>
+                <span>
+                  Are you sure? This will delete the budget and remove budget
+                  from associated transactions.
+                </span>
+                <br />
+                <span className="text-destructive">
+                  {budget.transactionCount} Transactions will be updated
+                </span>
+              </div>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isSubmitting}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              variant="destructive"
+              onClick={(e) => {
+                e.preventDefault();
+                handleDelete();
+              }}
+              disabled={isSubmitting || !done}
+            >
+              {done ? "Confirm Delete" : `Confirm in ${count}s`}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   );
 }
 

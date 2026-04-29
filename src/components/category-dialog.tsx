@@ -27,6 +27,16 @@ import {
   DialogHeader,
   DialogFooter,
 } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -134,6 +144,7 @@ export function CategoryDialog({
     try {
       await deleteCategory({ id: category!._id });
       toast.success("Category deleted");
+      setShowConfirmDelete(false);
       setOpen(false);
     } catch (err: unknown) {
       const message =
@@ -147,69 +158,50 @@ export function CategoryDialog({
   };
 
   return (
-    <Dialog
-      open={open}
-      onOpenChange={(val) => {
-        if (!val) resetForm();
-        setOpen(val);
-      }}
-    >
-      <DialogTrigger asChild>
-        {trigger ? (
-          trigger
-        ) : mode === "add" ? (
-          <Button
-            aria-label="Add category"
-            size="icon"
-            variant="outline"
-            disabled={disabled}
-          >
-            <IconPlus />
-          </Button>
-        ) : (
-          <Button
-            aria-label={`Edit ${category?.name ?? "category"}`}
-            size="icon"
-            variant="ghost"
-            disabled={disabled}
-          >
-            <IconEdit />
-          </Button>
-        )}
-      </DialogTrigger>
+    <>
+      <Dialog
+        open={open}
+        onOpenChange={(val) => {
+          if (!val) resetForm();
+          setOpen(val);
+        }}
+      >
+        <DialogTrigger asChild>
+          {trigger ? (
+            trigger
+          ) : mode === "add" ? (
+            <Button
+              aria-label="Add category"
+              size="icon"
+              variant="outline"
+              disabled={disabled}
+            >
+              <IconPlus />
+            </Button>
+          ) : (
+            <Button
+              aria-label={`Edit ${category?.name ?? "category"}`}
+              size="icon"
+              variant="ghost"
+              disabled={disabled}
+            >
+              <IconEdit />
+            </Button>
+          )}
+        </DialogTrigger>
 
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>
-            {mode === "edit"
-              ? showConfirmDelete
-                ? "Delete Category"
-                : "Edit Category"
-              : "Create Category"}
-          </DialogTitle>
-          <DialogDescription>
-            {mode === "edit" ? (
-              showConfirmDelete ? (
-                <>
-                  <span>
-                    Are you sure? This will delete the category and its
-                    transactions.
-                  </span>
-                  <br />
-                  <span className="text-destructive">
-                    {category?.transactionCount} Transactions will be deleted
-                  </span>
-                </>
-              ) : (
-                "Update the selected transaction category."
-              )
-            ) : (
-              "Create a new transaction category."
-            )}
-          </DialogDescription>
-        </DialogHeader>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              {mode === "edit" ? "Edit Category" : "Create Category"}
+            </DialogTitle>
+            <DialogDescription>
+              {mode === "edit"
+                ? "Update the selected transaction category."
+                : "Create a new transaction category."}
+            </DialogDescription>
+          </DialogHeader>
 
-        {!showConfirmDelete && (
           <div className="grid gap-4">
             <div className="grid gap-3 *:w-full">
               <Label htmlFor="type">
@@ -263,63 +255,78 @@ export function CategoryDialog({
               </div>
             </div>
           </div>
-        )}
 
-        <DialogFooter className="mt-4 justify-between!">
-          {!showConfirmDelete ? (
-            <>
-              {mode === "edit" ? (
-                <Button
-                  type="button"
-                  variant="destructive"
-                  onClick={() => setShowConfirmDelete(true)}
-                  disabled={isSubmitting}
-                >
-                  Delete
-                </Button>
-              ) : (
-                <div></div>
-              )}
-              <div className="flex flex-col-reverse gap-2 sm:flex-row">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => setOpen(false)}
-                  disabled={isSubmitting}
-                >
-                  Cancel
-                </Button>
-                <Button
-                  type="button"
-                  onClick={handleSubmit}
-                  disabled={isSubmitting || !name.trim()}
-                >
-                  {mode === "edit" ? "Save Changes" : "Confirm"}
-                </Button>
-              </div>
-            </>
-          ) : (
-            <div className="flex grow flex-col-reverse justify-end gap-2 sm:flex-row">
+          <DialogFooter className="mt-4 justify-between!">
+            {mode === "edit" ? (
+              <Button
+                type="button"
+                variant="destructive"
+                onClick={() => {
+                  setOpen(false);
+                  setShowConfirmDelete(true);
+                }}
+                disabled={isSubmitting}
+              >
+                Delete
+              </Button>
+            ) : (
+              <div></div>
+            )}
+            <div className="flex flex-col-reverse gap-2 sm:flex-row">
               <Button
                 type="button"
                 variant="outline"
-                onClick={() => setShowConfirmDelete(false)}
+                onClick={() => setOpen(false)}
                 disabled={isSubmitting}
               >
                 Cancel
               </Button>
               <Button
                 type="button"
-                variant="destructive"
-                onClick={handleDelete}
-                disabled={isSubmitting || !done}
+                onClick={handleSubmit}
+                disabled={isSubmitting || !name.trim()}
               >
-                {done ? "Confirm Delete" : `Confirm in ${count}s`}
+                {mode === "edit" ? "Save Changes" : "Confirm"}
               </Button>
             </div>
-          )}
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <AlertDialog open={showConfirmDelete} onOpenChange={setShowConfirmDelete}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Category</AlertDialogTitle>
+            <AlertDialogDescription asChild>
+              <div>
+                <span>
+                  Are you sure? This will delete the category and its
+                  transactions.
+                </span>
+                <br />
+                <span className="text-destructive">
+                  {category?.transactionCount} Transactions will be deleted
+                </span>
+              </div>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isSubmitting}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              variant="destructive"
+              onClick={(e) => {
+                e.preventDefault();
+                handleDelete();
+              }}
+              disabled={isSubmitting || !done}
+            >
+              {done ? "Confirm Delete" : `Confirm in ${count}s`}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   );
 }
