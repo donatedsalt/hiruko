@@ -17,11 +17,11 @@
   },
   "lint-staged": {
     "*.{ts,tsx,js,jsx,mjs,cjs}": [
-      "prettier --write",
-      "eslint --fix --cache --cache-location node_modules/.cache/eslint/"
+      "prettier --write --cache --cache-location node_modules/.cache/.prettier-cache",
+      "eslint --fix --cache --cache-location node_modules/.cache/.eslintcache"
     ],
     "*.{md,json,yml,yaml,css}": [
-      "prettier --write"
+      "prettier --write --cache --cache-location node_modules/.cache/.prettier-cache"
     ]
   },
   "dependencies": {
