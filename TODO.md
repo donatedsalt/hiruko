@@ -44,14 +44,10 @@ list of todos
 - [ ] form validation: highlight invalid fields inline instead of toasting only the first issue — `src/app/(dashboard)/transactions/new/page.tsx:100-112` and other forms
 - [ ] mobile: stack toggle groups and audit floating button overlap on small screens (budget/goal/account edit dialogs)
 - [ ] PWA: add manifest screenshots, categories, larger icons (1024x1024), and an offline fallback / service worker — `src/app/manifest.ts`
-- [ ] add breadcrumbs on nested routes (e.g. `/transactions/[id]`)
-- [ ] combine separate date + time inputs into a single datetime picker on `transactions/new`
 - [ ] dark-mode WCAG AA contrast audit (Lighthouse), especially pie-chart palette
 - [ ] show impact preview on category delete (which budgets/goals lose associations) — `src/components/category-dialog.tsx:156-157`
 
 ## UI / Design
-
-- [ ] add `aria-describedby` to dialogs; use `alertdialog` role for destructive confirmations
 
 ---
 
