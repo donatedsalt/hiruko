@@ -466,6 +466,10 @@ function SidebarMenuItem({ className, ...props }: React.ComponentProps<"li">) {
   const { setOpenMobile } = useSidebar();
 
   return (
+    // Click delegated from the inner SidebarMenuButton (the real interactive
+    // element) to close the mobile sheet on any menu activation. Keyboard
+    // Enter/Space on the inner button still fires this via click bubbling.
+    // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-noninteractive-element-interactions
     <li
       data-slot="sidebar-menu-item"
       data-sidebar="menu-item"

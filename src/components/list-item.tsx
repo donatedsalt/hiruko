@@ -44,7 +44,7 @@ function ListItemInner({ href, icon, title, badge, amount }: ListItemProps) {
     );
   }
   return (
-    <li className={itemRowClass} tabIndex={0}>
+    <li className={itemRowClass}>
       <ItemBody icon={icon} title={title} badge={badge} amount={amount} />
     </li>
   );
